@@ -1,0 +1,18 @@
+[1mdiff --git a/README.md b/README.md[m
+[1mindex 70ef5d8..b8ded52 100644[m
+[1m--- a/README.md[m
+[1m+++ b/README.md[m
+[36m@@ -30,4 +30,6 @@[m [mtemplate/[m
+ - 各ライブラリに計算量と使用上の注意を記載する[m
+ - 追加したライブラリには、可能な限り対応する検証コードを用意する[m
+ [m
+[31m-具体的なアルゴリズムは今後追加します。[m
+[32m+[m[32m## ライブラリ[m
+[32m+[m
+[32m+[m[32m- `data_structure/fenwick_tree.hpp`: Fenwick Tree（点加算・区間和）[m
+[1mdiff --git a/library/data_structure/.gitkeep b/library/data_structure/.gitkeep[m
+[1mdeleted file mode 100644[m
+[1mindex e69de29..0000000[m
+[1mdiff --git a/verify/data_structure/.gitkeep b/verify/data_structure/.gitkeep[m
+[1mdeleted file mode 100644[m
+[1mindex e69de29..0000000[m
