@@ -1,0 +1,28 @@
+# Compiled binaries and object files
+*.exe
+*.out
+*.o
+*.obj
+*.a
+*.so
+*.dll
+
+# Build directories
+build/
+cmake-build-*/
+
+# Debug and profiling output
+*.dSYM/
+*.gcda
+*.gcno
+*.profraw
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local temporary files
+*.tmp
+*.log
