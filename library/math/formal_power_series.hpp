@@ -6,21 +6,18 @@
 
 #include <atcoder/convolution>
 
-// Formal Power Series
-//
-// 係数を昇べき順に保持する。
-// f[i] は x^i の係数。
-//
-// Mint:
-// - atcoder::static_modint など、四則演算・inv()・pow() を持つ型を想定する。
-// - 多項式積には atcoder::convolution を利用する。
-//
-// 主な計算量（次数 N）:
-// - 加減算: O(N)
-// - 乗算: O(N log N)
-// - inv / log / exp / pow: O(N log N)
-//
-// pre(n) は先頭 n 項、区間ではなく次数打ち切りを表す。
+/**
+ * @brief 形式的冪級数 (Formal Power Series)。
+ *
+ * 係数を昇べき順に保持し、f[i] は x^i の係数を表す。
+ * 多項式積には atcoder::convolution を利用する。
+ *
+ * @tparam Mint atcoder::static_modint など、四則演算・inv()・pow() を持つ型
+ * @note pre(n) は先頭 n 項を取り出し、次数を n 項で打ち切る操作を表す。
+ * @par Complexity
+ * 次数 N に対して、加減算 O(N)、乗算 O(N log N)、
+ * inv / log / exp / pow は O(N log N)。
+ */
 template <class Mint>
 struct FormalPowerSeries : std::vector<Mint> {
     using std::vector<Mint>::vector;
@@ -120,14 +117,28 @@ struct FormalPowerSeries : std::vector<Mint> {
         return *this;
     }
 
-    // x^k を掛ける。
+    /**
+     * @brief x^k を掛ける。
+     * @param k シフトする次数
+     * @return 自身への参照
+     * @pre k >= 0
+     * @par Complexity
+     * O(N + k)
+     */
     FPS& operator<<=(int k) {
         assert(k >= 0);
         this->insert(this->begin(), k, Mint(0));
         return *this;
     }
 
-    // x^k で割り、低次 k 項を捨てる。
+    /**
+     * @brief x^k で割り、低次 k 項を捨てる。
+     * @param k 捨てる低次項数
+     * @return 自身への参照
+     * @pre k >= 0
+     * @par Complexity
+     * O(N)
+     */
     FPS& operator>>=(int k) {
         assert(k >= 0);
         if (k >= static_cast<int>(this->size())) {
@@ -146,7 +157,12 @@ struct FormalPowerSeries : std::vector<Mint> {
         return res;
     }
 
-    // 商を求める。rhs は末尾係数が 0 でないこと。
+    /**
+     * @brief rhs で割った商を求める。
+     * @param rhs 除数
+     * @return 自身への参照
+     * @pre rhs は空でなく、最高次係数が 0 でないこと。
+     */
     FPS& operator/=(const FPS& rhs) {
         assert(!rhs.empty());
         assert(rhs.back() != Mint(0));
@@ -164,7 +180,12 @@ struct FormalPowerSeries : std::vector<Mint> {
         return normalize();
     }
 
-    // 剰余を求める。rhs は末尾係数が 0 でないこと。
+    /**
+     * @brief rhs で割った剰余を求める。
+     * @param rhs 除数
+     * @return 自身への参照
+     * @pre rhs は空でなく、最高次係数が 0 でないこと。
+     */
     FPS& operator%=(const FPS& rhs) {
         assert(!rhs.empty());
         assert(rhs.back() != Mint(0));
@@ -175,7 +196,13 @@ struct FormalPowerSeries : std::vector<Mint> {
         return normalize();
     }
 
-    // f'(x)
+    /**
+     * @brief f の形式微分を返す。
+     * @param f 微分する FPS
+     * @return f'(x)
+     * @par Complexity
+     * O(N)
+     */
     friend FPS diff(const FPS& f) {
         if (f.empty()) return {};
 
@@ -187,7 +214,13 @@ struct FormalPowerSeries : std::vector<Mint> {
         return res;
     }
 
-    // integral f(x) dx、積分定数は 0。
+    /**
+     * @brief f の形式積分を返す。積分定数は 0。
+     * @param f 積分する FPS
+     * @return integral f(x) dx
+     * @par Complexity
+     * O(N)
+     */
     friend FPS integrate(const FPS& f) {
         const int n = static_cast<int>(f.size());
         FPS res(n + 1, Mint(0));
@@ -198,8 +231,15 @@ struct FormalPowerSeries : std::vector<Mint> {
         return res;
     }
 
-    // 1 / f mod x^deg
-    // 前提: deg == 0 または f[0] != 0
+    /**
+     * @brief 1 / f mod x^deg を返す。
+     * @param f 逆数を求める FPS
+     * @param deg 打ち切る項数
+     * @return 1 / f mod x^deg
+     * @pre deg >= 0。deg > 0 なら f[0] != 0。
+     * @par Complexity
+     * O(deg log deg)
+     */
     friend FPS inv(const FPS& f, int deg) {
         assert(deg >= 0);
         if (deg == 0) return {};
@@ -220,8 +260,15 @@ struct FormalPowerSeries : std::vector<Mint> {
         return inv(f, static_cast<int>(f.size()));
     }
 
-    // log(f) mod x^deg
-    // 前提: deg == 0 または f[0] == 1
+    /**
+     * @brief log(f) mod x^deg を返す。
+     * @param f 対数を求める FPS
+     * @param deg 打ち切る項数
+     * @return log(f) mod x^deg
+     * @pre deg >= 0。deg > 0 なら f[0] == 1。
+     * @par Complexity
+     * O(deg log deg)
+     */
     friend FPS log(const FPS& f, int deg) {
         assert(deg >= 0);
         if (deg == 0) return {};
@@ -236,8 +283,15 @@ struct FormalPowerSeries : std::vector<Mint> {
         return log(f, static_cast<int>(f.size()));
     }
 
-    // exp(f) mod x^deg
-    // 前提: f が空、または f[0] == 0
+    /**
+     * @brief exp(f) mod x^deg を返す。
+     * @param f 指数関数を求める FPS
+     * @param deg 打ち切る項数
+     * @return exp(f) mod x^deg
+     * @pre deg >= 0。f が空、または f[0] == 0。
+     * @par Complexity
+     * O(deg log deg)
+     */
     friend FPS exp(const FPS& f, int deg) {
         assert(deg >= 0);
         if (deg == 0) return {};
@@ -258,8 +312,16 @@ struct FormalPowerSeries : std::vector<Mint> {
         return exp(f, static_cast<int>(f.size()));
     }
 
-    // f^k mod x^deg
-    // 前提: k >= 0
+    /**
+     * @brief f^k mod x^deg を返す。
+     * @param f 累乗する FPS
+     * @param k 指数
+     * @param deg 打ち切る項数
+     * @return f^k mod x^deg
+     * @pre k >= 0、deg >= 0
+     * @par Complexity
+     * O(deg log deg)
+     */
     friend FPS pow(const FPS& f, long long k, int deg) {
         assert(k >= 0);
         assert(deg >= 0);
