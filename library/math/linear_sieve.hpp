@@ -3,12 +3,23 @@
 #include <vector>
 #include <utility>
 
+/**
+ * @brief 線形篩で最小素因数と素数一覧を前計算する。
+ *
+ * @par Complexity
+ * 構築 O(N)、メモリ O(N)。
+ */
 struct LinearSieve {
     std::vector<int> lpf;
     std::vector<int> primes;
 
-    // 1..N の最小素因数と素数一覧を O(N) で前計算する。
-    // メモリ: O(N)
+    /**
+     * @brief 1..n の最小素因数と素数一覧を前計算する。
+     * @param n 前計算する最大値
+     * @pre n >= 0
+     * @par Complexity
+     * 時間 O(N)、メモリ O(N)。
+     */
     explicit LinearSieve(int n) : lpf(n + 1, 0) {
         for (int i = 2; i <= n; ++i) {
             if (lpf[i] == 0) {
@@ -23,8 +34,14 @@ struct LinearSieve {
         }
     }
 
-    // x を素因数分解し、(素因数, 指数) の列を返す。
-    // 前提: 1 <= x < lpf.size()
+    /**
+     * @brief x を素因数分解する。
+     * @param x 素因数分解する整数
+     * @return (素因数, 指数) の列
+     * @pre 1 <= x < lpf.size()
+     * @par Complexity
+     * O(log x)
+     */
     std::vector<std::pair<int, int>> factorize(int x) const {
         std::vector<std::pair<int, int>> res;
 
