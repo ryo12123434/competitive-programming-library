@@ -3,9 +3,14 @@
 #include <utility>
 #include <vector>
 
-// N を素因数分解し、(素因数, 指数) の列を返す。
-// 計算量: O(sqrt(N))
-// 前提: N >= 1
+/**
+ * @brief N を試し割りで素因数分解する。
+ * @param N 素因数分解する正整数
+ * @return (素因数, 指数) の列
+ * @pre N >= 1
+ * @par Complexity
+ * O(sqrt(N))
+ */
 inline std::vector<std::pair<long long, long long>> prime_factorize(long long N) {
     std::vector<std::pair<long long, long long>> res;
 
