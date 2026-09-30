@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} · {% endif %}{{ site.title }}</title>
+  <meta name="description" content="C++23 competitive programming library">
+  <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+  {% include mathjax.html %}
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="{{ '/' | relative_url }}">
+        <span class="brand__mark">CP</span>
+        <span class="brand__text">{{ site.title }}</span>
+      </a>
+      <nav class="site-nav">
+        <a href="{{ '/' | relative_url }}">Library</a>
+        <a href="{{ site.github.repository_url }}">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+    {{ content }}
+  </main>
+
+  <footer class="site-footer">
+    <div>Built from the repository with verification-helper.</div>
+  </footer>
+</body>
+</html>
