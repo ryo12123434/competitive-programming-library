@@ -1,0 +1,53 @@
+{% if page.data.dependsOn.size != 0 %}
+<section class="document-section">
+  <h2>Dependencies</h2>
+  <div class="link-list">
+    {% for item in page.data._extendedDependsOn %}
+      <a href="{{ item.path | append: '.html' | relative_url }}">{{ item.path }}</a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if page.data.requiredBy.size != 0 %}
+<section class="document-section">
+  <h2>Used by</h2>
+  <div class="link-list">
+    {% for item in page.data._extendedRequiredBy %}
+      <a href="{{ item.path | append: '.html' | relative_url }}">{{ item.path }}</a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if page.data.verifiedWith.size != 0 %}
+<section class="document-section">
+  <h2>Verification</h2>
+  <div class="link-list">
+    {% for item in page.data._extendedVerifiedWith %}
+      <a href="{{ item.path | append: '.html' | relative_url }}">{{ item.path }}</a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="document-section">
+  <div class="section-heading section-heading--compact">
+    <div>
+      <div class="eyebrow">Implementation</div>
+      <h2>Source Code</h2>
+    </div>
+  </div>
+
+  <script defer src="{{ '/assets/js/copy-button.js' | relative_url }}"></script>
+  <link rel="stylesheet" href="{{ '/assets/css/copy-button.css' | relative_url }}">
+
+  {% include highlight.html extension=page.data._pathExtension content=page.data.code %}
+
+  <details class="bundled-code">
+    <summary>Show bundled source</summary>
+    <div class="bundled-code__body">
+      {% include highlight.html extension=page.data._pathExtension content=page.data.bundledCode %}
+    </div>
+  </details>
+</section>
