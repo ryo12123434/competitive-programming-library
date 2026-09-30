@@ -2,10 +2,14 @@
 
 #include <vector>
 
-// 0..N が素数かどうかをエラトステネスの篩で求める。
-// 計算量: O(N log log N)
-// メモリ: O(N)
-// 前提: N >= 0
+/**
+ * @brief 0..n の素数判定表をエラトステネスの篩で構築する。
+ * @param n 判定する最大値
+ * @return is_prime[x] が x の素数判定を表す配列
+ * @pre n >= 0
+ * @par Complexity
+ * 時間 O(N log log N)、メモリ O(N)。
+ */
 inline std::vector<bool> eratosthenes(int n) {
     std::vector<bool> is_prime(n + 1, true);
 
