@@ -3,9 +3,14 @@
 #include <algorithm>
 #include <vector>
 
-// N の正の約数を昇順で列挙する。
-// 計算量: O(sqrt(N))
-// 前提: N >= 1
+/**
+ * @brief N の正の約数を昇順で列挙する。
+ * @param N 正整数
+ * @return N の正の約数を昇順に並べた列
+ * @pre N >= 1
+ * @par Complexity
+ * O(sqrt(N))
+ */
 inline std::vector<long long> calc_divisors(long long N) {
     std::vector<long long> res;
 
