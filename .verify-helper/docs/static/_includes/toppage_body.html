@@ -1,0 +1,139 @@
+{% assign library_count = 0 %}
+{% for category in page.data.libraryCategories %}
+  {% assign library_count = library_count | plus: category.pages.size %}
+{% endfor %}
+
+<section class="summary-strip">
+  <div class="summary-item">
+    <span class="summary-item__value">{{ library_count }}</span>
+    <span class="summary-item__label">Libraries</span>
+  </div>
+  <div class="summary-item">
+    <span class="summary-item__value">{{ page.data.libraryCategories.size }}</span>
+    <span class="summary-item__label">Categories</span>
+  </div>
+  <div class="summary-item">
+    <span class="summary-item__value">C++23</span>
+    <span class="summary-item__label">Standard</span>
+  </div>
+</section>
+
+<section class="section-block">
+  <div class="section-heading">
+    <div>
+      <div class="eyebrow">Browse by category</div>
+      <h2>Categories</h2>
+    </div>
+  </div>
+
+  <div class="category-grid">
+    {% for category in page.data.libraryCategories %}
+      {% assign category_key = category.name | remove: 'library/' %}
+      {% case category_key %}
+        {% when 'data_structure' %}
+          {% assign category_title = 'Data Structures' %}
+          {% assign category_desc = 'Fenwick Tree, Union-Find, Treap など' %}
+          {% assign category_code = 'DS' %}
+        {% when 'graph' %}
+          {% assign category_title = 'Graph' %}
+          {% assign category_desc = 'グラフ探索・最短路・木アルゴリズム' %}
+          {% assign category_code = 'GR' %}
+        {% when 'math' %}
+          {% assign category_title = 'Mathematics' %}
+          {% assign category_desc = '整数・組合せ・FPS など' %}
+          {% assign category_code = 'MA' %}
+        {% when 'string' %}
+          {% assign category_title = 'Strings' %}
+          {% assign category_desc = '文字列アルゴリズム・圧縮' %}
+          {% assign category_code = 'ST' %}
+        {% else %}
+          {% assign category_title = category_key | replace: '_', ' ' | capitalize %}
+          {% assign category_desc = 'Library category' %}
+          {% assign category_code = 'LB' %}
+      {% endcase %}
+
+      <a class="category-card" href="#category-{{ category_key }}">
+        <div class="category-card__top">
+          <span class="category-card__code">{{ category_code }}</span>
+          <span class="category-card__count">{{ category.pages.size }} items</span>
+        </div>
+        <h3>{{ category_title }}</h3>
+        <p>{{ category_desc }}</p>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section-block">
+  <div class="section-heading">
+    <div>
+      <div class="eyebrow">Library index</div>
+      <h2>All Libraries</h2>
+    </div>
+  </div>
+
+  {% for category in page.data.libraryCategories %}
+    {% assign category_key = category.name | remove: 'library/' %}
+    {% case category_key %}
+      {% when 'data_structure' %}
+        {% assign category_title = 'Data Structures' %}
+      {% when 'graph' %}
+        {% assign category_title = 'Graph' %}
+      {% when 'math' %}
+        {% assign category_title = 'Mathematics' %}
+      {% when 'string' %}
+        {% assign category_title = 'Strings' %}
+      {% else %}
+        {% assign category_title = category_key | replace: '_', ' ' | capitalize %}
+    {% endcase %}
+
+    <section class="library-group" id="category-{{ category_key }}">
+      <div class="library-group__header">
+        <h3>{{ category_title }}</h3>
+        <span>{{ category.pages.size }} libraries</span>
+      </div>
+
+      <div class="library-list">
+        {% for item in category.pages %}
+          {% assign display_name = item.path | split: '/' | last | remove: '.hpp' | remove: '.cpp' | replace: '_', ' ' | capitalize %}
+          <a class="library-row" href="{{ item.path | append: '.html' | relative_url }}">
+            <div>
+              <div class="library-row__name">{{ display_name }}</div>
+              <div class="library-row__path">{{ item.path }}</div>
+            </div>
+
+            {% if item.icon == ':heavy_check_mark:' %}
+              <span class="status status--verified">Verified</span>
+            {% elsif item.icon == ':x:' %}
+              <span class="status status--failed">Failed</span>
+            {% elsif item.icon == ':question:' %}
+              <span class="status status--partial">Partial</span>
+            {% else %}
+              <span class="status status--untested">Untested</span>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+</section>
+
+{% if page.data.verificationCategories.size != 0 %}
+<section class="section-block section-block--muted">
+  <details class="verification-details">
+    <summary>Verification sources</summary>
+    {% for category in page.data.verificationCategories %}
+      <div class="verification-group">
+        <h3>{{ category.name | remove: 'verify/' | replace: '_', ' ' | capitalize }}</h3>
+        <ul>
+          {% for item in category.pages %}
+            <li>
+              <a href="{{ item.path | append: '.html' | relative_url }}">{{ item.path | split: '/' | last }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endfor %}
+  </details>
+</section>
+{% endif %}
