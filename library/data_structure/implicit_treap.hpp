@@ -6,46 +6,38 @@
 #include <utility>
 #include <vector>
 
-// Implicit Treap
-//
-// 配列を暗黙の添字で管理する平衡二分木。
-// 挿入・削除・区間作用・区間積・反転・rotate を期待 O(log N) で行う。
-// vector からの構築は O(N)、to_vector() は O(N)。
-//
-// S:
-//   区間積を表す型。
-// op(a, b):
-//   S 上の結合的演算。
-// e():
-//   op の単位元。
-// F:
-//   S に作用する写像の型。
-// mapping(f, x, len):
-//   長さ len の区間積 x に f を作用させた結果。
-// composition(f, g):
-//   f(g(x)) を表す合成。ACL と同じ順序。
-// id():
-//   F の恒等写像。
-//
-// 区間 API はすべて半開区間 [l, r)。
-// reverse に対して非可換な op も扱えるよう、順方向・逆方向の積を両方保持する。
-//
-// 使用例: 区間加算・区間和
-//
-// long long op(long long a, long long b) { return a + b; }
-// long long e() { return 0; }
-// long long mapping(long long f, long long x, int len) {
-//     return x + f * len;
-// }
-// long long composition(long long f, long long g) {
-//     return f + g;
-// }
-// long long id() { return 0; }
-//
-// using Treap = ImplicitTreap<
-//     long long, op, e,
-//     long long, mapping, composition, id
-// >;
+/**
+ * @brief 配列を暗黙の添字で管理する Implicit Treap。
+ *
+ * 挿入・削除・区間作用・区間積・反転・rotate を扱う。
+ * reverse に対して非可換な op も扱えるよう、順方向・逆方向の積を両方保持する。
+ *
+ * @tparam S 区間積を表す型
+ * @tparam op S 上の結合的演算
+ * @tparam e op の単位元を返す関数
+ * @tparam F S に作用する写像の型
+ * @tparam mapping 長さ len の区間積 x に f を作用させる関数
+ * @tparam composition f(g(x)) を表す写像合成。ACL と同じ順序
+ * @tparam id F の恒等写像を返す関数
+ * @note 区間 API はすべて半開区間 [l, r)。
+ * @par Complexity
+ * vector からの構築 O(N)、to_vector O(N)、その他の主要操作は期待 O(log N)。
+ *
+ * @code
+ * long long op(long long a, long long b) { return a + b; }
+ * long long e() { return 0; }
+ * long long mapping(long long f, long long x, int len) {
+ *     return x + f * len;
+ * }
+ * long long composition(long long f, long long g) { return f + g; }
+ * long long id() { return 0; }
+ *
+ * using Treap = ImplicitTreap<
+ *     long long, op, e,
+ *     long long, mapping, composition, id
+ * >;
+ * @endcode
+ */
 template <class S, S (*op)(S, S), S (*e)(), class F,
           S (*mapping)(F, S, int), F (*composition)(F, F), F (*id)()>
 class ImplicitTreap {
@@ -227,7 +219,12 @@ public:
         root_ = nullptr;
     }
 
-    // O(N)
+    /**
+     * @brief vector の内容で木を再構築する。
+     * @param a 初期列
+     * @par Complexity
+     * O(N)
+     */
     void build(const std::vector<S>& a) {
         clear();
         if (a.empty()) return;
@@ -253,8 +250,14 @@ public:
         rebuild(root_);
     }
 
-    // pos の直前に x を挿入する。
-    // 0 <= pos <= size()
+    /**
+     * @brief pos の直前に x を挿入する。
+     * @param pos 挿入位置
+     * @param x 挿入する値
+     * @pre 0 <= pos <= size()
+     * @par Complexity
+     * 期待 O(log N)
+     */
     void insert(int pos, const S& x) {
         assert(0 <= pos && pos <= size());
 
@@ -262,7 +265,13 @@ public:
         root_ = merge(merge(a, new Node(x, rng())), b);
     }
 
-    // pos 番目を削除する。
+    /**
+     * @brief pos 番目の要素を削除する。
+     * @param pos 削除する位置
+     * @pre 0 <= pos < size()
+     * @par Complexity
+     * 期待 O(log N)
+     */
     void erase(int pos) {
         assert(0 <= pos && pos < size());
 
@@ -273,7 +282,14 @@ public:
         root_ = merge(a, c);
     }
 
-    // pos 番目を x に置き換える。
+    /**
+     * @brief pos 番目の要素を x に置き換える。
+     * @param pos 更新する位置
+     * @param x 新しい値
+     * @pre 0 <= pos < size()
+     * @par Complexity
+     * 期待 O(log N)
+     */
     void set(int pos, const S& x) {
         assert(0 <= pos && pos < size());
 
@@ -294,7 +310,15 @@ public:
         return prod(pos, pos + 1);
     }
 
-    // [l, r) の積を返す。
+    /**
+     * @brief 区間 [l, r) の積を返す。
+     * @param l 区間の左端
+     * @param r 区間の右端
+     * @return op による区間積
+     * @pre 0 <= l <= r <= size()
+     * @par Complexity
+     * 期待 O(log N)
+     */
     S prod(int l, int r) {
         assert(0 <= l && l <= r && r <= size());
         if (l == r) return e();
@@ -311,7 +335,15 @@ public:
         return prod(root_);
     }
 
-    // [l, r) に f を作用させる。
+    /**
+     * @brief 区間 [l, r) に写像 f を作用させる。
+     * @param l 区間の左端
+     * @param r 区間の右端
+     * @param f 適用する写像
+     * @pre 0 <= l <= r <= size()
+     * @par Complexity
+     * 期待 O(log N)
+     */
     void apply(int l, int r, const F& f) {
         assert(0 <= l && l <= r && r <= size());
         if (l == r) return;
@@ -323,7 +355,14 @@ public:
         root_ = merge(a, merge(b, c));
     }
 
-    // [l, r) を反転する。
+    /**
+     * @brief 区間 [l, r) の要素順を反転する。
+     * @param l 区間の左端
+     * @param r 区間の右端
+     * @pre 0 <= l <= r <= size()
+     * @par Complexity
+     * 期待 O(log N)
+     */
     void reverse(int l, int r) {
         assert(0 <= l && l <= r && r <= size());
         if (l == r) return;
@@ -335,7 +374,15 @@ public:
         root_ = merge(a, merge(b, c));
     }
 
-    // std::rotate と同じく [l, m), [m, r) を [m, r), [l, m) にする。
+    /**
+     * @brief std::rotate と同様に [l, m), [m, r) を [m, r), [l, m) へ並べ替える。
+     * @param l 区間の左端
+     * @param m 回転の境界
+     * @param r 区間の右端
+     * @pre 0 <= l <= m <= r <= size()
+     * @par Complexity
+     * 期待 O(log N)
+     */
     void rotate(int l, int m, int r) {
         assert(0 <= l && l <= m && m <= r && r <= size());
         if (l == m || m == r) return;
