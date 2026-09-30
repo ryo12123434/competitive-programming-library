@@ -4,9 +4,13 @@
 #include <utility>
 #include <vector>
 
-// 文字列を連続する同一文字ごとに (文字, 個数) へ圧縮する。
-// 計算量: O(|s|)
-// 空文字列に対しては空の vector を返す。
+/**
+ * @brief 文字列を連続する同一文字ごとにランレングス圧縮する。
+ * @param s 圧縮する文字列
+ * @return (文字, 連続個数) の列。空文字列なら空の vector
+ * @par Complexity
+ * O(|s|)
+ */
 inline std::vector<std::pair<char, int>> RLE(const std::string& s) {
     std::vector<std::pair<char, int>> res;
     if (s.empty()) return res;
