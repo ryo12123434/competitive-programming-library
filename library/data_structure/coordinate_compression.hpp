@@ -3,6 +3,16 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+/**
+ * @brief 整数列を座標圧縮する。
+ *
+ * 各要素を、元の列に現れる異なる値を昇順に並べたときの 0-indexed の順位へ変換する。
+ *
+ * @param a 圧縮する整数列
+ * @return 座標圧縮後の整数列
+ * @par Complexity
+ * O(N log N)
+ */
 vector<int> compress(vector<int> a){
     // コピー
     vector<int> b = a;
