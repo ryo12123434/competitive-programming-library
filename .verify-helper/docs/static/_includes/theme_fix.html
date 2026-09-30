@@ -1,0 +1,91 @@
+{% if site.theme == "jekyll-theme-minimal" %}
+<style type="text/css">
+:root {
+    --page-bg: #f6f7fb;
+    --surface: #ffffff;
+    --text: #263043;
+    --heading: #172033;
+    --muted: #687386;
+    --link: #4f46e5;
+    --link-hover: #3730a3;
+    --border: #dfe4ec;
+    --code-bg: #eef1f6;
+}
+
+body {
+    background: var(--page-bg);
+    color: var(--text);
+}
+
+div.wrapper {
+    background: var(--surface);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--heading);
+}
+
+p, li, td, th {
+    color: var(--text);
+}
+
+small {
+    color: var(--muted);
+}
+
+a {
+    color: var(--link);
+}
+
+a:hover,
+a:focus {
+    color: var(--link-hover);
+    font-weight: normal;
+    text-decoration: underline;
+}
+
+h1 a:hover,
+h1 a:focus {
+    font-weight: bold;
+}
+
+code {
+    color: var(--heading);
+    background: var(--code-bg);
+}
+
+pre {
+    background: #f3f5f9;
+    border: 1px solid var(--border);
+}
+
+blockquote {
+    color: var(--muted);
+    border-left-color: var(--border);
+}
+
+table,
+th,
+td {
+    border-color: var(--border);
+}
+
+hr {
+    background: var(--border);
+}
+
+@media screen and (min-width: 900px) {
+    div.wrapper {
+        width: 100%;
+    }
+
+    div.wrapper > header {
+        width: 280px;
+    }
+
+    div.wrapper > section {
+        width: calc(100% - 300px);
+    }
+}
+</style>
+{% endif %}
