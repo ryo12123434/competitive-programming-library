@@ -5,17 +5,28 @@
 #include <utility>
 #include <vector>
 
-// 半開区間 [l, r) の集合を管理する。
-// 区間は互いに重ならず、隣接する区間も自動的にマージされる。
-// insert / erase: O((K + 1) log N)
-//   N: 現在の区間数
-//   K: 操作によって削除・結合される区間数
+/**
+ * @brief 半開区間 [l, r) の集合を管理する。
+ *
+ * 区間は互いに重ならず、隣接する区間も自動的にマージされる。
+ *
+ * @tparam T 区間端点の型
+ * @par Complexity
+ * insert / erase は O((K + 1) log N)。
+ * N は現在の区間数、K は操作で削除・結合される区間数。
+ */
 template <class T>
 struct IntervalSet {
     std::set<std::pair<T, T>> st;
 
-    // [l, r) を追加する。
-    // l >= r のときは何もしない。
+    /**
+     * @brief 区間 [l, r) を追加する。
+     * @param l 区間の左端
+     * @param r 区間の右端
+     * @note l >= r のときは何もしない。
+     * @par Complexity
+     * O((K + 1) log N)
+     */
     void insert(T l, T r) {
         if (!(l < r)) return;
 
@@ -34,8 +45,14 @@ struct IntervalSet {
         st.insert({l, r});
     }
 
-    // [l, r) を削除する。
-    // l >= r のときは何もしない。
+    /**
+     * @brief 区間 [l, r) を削除する。
+     * @param l 区間の左端
+     * @param r 区間の右端
+     * @note l >= r のときは何もしない。
+     * @par Complexity
+     * O((K + 1) log N)
+     */
     void erase(T l, T r) {
         if (!(l < r)) return;
 
