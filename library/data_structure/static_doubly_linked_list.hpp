@@ -4,17 +4,33 @@
 using namespace std;
 
 
-// 静的双方向連結リスト
-// 要素取得に各要素の総連結要素数nに対してO(n)
+/**
+ * @brief 頂点番号で管理する静的双方向連結リスト。
+ *
+ * 各頂点の前後の頂点番号を配列で保持する。
+ *
+ * @note 頂点自体の追加・削除ではなく、既存頂点間の連結を管理する。
+ */
 struct Static_Doubly_LinkedList {
     int n;
     vector<int> nxt; // 次の要素 (p)
     vector<int> prv; // 前の要素 (q)
 
-    // 初期化
+    /**
+     * @brief n 頂点を互いに未接続の状態で初期化する。
+     * @param n 頂点数
+     * @par Complexity
+     * O(N)
+     */
     Static_Doubly_LinkedList(int n) : n(n), nxt(n, -1), prv(n, -1) {}
 
-    // x の後ろに y を連結するO(1)
+    /**
+     * @brief x の直後に y を連結する。
+     * @param x 前側の頂点
+     * @param y 後側の頂点
+     * @par Complexity
+     * O(1)
+     */
     void connect(int x, int y) {
         if(nxt[x] != -1) prv[nxt[x]] = -1;
         if(prv[y] != -1) nxt[prv[y]] = -1;
@@ -22,27 +38,51 @@ struct Static_Doubly_LinkedList {
         prv[y] = x;
     }
 
-    // x と y の連結を解除するO(1)
+    /**
+     * @brief x と y が直接連結されていれば解除する。
+     * @param x 前側の頂点
+     * @param y 後側の頂点
+     * @par Complexity
+     * O(1)
+     */
     void disconnect(int x, int y) {
         if(nxt[x] == y) nxt[x] = -1;
         if(prv[y] == x) prv[y] = -1;
     }
     
-    // xの直後にzを挿入するO(1)
+    /**
+     * @brief x の直後に z を挿入する。
+     * @param x 基準となる頂点
+     * @param z 挿入する頂点
+     * @par Complexity
+     * O(1)
+     */
     void insert_after(int x, int z) {
         int y = nxt[x];
         connect(x, z);
         if(y != -1) connect(z, y);
     }
 
-    // xの直前にzを挿入するO(1)
+    /**
+     * @brief x の直前に z を挿入する。
+     * @param x 基準となる頂点
+     * @param z 挿入する頂点
+     * @par Complexity
+     * O(1)
+     */
     void insert_before(int x, int z) {
         int y = prv[x];
         connect(z, x);
         if(y != -1) connect(y, z);
     }
 
-    // x が含まれる連結成分を先頭から順に取得する
+    /**
+     * @brief x が含まれる連結成分を先頭から順に取得する。
+     * @param x 連結成分内の頂点
+     * @return 先頭から末尾までの頂点列
+     * @par Complexity
+     * 連結成分の要素数を K として O(K)。
+     */
     vector<int> get_path(int x) {
         // 先頭まで遡る
         int head = x;
