@@ -43,6 +43,9 @@ jobs:
           git clone --depth 1 https://github.com/atcoder/ac-library.git /tmp/ac-library
           sudo cp -r /tmp/ac-library/atcoder /usr/local/include/
 
+      - name: Verify libraries
+        run: env -u GITHUB_ACTION -u GITHUB_TOKEN oj-verify all
+
       - name: Generate documentation
         run: env -u GITHUB_ACTION -u GITHUB_TOKEN oj-verify docs
 
