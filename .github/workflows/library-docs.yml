@@ -44,7 +44,15 @@ jobs:
           git clone --depth 1 https://github.com/atcoder/ac-library.git /tmp/ac-library
           sudo cp -r /tmp/ac-library/atcoder /usr/local/include/
 
+      - name: Restore verification cache
+        id: verification-cache
+        uses: actions/cache@v4
+        with:
+          path: .verify-helper/timestamps.local.json
+          key: verification-${{ runner.os }}-${{ hashFiles('library/**', 'verify/**', '.verify-helper/config.toml') }}
+
       - name: Verify libraries
+        if: steps.verification-cache.outputs.cache-hit != 'true'
         run: env -u GITHUB_ACTION -u GITHUB_TOKEN oj-verify all
 
       - name: Generate documentation
