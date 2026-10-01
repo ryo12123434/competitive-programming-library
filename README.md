@@ -27,6 +27,3 @@ template/
 - C++23（AtCoder の GNU++23）を使用する
 - 追加したライブラリには、可能な限り対応する検証コードを用意する
 
-## ライブラリ
-
-- `data_structure/fenwick_tree.hpp`: Fenwick Tree（点加算・区間和）
