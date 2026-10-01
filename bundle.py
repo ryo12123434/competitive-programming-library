@@ -10,9 +10,9 @@ ROOT = Path(__file__).resolve().parent
 LIBRARY_DIR = ROOT / "library"
 
 LOCAL_INCLUDE_RE = re.compile(
-    r'^(?P<indent>\\s*)#\\s*include\\s*"(?P<path>[^"]+)"(?P<suffix>\\s*(?://.*)?)$'
+    r'^(?P<indent>\s*)#\s*include\s*"(?P<path>[^"]+)"(?P<suffix>\s*(?://.*)?)$'
 )
-PRAGMA_ONCE_RE = re.compile(r"^\\s*#\\s*pragma\\s+once(?:\\s*(?://.*)?)?$")
+PRAGMA_ONCE_RE = re.compile(r"^\s*#\s*pragma\s+once(?:\s*(?://.*)?)?$")
 
 
 class BundleError(RuntimeError):
