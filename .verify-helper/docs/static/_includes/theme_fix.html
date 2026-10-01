@@ -78,17 +78,22 @@ footer {
     display: none;
 }
 
+div.wrapper > header {
+    display: none;
+}
+
+div.wrapper > section {
+    float: none;
+    width: 100%;
+}
+
 @media screen and (min-width: 900px) {
     div.wrapper {
         width: 100%;
     }
 
-    div.wrapper > header {
-        width: 280px;
-    }
-
     div.wrapper > section {
-        width: calc(100% - 300px);
+        width: 100%;
     }
 }
 </style>
