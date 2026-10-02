@@ -1,8 +1,7 @@
 #pragma once
 
-#include<bits/stdc++.h>
-using namespace std;
-
+#include <cassert>
+#include <vector>
 
 /**
  * @brief 頂点番号で管理する静的双方向連結リスト。
@@ -14,8 +13,8 @@ using namespace std;
  */
 struct Static_Doubly_LinkedList {
     int n;
-    vector<int> nxt; // 次の要素 (p)
-    vector<int> prv; // 前の要素 (q)
+    std::vector<int> nxt; // 次の要素 (p)
+    std::vector<int> prv; // 前の要素 (q)
 
     /**
      * @brief n 頂点を互いに未接続の状態で初期化する。
@@ -99,7 +98,7 @@ struct Static_Doubly_LinkedList {
      * @par Complexity
      * 連結成分の要素数を K として O(K)。
      */
-    vector<int> get_path(int x) {
+    std::vector<int> get_path(int x) {
         assert(0 <= x && x < n);
         // 先頭まで遡る
         int head = x;
@@ -108,7 +107,7 @@ struct Static_Doubly_LinkedList {
         }
 
         // 先頭から順に末尾まで辿る
-        vector<int> path;
+        std::vector<int> path;
         int cur = head;
         while (cur != -1) {
             path.push_back(cur);

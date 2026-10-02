@@ -75,11 +75,70 @@ docs の `exclude` は依存解析より後に適用されるため、この警�
 実際の algorithm / FPS / Treap の回帰プログラムもリポジトリ外に展開してコンパイル・実行しています。
 ヘッダの単独コンパイル・複数翻訳単位の検査と bundler テストを CI に追加しました。
 
+## CI の依存固定
+
+Cloud セットアップのスクリプトとインストール済みの版を照合しました。GitHub Actions は helper と ACL の最新版を取得していたため、検証済みの版に合わせました。
+
+| 依存 | Cloud / 更新後の GitHub Actions |
+| --- | --- |
+| online-judge-verify-helper | 5.6.0 |
+| online-judge-tools | 11.5.1 |
+| setuptools | 80.10.2 |
+| ACL | 864245a00b00dd008d1abfdc239618fdb7d139da |
+
+CI は ACL のコミットを直接 shallow fetch して HEAD を照合し、Python の依存には `pip check` を実行します。
+検証キャッシュのキーに workflow 自体も含め、依存版を変更したときに以前の検証済み時刻を再利用しないようにしました。
+間接依存、runner、コンパイラ、Ruby の依存までは完全には固定していません。
+
+## FPS の複数翻訳単位リンク
+
+固定した ACL コミットで、FPS を含む 2 翻訳単位と、`<atcoder/convolution>` だけを含む 2 翻訳単位を別々にリンクしました。
+GNU++23、`-O0` / `-O2` の両方で終了コード 1 となり、次の同じ 3 シンボルが `multiple definition` になりました。
+
+| 重複する関数 | ACL の定義箇所 |
+| --- | --- |
+| `atcoder::internal::countr_zero(unsigned int)` | [internal_bit.hpp:33](https://github.com/atcoder/ac-library/blob/864245a00b00dd008d1abfdc239618fdb7d139da/atcoder/internal_bit.hpp#L33) |
+| `atcoder::internal::floor_sum_unsigned(unsigned long long, unsigned long long, unsigned long long, unsigned long long)` | [internal_math.hpp:182](https://github.com/atcoder/ac-library/blob/864245a00b00dd008d1abfdc239618fdb7d139da/atcoder/internal_math.hpp#L182) |
+| `atcoder::convolution_ll(const std::vector<long long>&, const std::vector<long long>&)` | [convolution.hpp:269](https://github.com/atcoder/ac-library/blob/864245a00b00dd008d1abfdc239618fdb7d139da/atcoder/convolution.hpp#L269) |
+
+いずれもヘッダ内の非テンプレート・非 inline の外部定義です。include guard は翻訳単位ごとに働くため、この重複を防ぎません。
+`convolution` は `internal_bit` と `modint` を読み込み、`modint` が `internal_math` を読み込みます。
+自作 FPS を読み込まなくても発生するため、FPS の関数定義や最適化オプションが原因ではありません。
+対照実験では、リポジトリ外の ACL コピーのこの 3 定義だけに `inline` を付けると、各翻訳単位で FPS を使用するプログラムがリンク・実行できました。
+実際に使用する ACL は変更していません。依存ヘッダの書き換えや namespace を変える回避策をライブラリに組み込まず、FPS の除外を維持します。
+
+再現用ソースは次のとおりです。ACL の include パスは固定コミットの checkout を指定してください。
+
+```cpp
+// /tmp/fps-first.cpp
+#include "library/math/formal_power_series.hpp"
+int other();
+int main() { return other(); }
+```
+
+```cpp
+// /tmp/fps-second.cpp
+#include "library/math/formal_power_series.hpp"
+int other() { return 0; }
+```
+
+```sh
+g++ -std=gnu++23 -O2 -I . -I /path/to/ac-library /tmp/fps-first.cpp /tmp/fps-second.cpp -o /tmp/fps-linked
+```
+
+両方の include を `<atcoder/convolution>` に置き換えても同じ重複になります。
+`test_fps_multiple_translation_unit_exclusion` はこの ACL 単体と FPS の重複シンボル集合が完全に一致することを検査します。
+ACL 更新でリンクに成功するようになった場合、または FPS 独自の重複が追加された場合はテストが失敗し、除外の見直しを促します。
+
+静的双方向連結リストは `<cassert>` / `<vector>` の明示的な include と `std::` 修飾に変更しました。公開型・メソッド・動作は維持しています。
+
 ## 検証結果
 
-- `oj-verify all`: 検証済み時刻のキャッシュを外し、39 プログラム・796 ケースがすべて成功。最後のいもす修正後も再実行し、変更の影響を受ける対象が成功しました。
-- `python -m unittest discover -s .verify-helper/tests -v`: 7 テスト成功。全 31 ヘッダが GNU++23 / `-Wall -Wextra -Werror` で単独コンパイルでき、ACL 依存の FPS を除く 30 ヘッダは複数翻訳単位でもリンクできます。
-- 全 13 回帰プログラムが AddressSanitizer / UndefinedBehaviorSanitizer 付きで成功。最後のいもす変更にも再実行しました。
+- `oj-verify all`: 初回監査に続き、依存固定と静的リスト整理後も検証済み時刻のキャッシュを外し、39 プログラム・796 ケースがすべて成功しました。新規 Python 3.12 venv と固定コミットの新規 ACL checkout を使用しています。
+- `python -m unittest discover -s .verify-helper/tests -v`: マージ前確認で 8 テスト成功。全 31 ヘッダの単独コンパイル、FPS を除く 30 ヘッダの複数翻訳単位リンク、FPS / ACL の同じ 3 シンボルの衝突を検査しました。
+- 静的リストを含む追加データ構造回帰テストと FPS 回帰テストを GNU++23 / `-O2 -Wall -Wextra -Werror` でコンパイル・実行し、成功しました。
+- workflow の YAML と install スクリプトの構文、インストール済み Python 依存との版一致、`pip check`、ACL の HEAD と作業ツリーも確認しました。
+- 初回監査の全 13 回帰プログラムは AddressSanitizer / UndefinedBehaviorSanitizer 付きで成功。最後のいもす変更にも再実行しました。
 - 実際の verify 3 本を `bundle.py` で展開し、リポジトリ外でコンパイル・実行して同じ結果を確認しました。
 - ネットワーク・judge 接続による検証不能はありません。docs の依存解析診断は残りますが、`oj-verify all` の終了コードは 0 です。
 

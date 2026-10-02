@@ -37,11 +37,15 @@ jobs:
       - name: Install documentation tools
         run: |
           python -m pip install --upgrade pip
-          pip install "setuptools<81"
-          pip install online-judge-verify-helper
+          python -m pip install "setuptools==80.10.2" "online-judge-verify-helper==5.6.0" "online-judge-tools==11.5.1"
+          python -m pip check
           sudo apt-get update
           sudo apt-get install -y doxygen
-          git clone --depth 1 https://github.com/atcoder/ac-library.git /tmp/ac-library
+          git init /tmp/ac-library
+          git -C /tmp/ac-library remote add origin https://github.com/atcoder/ac-library.git
+          git -C /tmp/ac-library fetch --depth 1 origin 864245a00b00dd008d1abfdc239618fdb7d139da
+          git -C /tmp/ac-library checkout --detach FETCH_HEAD
+          test "$(git -C /tmp/ac-library rev-parse HEAD)" = 864245a00b00dd008d1abfdc239618fdb7d139da
           sudo cp -r /tmp/ac-library/atcoder /usr/local/include/
 
       - name: Restore verification cache
@@ -49,7 +53,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .verify-helper/timestamps.remote.json
-          key: verification-remote-v1-${{ runner.os }}-${{ hashFiles('library/**', 'verify/**', '.verify-helper/config.toml') }}
+          key: verification-remote-v1-${{ runner.os }}-${{ hashFiles('library/**', 'verify/**', '.verify-helper/config.toml', '.github/workflows/library-docs.yml') }}
 
       - name: Test headers and submission bundling
         run: python -m unittest discover -s .verify-helper/tests -v
