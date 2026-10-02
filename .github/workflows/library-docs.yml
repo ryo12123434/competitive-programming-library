@@ -48,15 +48,15 @@ jobs:
         id: verification-cache
         uses: actions/cache@v4
         with:
-          path: .verify-helper/timestamps.local.json
+          path: .verify-helper/timestamps.remote.json
           key: verification-${{ runner.os }}-${{ hashFiles('library/**', 'verify/**', '.verify-helper/config.toml') }}
 
       - name: Verify libraries
         if: steps.verification-cache.outputs.cache-hit != 'true'
-        run: env -u GITHUB_ACTION -u GITHUB_TOKEN oj-verify all
+        run: oj-verify all
 
       - name: Generate documentation
-        run: env -u GITHUB_ACTION -u GITHUB_TOKEN oj-verify docs
+        run: oj-verify docs
 
       - name: Build site
         working-directory: .verify-helper/markdown
