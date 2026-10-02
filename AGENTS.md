@@ -1,40 +1,8 @@
 # AGENTS.md
 
-## 対象環境
-
-- C++23（AtCoder の GNU++23）を基準とする。
-- AtCoder のジャッジ環境で利用できない外部ライブラリに依存しない。
-- AtCoder Library (ACL) は利用可能とする。
-
-## ライブラリの配置
-
-- ライブラリ本体は `library/` 以下の適切なカテゴリに置く。
-- 初期カテゴリは `data_structure`、`graph`、`math`、`string` とする。
-- 原則として、1つの独立したライブラリを1つのヘッダーファイルにまとめる。
-- 提出コードへコピーしやすいよう、不要な依存関係や過度な抽象化を避ける。
-- 新しいカテゴリは、既存カテゴリでは整理できない実装が必要になった時点で追加する。
-
-## 実装上のルール
-
-- 各ライブラリの公開 API コメントは Doxygen 形式で統一し、`@brief`、`@tparam`、`@param`、`@return`、`@pre`、`@note`、`@par Complexity` を必要に応じて用いる。
-- 添字の基準、入力可能な範囲、オーバーフローの可能性など、誤用しやすい点を明記する。
-- 添字は原則として 0-indexed とする。
-- 区間を扱う API は原則として半開区間 `[l, r)` とする。
-- 名前は役割が分かるものにし、カテゴリ内で一貫性を保つ。
-- 既存ライブラリとの API、命名、引数順の一貫性を優先する。
-- 競技用途として十分に簡潔でありながら、正しさを確認しやすい実装にする。
-
-## 検証
-
-- 検証コードは `verify/` 以下の対応するカテゴリに置く。
-- 検証コードには、対象ライブラリと検証に使用した問題のURLを記載する。
-- 新しいライブラリには、原則として対応する検証コードを追加する。
-- 適切な検証問題がない場合は、その理由を明記する。
-- 変更時は GNU++23 でコンパイルし、関連する検証を実行する。
-
-## 変更時の注意
-
-- ユーザーの既存コードや未コミットの変更を尊重し、無関係な箇所を変更しない。
-- 既存 API の破壊的変更は、ユーザーの明示的な了承なしに行わない。
-- 依頼されていない `git commit` や `git push` は行わない。
-- アルゴリズム追加時は、必要に応じてルートの `README.md` も更新する。
+- Target AtCoder GNU++23. ACL is allowed; do not depend on unavailable external libraries.
+- Put reusable headers under the appropriate `library/` category, normally one library per header. Add a category only when needed.
+- Prefer 0-indexing, half-open ranges `[l, r)`, and existing API/naming conventions. Keep implementations simple for contest use.
+- Document public APIs with concise Doxygen comments; include preconditions, pitfalls, overflow, and complexity when relevant.
+- Put verification code under the matching `verify/` category with the problem URL when a suitable judge problem exists. Compile/test affected code.
+- Do not make unrelated changes or break existing APIs without approval. Do not commit or push unless explicitly requested.
