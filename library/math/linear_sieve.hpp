@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <vector>
 #include <utility>
 
@@ -20,11 +21,13 @@ struct LinearSieve {
      * @par Complexity
      * 時間 O(N)、メモリ O(N)。
      */
-    explicit LinearSieve(int n) : lpf(n + 1, 0) {
-        for (int i = 2; i <= n; ++i) {
+    explicit LinearSieve(int n) {
+        assert(n >= 0);
+        lpf.assign(static_cast<std::size_t>(n) + 1, 0);
+        for (long long i = 2; i <= n; ++i) {
             if (lpf[i] == 0) {
-                lpf[i] = i;
-                primes.push_back(i);
+                lpf[i] = static_cast<int>(i);
+                primes.push_back(static_cast<int>(i));
             }
 
             for (int p : primes) {
@@ -43,6 +46,7 @@ struct LinearSieve {
      * O(log x)
      */
     std::vector<std::pair<int, int>> factorize(int x) const {
+        assert(1 <= x && static_cast<std::size_t>(x) < lpf.size());
         std::vector<std::pair<int, int>> res;
 
         while (x > 1) {

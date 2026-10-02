@@ -56,11 +56,15 @@ struct Dijkstra {
         }
     }
 
-    /// @brief t までの距離を O(1) で返す。到達不能なら INF。@pre solve_dijk 実行済み。
-    long long get_dist(int t) const { return dis[t]; }
+    /// @brief t までの距離を O(1) で返す。到達不能なら INF。@pre 最後の辺追加後に solve_dijk 実行済み。
+    long long get_dist(int t) const {
+        assert(0 <= t && t < V && static_cast<int>(dis.size()) == V);
+        return dis[t];
+    }
 
-    /// @brief 最短路の頂点列を O(V) で返す。到達不能なら空配列。@pre solve_dijk 実行済み。
+    /// @brief 最短路の頂点列を O(V) で返す。到達不能なら空配列。@pre 最後の辺追加後に solve_dijk 実行済み。
     std::vector<int> get_path(int t) const {
+        assert(0 <= t && t < V && static_cast<int>(dis.size()) == V);
         if (dis[t] == INF) return {};
         std::vector<int> path;
         for (int v = t; v != -1; v = prev[v]) path.push_back(v);

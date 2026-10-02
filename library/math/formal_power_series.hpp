@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <utility>
 #include <vector>
 
 #include <atcoder/convolution>
@@ -13,10 +14,11 @@
  * 多項式積には atcoder::convolution を利用する。
  *
  * @tparam Mint atcoder::static_modint など、四則演算・inv()・pow() を持つ型
+ * @pre 係数数・打ち切る項数は int に収まり、乗算は ACL の法と畳み込み長の制約を満たすこと。
  * @note pre(n) は先頭 n 項を取り出し、次数を n 項で打ち切る操作を表す。
  * @par Complexity
  * 次数 N に対して、加減算 O(N)、乗算 O(N log N)、
- * inv / log / exp / pow は O(N log N)。
+ * inv / log / exp は O(N log N)、pow は O(N log N + log k)。
  */
 template <class Mint>
 struct FormalPowerSeries : std::vector<Mint> {
@@ -92,7 +94,8 @@ struct FormalPowerSeries : std::vector<Mint> {
     }
 
     FPS& operator*=(const Mint& x) {
-        for (Mint& a : *this) a *= x;
+        const Mint factor = x;
+        for (Mint& a : *this) a *= factor;
         return *this;
     }
 
@@ -218,16 +221,20 @@ struct FormalPowerSeries : std::vector<Mint> {
      * @brief f の形式積分を返す。積分定数は 0。
      * @param f 積分する FPS
      * @return integral f(x) dx
+     * @pre 1..N が法の下で可逆であること。素数法では N < mod。
      * @par Complexity
-     * O(N)
+     * O(N) 回の四則演算と逆元計算 1 回。
      */
     friend FPS integrate(const FPS& f) {
         const int n = static_cast<int>(f.size());
-        FPS res(n + 1, Mint(0));
-
-        for (int i = 0; i < n; ++i) {
-            res[i + 1] = f[i] / Mint(i + 1);
+        FPS res(static_cast<std::size_t>(n) + 1, Mint(1));
+        for (int i = 0; i < n; ++i) res[i + 1] = res[i] * Mint(i + 1);
+        Mint inv_fact = res[n].inv();
+        for (int i = n; i >= 1; --i) {
+            res[i] = f[i - 1] * res[i - 1] * inv_fact;
+            inv_fact *= Mint(i);
         }
+        res[0] = Mint(0);
         return res;
     }
 
@@ -247,9 +254,10 @@ struct FormalPowerSeries : std::vector<Mint> {
 
         FPS res{f[0].inv()};
 
-        for (int n = 1; n < deg; n <<= 1) {
-            const int m = std::min(n << 1, deg);
+        for (int n = 1; n < deg;) {
+            const int m = n > deg - n ? deg : n * 2;
             res = (res + res - res * res * f.pre(m)).pre(m);
+            n = m;
         }
 
         res.resize(deg);
@@ -265,7 +273,7 @@ struct FormalPowerSeries : std::vector<Mint> {
      * @param f 対数を求める FPS
      * @param deg 打ち切る項数
      * @return log(f) mod x^deg
-     * @pre deg >= 0。deg > 0 なら f[0] == 1。
+     * @pre deg >= 0。deg > 0 なら f[0] == 1。1..deg-1 が法の下で可逆であること。
      * @par Complexity
      * O(deg log deg)
      */
@@ -274,7 +282,7 @@ struct FormalPowerSeries : std::vector<Mint> {
         if (deg == 0) return {};
         assert(!f.empty() && f[0] == Mint(1));
 
-        FPS res = integrate(diff(f) * inv(f, deg));
+        FPS res = integrate((diff(f.pre(deg)) * inv(f, deg)).pre(deg - 1));
         res.resize(deg);
         return res;
     }
@@ -288,7 +296,7 @@ struct FormalPowerSeries : std::vector<Mint> {
      * @param f 指数関数を求める FPS
      * @param deg 打ち切る項数
      * @return exp(f) mod x^deg
-     * @pre deg >= 0。f が空、または f[0] == 0。
+     * @pre deg >= 0。f が空、または f[0] == 0。1..deg-1 が法の下で可逆であること。
      * @par Complexity
      * O(deg log deg)
      */
@@ -299,9 +307,10 @@ struct FormalPowerSeries : std::vector<Mint> {
 
         FPS res{Mint(1)};
 
-        for (int n = 1; n < deg; n <<= 1) {
-            const int m = std::min(n << 1, deg);
+        for (int n = 1; n < deg;) {
+            const int m = n > deg - n ? deg : n * 2;
             res = (res * (f.pre(m) - log(res, m) + Mint(1))).pre(m);
+            n = m;
         }
 
         res.resize(deg);
@@ -318,9 +327,9 @@ struct FormalPowerSeries : std::vector<Mint> {
      * @param k 指数
      * @param deg 打ち切る項数
      * @return f^k mod x^deg
-     * @pre k >= 0、deg >= 0
+     * @pre k >= 0、deg >= 0。log/exp を使う場合は 1..deg-1 が法の下で可逆であること。
      * @par Complexity
-     * O(deg log deg)
+     * O(deg log deg + log k)
      */
     friend FPS pow(const FPS& f, long long k, int deg) {
         assert(k >= 0);
@@ -334,16 +343,17 @@ struct FormalPowerSeries : std::vector<Mint> {
             return res;
         }
 
+        const int limit = std::min<int>(f.size(), deg);
         int first = 0;
-        while (first < static_cast<int>(f.size()) && f[first] == Mint(0)) {
+        while (first < limit && f[first] == Mint(0)) {
             ++first;
         }
 
-        if (first == static_cast<int>(f.size())) {
+        if (first == limit) {
             return FPS(deg, Mint(0));
         }
 
-        if (first > 0 && k >= (deg + first - 1LL) / first) {
+        if (first > 0 && k >= (static_cast<long long>(deg) + first - 1) / first) {
             return FPS(deg, Mint(0));
         }
 
@@ -354,7 +364,7 @@ struct FormalPowerSeries : std::vector<Mint> {
         const int need = deg - shift;
         const Mint lead = f[first];
 
-        FPS g = (f >> first) / lead;
+        FPS g = (f.pre(first + need) >> first) / lead;
         FPS res = exp(log(g, need) * Mint(k), need) * lead.pow(k);
         res <<= shift;
         res.resize(deg);

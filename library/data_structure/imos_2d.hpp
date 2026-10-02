@@ -15,8 +15,9 @@ struct Imos2D {
     std::vector<std::vector<T>> data;
 
     /// @brief 零で初期化したグリッドを O((H+1)(W+1)) 時間・空間で構築する。@pre H, W >= 0。
-    Imos2D(int H, int W) : H(H), W(W), data(H + 1, std::vector<T>(W + 1, T{})) {
+    Imos2D(int H, int W) : H(H), W(W) {
         assert(H >= 0 && W >= 0);
+        data.assign(static_cast<std::size_t>(H) + 1, std::vector<T>(static_cast<std::size_t>(W) + 1, T{}));
     }
 
     /// @brief [u, d) x [l, r) に val を O(1) で加算する。範囲外は切り詰め、空領域は無視する。
@@ -32,10 +33,10 @@ struct Imos2D {
 
     /// @brief 差分を各セルの値に O((H+1)(W+1)) で変換する。@pre build 未実行。
     void build() {
-        for (int i = 0; i <= H; ++i)
-            for (int j = 1; j <= W; ++j) data[i][j] += data[i][j - 1];
-        for (int j = 0; j <= W; ++j)
-            for (int i = 1; i <= H; ++i) data[i][j] += data[i - 1][j];
+        for (std::size_t i = 0; i <= static_cast<std::size_t>(H); ++i)
+            for (std::size_t j = 1; j <= static_cast<std::size_t>(W); ++j) data[i][j] += data[i][j - 1];
+        for (std::size_t j = 0; j <= static_cast<std::size_t>(W); ++j)
+            for (std::size_t i = 1; i <= static_cast<std::size_t>(H); ++i) data[i][j] += data[i - 1][j];
     }
 
     /// @brief セルの値を O(1) で返す。@pre build 実行済み、0 <= i < H、0 <= j < W。

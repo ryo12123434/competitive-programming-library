@@ -51,6 +51,9 @@ jobs:
           path: .verify-helper/timestamps.remote.json
           key: verification-remote-v1-${{ runner.os }}-${{ hashFiles('library/**', 'verify/**', '.verify-helper/config.toml') }}
 
+      - name: Test headers and submission bundling
+        run: python -m unittest discover -s .verify-helper/tests -v
+
       - name: Verify libraries
         if: steps.verification-cache.outputs.cache-hit != 'true'
         run: oj-verify all
