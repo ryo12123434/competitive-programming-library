@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <functional>
 #include <limits>
 #include <utility>
 
@@ -33,6 +34,7 @@ using ordered_set = __gnu_pbds::tree<
  *
  * @tparam T 要素の型
  * @note GNU++ 環境を前提とする。
+ * @pre 要素数は int に、clear 間の挿入回数は long long に収まること。
  */
 template<class T>
 class OrderedMultiset {
@@ -58,6 +60,7 @@ public:
      * O(log N)
      */
     void insert(const T& x) {
+        assert(next_id_ < std::numeric_limits<Id>::max());
         tree_.insert({x, next_id_++});
     }
 

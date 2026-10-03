@@ -12,6 +12,10 @@
 #include "../../library/data_structure/imos_2d.hpp"
 
 int main() {
+    Imos2D<long long> empty_grid(0, 0);
+    empty_grid.add(-1, 1, -1, 1, 5);
+    empty_grid.build();
+    assert(empty_grid.data == (std::vector<std::vector<long long>>{{0}}));
     std::mt19937 rng(1704);
     UnionFind uf(20);
     std::vector<int> label(20);

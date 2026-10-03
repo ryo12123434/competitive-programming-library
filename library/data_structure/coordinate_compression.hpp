@@ -10,10 +10,11 @@ using namespace std;
  *
  * @param a 圧縮する整数列
  * @return 座標圧縮後の整数列
+ * @pre a.size() は int に収まること。
  * @par Complexity
  * O(N log N)
  */
-vector<int> compress(vector<int> a){
+inline vector<int> compress(vector<int> a){
     // コピー
     vector<int> b = a;
     
@@ -25,8 +26,8 @@ vector<int> compress(vector<int> a){
 
     // 座標圧縮した結果を求める
     vector<int> res(a.size());
-    for (int i = 0; i < a.size(); ++i) {
-        res[i] = lower_bound(b.begin(), b.end(), a[i]) - b.begin();
+    for (std::size_t i = 0; i < a.size(); ++i) {
+        res[i] = static_cast<int>(lower_bound(b.begin(), b.end(), a[i]) - b.begin());
     }
     return res;
 };

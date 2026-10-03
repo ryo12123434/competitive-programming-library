@@ -7,6 +7,7 @@
  * @brief ポテンシャル差を管理する Weighted Union-Find。
  *
  * @tparam Abel 加減算と単項マイナスをサポートする可換群の値型
+ * @pre 頂点番号は [0, N)。中間値も含めポテンシャルの演算が Abel で表現できること。
  * @par Complexity
  * root / issame / unite / get_size / get_weight / diff は償却 O(alpha(N))。
  */

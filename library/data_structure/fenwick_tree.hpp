@@ -10,6 +10,7 @@
  *
  * @tparam T 管理する値の型
  * @pre T{} が加法単位元であり、T が += と減算をサポートすること。
+ * @pre 集計途中も含め、加減算が T で表現できること。
  * @note 添字は 0-indexed、区間は半開区間 [l, r)。
  * @par Complexity
  * 初期化 O(N)、add / sum O(log N)、メモリ O(N)。
@@ -39,8 +40,11 @@ public:
      */
     void add(int p, T x) {
         assert(0 <= p && p < n_);
-        for (++p; p <= n_; p += p & -p) {
+        for (++p; p <= n_;) {
             data_[p - 1] += x;
+            int step = p & -p;
+            if (step > n_ - p) break;
+            p += step;
         }
     }
 

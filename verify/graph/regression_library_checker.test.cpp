@@ -3,6 +3,7 @@
 // A + B を入出力用に使い、各 API の境界条件とランダムケースを assert で検証する。
 #include <cassert>
 #include <iostream>
+#include <limits>
 #include <random>
 #include "../../library/graph/dijkstra.hpp"
 #include "../../library/graph/bellman_ford.hpp"
@@ -19,6 +20,12 @@ int main() {
     assert(bellman_ford({{0, 0, -1}}, 1, 0, dis));
     assert(bellman_ford({{0, 1, 2}, {1, 2, -3}, {2, 1, 1}}, 3, 0, dis));
     assert(!bellman_ford({}, 1, 0, dis) && dis[0] == 0);
+    auto minimum = std::numeric_limits<long long>::min();
+    auto maximum = std::numeric_limits<long long>::max();
+    assert(bellman_ford({{0, 1, minimum}, {1, 1, -1}}, 2, 0, dis));
+    assert(!bellman_ford({{0, 1, maximum - 1}, {1, 2, 4}, {0, 2, 5}}, 3, 0, dis));
+    assert((dis == std::vector<long long>{0, maximum - 1, 5}));
+    assert(!bellman_ford({{0, 1, minimum}}, 2, 0, dis) && dis[1] == minimum);
 
     Dijkstra large(3);
     large.add_edge(0, 1, Dijkstra::INF - 10);
@@ -67,6 +74,25 @@ int main() {
         std::vector<int> pos(n);
         for (int i = 0; i < n; ++i) pos[order[i]] = i;
         for (int u = 0; u < n; ++u) for (int v : dag[u]) assert(pos[u] < pos[v]);
+
+        // 負辺を含む DAG の最短路を Floyd-Warshall と比較する。
+        Edges signed_edges;
+        std::vector<std::vector<long long>> distance(n, std::vector<long long>(n, BELLMAN_FORD_INF));
+        for (int u = 0; u < n; ++u) {
+            distance[u][u] = 0;
+            for (int v = u + 1; v < n; ++v) if (rng() % 3 == 0) {
+                long long weight = static_cast<int>(rng() % 41) - 20;
+                signed_edges.push_back({u, v, weight});
+                distance[u][v] = weight;
+            }
+        }
+        for (int k = 0; k < n; ++k) for (int u = 0; u < n; ++u) for (int v = 0; v < n; ++v)
+            if (distance[u][k] != BELLMAN_FORD_INF && distance[k][v] != BELLMAN_FORD_INF)
+                distance[u][v] = std::min(distance[u][v], distance[u][k] + distance[k][v]);
+        for (int s = 0; s < n; ++s) {
+            assert(!bellman_ford(signed_edges, n, s, dis));
+            assert(dis == distance[s]);
+        }
     }
     std::vector<int> degree{1, 1, 0};
     assert((topological_sort({{1}, {0}, {}}, degree, 3) == std::vector<int>{2}));

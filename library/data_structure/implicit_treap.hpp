@@ -20,6 +20,8 @@
  * @tparam composition f(g(x)) を表す写像合成。ACL と同じ順序
  * @tparam id F の恒等写像を返す関数
  * @note 区間 API はすべて半開区間 [l, r)。
+ * @pre op は結合的で e が単位元。mapping は長さを保ち、区間積と反転に整合すること。
+ * @note 計算量は op / mapping / composition が O(1) の場合。木の高さは乱数に依存する。
  * @par Complexity
  * vector からの構築 O(N)、to_vector O(N)、その他の主要操作は期待 O(log N)。
  *
