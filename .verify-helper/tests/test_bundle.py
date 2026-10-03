@@ -73,6 +73,35 @@ class BundleTest(unittest.TestCase):
         with self.assertRaisesRegex(bundler.BundleError, "cannot resolve"):
             bundler.bundle(source)
 
+    def test_cli_stdout_modes(self):
+        source = self.write("submission.cpp", '#include <iostream>\nint main() { std::cout << 42; }\n')
+        expected = bundler.bundle(source)
+
+        for args in [
+            ["bundle.py", str(source), "--stdout"],
+            ["bundle.py", str(source), "-o", "-"],
+        ]:
+            with self.subTest(args=args):
+                stdout = io.StringIO()
+                with patch.object(bundler.sys, "argv", args):
+                    with contextlib.redirect_stdout(stdout):
+                        self.assertEqual(bundler.main(), 0)
+                self.assertEqual(stdout.getvalue(), expected)
+
+        self.assertFalse(bundler.default_output_path(source).exists())
+
+    def test_cli_default_output_is_preserved(self):
+        source = self.write("submission.cpp", "int main() {}\n")
+        output = bundler.default_output_path(source)
+        stdout = io.StringIO()
+
+        with patch.object(bundler.sys, "argv", ["bundle.py", str(source)]):
+            with contextlib.redirect_stdout(stdout):
+                self.assertEqual(bundler.main(), 0)
+
+        self.assertEqual(output.read_text(encoding="utf-8"), bundler.bundle(source))
+        self.assertEqual(stdout.getvalue().strip(), str(output.resolve()))
+
     def test_cli_failure_does_not_overwrite_output(self):
         output = self.write("result.cpp", "keep this file\n")
         with patch.object(bundler.sys, "argv", ["bundle.py", str(self.root / "missing.cpp"), "-o", str(output)]):

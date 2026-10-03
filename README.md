@@ -24,6 +24,31 @@ template/
 - `verify/`: ライブラリに対応する検証コード
 - `template/`: AtCoder 提出用テンプレート
 
+
+## 提出用 bundler
+
+`bundle.py` は `library/` 以下の自作ヘッダを展開し、提出用の 1 ファイルにまとめます。
+
+通常は bundled ファイルを生成します。
+
+```sh
+python bundle.py main.cpp
+python bundle.py main.cpp -o submission.cpp
+```
+
+標準出力へ直接出すこともできます。
+
+```sh
+python bundle.py main.cpp --stdout
+python bundle.py main.cpp -o -
+```
+
+Windows では次のようにすると、展開した提出コードをそのままクリップボードへコピーできます。
+
+```powershell
+python bundle.py main.cpp --stdout | clip
+```
+
 ## 検証
 
 ACL の `atcoder/` を C++ の include パスに置き、`online-judge-verify-helper` をインストールしてください。

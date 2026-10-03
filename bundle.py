@@ -143,21 +143,32 @@ def parse_args() -> argparse.Namespace:
         )
     )
     parser.add_argument("input", type=Path, help="input C++ source file")
-    parser.add_argument(
+    output_group = parser.add_mutually_exclusive_group()
+    output_group.add_argument(
         "-o",
         "--output",
         type=Path,
-        help="output file (default: <input>.bundled.cpp)",
+        help='output file (default: <input>.bundled.cpp); use "-" for stdout',
+    )
+    output_group.add_argument(
+        "--stdout",
+        action="store_true",
+        help="write bundled source to stdout instead of a file",
     )
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
-    output_path = args.output or default_output_path(args.input)
 
     try:
         bundled = bundle(args.input)
+
+        if args.stdout or args.output == Path("-"):
+            sys.stdout.write(bundled)
+            return 0
+
+        output_path = args.output or default_output_path(args.input)
         output_path.write_text(bundled, encoding="utf-8", newline="\n")
     except (BundleError, OSError) as exc:
         print(f"bundle.py: error: {exc}", file=sys.stderr)
