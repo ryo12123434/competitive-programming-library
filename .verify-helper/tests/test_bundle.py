@@ -110,6 +110,91 @@ class BundleTest(unittest.TestCase):
         self.assertIn("input file not found", errors.getvalue())
         self.assertEqual(output.read_text(encoding="utf-8"), "keep this file\n")
 
+    def test_acl_expansion_is_opt_in(self):
+        source = self.write("submission.cpp", '#include <atcoder/modint>\n#include "external.hpp"\n')
+        with patch.object(bundler, "find_acl_directory", side_effect=AssertionError("ACL must not be searched")):
+            self.assertEqual(bundler.bundle(source), source.read_text(encoding="utf-8"))
+            self.assertEqual(bundler.bundle(source, acl_dir=self.root / "missing"), source.read_text(encoding="utf-8"))
+
+    def test_acl_transitive_expansion_duplicates_and_cli(self):
+        self.write("acl/atcoder/detail.hpp", "#pragma once\ninline int value() { return 42; }\n")
+        self.write("acl/atcoder/sample.hpp", '#pragma once\n#include "atcoder/detail.hpp"\n')
+        self.write("acl/atcoder/sample", '#include "atcoder/sample.hpp"\n')
+        self.write("library/root.hpp", '#pragma once\n#include <atcoder/sample> /* dependency */\n')
+        source = self.write(
+            "submission.cpp", '#include <iostream>\n#include "library/root.hpp"\n'
+            '#include <atcoder/sample.hpp> // duplicate\n#include "atcoder/detail.hpp"\n'
+            'int main() { std::cout << value(); }\n',
+        )
+        output = self.root / "bundled.cpp"
+        with patch.object(bundler.sys, "argv", ["bundle.py", str(source), "--expand-acl", "--acl-dir", str(self.root / "acl"), "-o", str(output)]):
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(bundler.main(), 0)
+        result = output.read_text(encoding="utf-8")
+        self.assertEqual(result.count("inline int value()"), 1)
+        self.assertNotIn('#include "', result)
+        self.assertNotIn("#include <atcoder/", result)
+        self.assertIn("#include <iostream>", result)
+        for output_args in [["--stdout"], ["-o", "-"]]:
+            with self.subTest(output_args=output_args):
+                arguments = ["bundle.py", str(source), "--expand-acl", "--acl-dir", str(self.root / "acl"), *output_args]
+                with patch.object(bundler.sys, "argv", arguments):
+                    with contextlib.redirect_stdout(io.StringIO()) as stdout:
+                        self.assertEqual(bundler.main(), 0)
+                self.assertEqual(stdout.getvalue(), result)
+        subprocess.run(["g++", "-std=gnu++23", str(output), "-o", str(self.root / "submission")], check=True, capture_output=True)
+        execution = subprocess.run([str(self.root / "submission")], check=True, capture_output=True, text=True)
+        self.assertEqual(execution.stdout, "42")
+
+    def test_acl_directory_search_and_explicit_override(self):
+        package = self.root / "acl" / "atcoder"
+        package.mkdir(parents=True)
+        other = self.root / "other" / "atcoder"
+        other.mkdir(parents=True)
+        for variable in ["CPATH", "CPLUS_INCLUDE_PATH"]:
+            with patch.dict(bundler.os.environ, {variable: str(package.parent)}, clear=True):
+                self.assertEqual(bundler.find_acl_directory(None), package)
+                self.assertEqual(bundler.find_acl_directory(other.parent), other)
+                self.assertEqual(bundler.find_acl_directory(other), other)
+                self.assertIsNone(bundler.find_acl_directory(self.root / "missing"))
+
+    def test_acl_errors_do_not_overwrite_output(self):
+        self.write("acl/atcoder/present.hpp", '#include "atcoder/missing.hpp"\n')
+        self.write("acl/outside.hpp", "inline int outside() { return 0; }\n")
+        for include, directory, message in [
+            ("atcoder/present.hpp", self.root / "missing", "cannot find ACL"),
+            ("atcoder/missing.hpp", self.root / "acl", "cannot resolve ACL"),
+            ("atcoder/present.hpp", self.root / "acl", "cannot resolve ACL"),
+            ("atcoder/../outside.hpp", self.root / "acl", "cannot resolve ACL"),
+        ]:
+            with self.subTest(include=include, directory=directory):
+                source = self.write("submission.cpp", f"#include <{include}>\n")
+                output = self.write("result.cpp", "keep this file\n")
+                with patch.object(bundler.sys, "argv", ["bundle.py", str(source), "--expand-acl", "--acl-dir", str(directory), "-o", str(output)]):
+                    with contextlib.redirect_stderr(io.StringIO()) as errors:
+                        self.assertEqual(bundler.main(), 1)
+                self.assertIn(message, errors.getvalue())
+                self.assertEqual(output.read_text(encoding="utf-8"), "keep this file\n")
+
+    def test_installed_acl_all_compiles_without_acl_include_path(self):
+        acl_directory = bundler.find_acl_directory(None)
+        if acl_directory is None:
+            self.skipTest("ACL is not installed; configure CPLUS_INCLUDE_PATH")
+        source = self.write(
+            "submission.cpp", '#include <atcoder/all>\n#include <atcoder/modint>\n#include <iostream>\n'
+            'int main() { atcoder::fenwick_tree<int> f(3); f.add(1, 7); '
+            'atcoder::modint998244353 x = 3; std::cout << f.sum(0, 3) + x.pow(2).val(); }\n',
+        )
+        result = bundler.bundle(source, expand_acl=True, acl_dir=acl_directory)
+        self.assertNotIn('#include "atcoder/', result)
+        self.assertNotIn("#include <atcoder/", result)
+        output = self.write("bundled.cpp", result)
+        # include パスの環境変数を外し、展開結果だけでコンパイルできることを確認する。
+        environment = {key: value for key, value in bundler.os.environ.items() if key not in {"CPATH", "CPLUS_INCLUDE_PATH"}}
+        subprocess.run(["g++", "-std=gnu++23", str(output), "-o", str(self.root / "submission")], env=environment, check=True, capture_output=True)
+        execution = subprocess.run([str(self.root / "submission")], check=True, capture_output=True, text=True)
+        self.assertEqual(execution.stdout, "16")
+
 
 if __name__ == "__main__":
     unittest.main()

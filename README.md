@@ -49,6 +49,20 @@ Windows では次のようにすると、展開した提出コードをそのま
 python bundle.py main.cpp --stdout | clip
 ```
 
+ACL も含む提出ファイルを生成する場合は、`--expand-acl` を指定します。
+
+```sh
+python bundle.py main.cpp --expand-acl -o submission.cpp
+python bundle.py main.cpp --expand-acl --stdout
+python bundle.py main.cpp --expand-acl --acl-dir /path/to/ac-library -o submission.cpp
+```
+
+通常は `library/` の include だけを展開し、`<atcoder/...>` はそのまま残します。
+`--expand-acl` を指定すると、ACL 内部の依存も再帰的に展開して重複を除きます。標準ライブラリの include は残します。
+ACL は `CPATH`、`CPLUS_INCLUDE_PATH`、リポジトリ内の `ac-library/` と `atcoder/`、`/usr/local/include`、`/usr/include` の順に探します。
+`--acl-dir` では ACL の checkout、include ディレクトリ、または `atcoder/` 自体を指定できます。
+展開に必要な ACL ヘッダが見つからない場合はエラーにし、出力ファイルを書き換えません。
+
 ## 検証
 
 ACL の `atcoder/` を C++ の include パスに置き、`online-judge-verify-helper` をインストールしてください。
