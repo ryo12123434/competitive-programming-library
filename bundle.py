@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import sys
 from pathlib import Path
@@ -14,6 +15,10 @@ LOCAL_INCLUDE_RE = re.compile(
     r'(?P<suffix>\s*(?:/\*.*?\*/\s*)*(?://.*)?)$'
 )
 PRAGMA_ONCE_RE = re.compile(r"^\s*#\s*pragma\s+once\s*(?:/\*.*?\*/\s*)*(?://.*)?$")
+ACL_INCLUDE_RE = re.compile(
+    r'^\s*#\s*include\s*(?:<(?P<angle>atcoder/[^>]+)>|"(?P<quoted>atcoder/[^"]+)")'
+    r'\s*(?:/\*.*?\*/\s*)*(?://.*)?$'
+)
 
 
 class BundleError(RuntimeError):
@@ -60,11 +65,41 @@ def looks_like_library_include(include_path: str) -> bool:
     return path == "library" or path.startswith("library/")
 
 
+def find_acl_directory(acl_dir: Path | None) -> Path | None:
+    """atcoder/ 自体、またはそれを含む include ディレクトリから ACL を探す。"""
+    if acl_dir is not None:
+        candidates = [acl_dir]
+    else:
+        candidates = []
+        for variable in ("CPATH", "CPLUS_INCLUDE_PATH"):
+            value = os.environ.get(variable)
+            if value:
+                candidates.extend(Path(entry or ".") for entry in value.split(os.pathsep))
+        candidates.extend([ROOT / "ac-library", ROOT, Path("/usr/local/include"), Path("/usr/include")])
+
+    for candidate in candidates:
+        directory = (candidate if candidate.name == "atcoder" else candidate / "atcoder").resolve()
+        if directory.is_dir():
+            return directory
+    return None
+
+
+def resolve_acl_include(include_path: str, acl_directory: Path | None) -> Path:
+    if acl_directory is None:
+        raise BundleError("cannot find ACL headers; specify --acl-dir or configure CPLUS_INCLUDE_PATH")
+    target = (acl_directory / include_path.removeprefix("atcoder/")).resolve()
+    if not target.is_file() or not is_inside(target, acl_directory):
+        raise BundleError(f'cannot resolve ACL include "{include_path}" from {acl_directory}')
+    return target
+
+
 def bundle_file(
     source: Path,
     included: set[Path],
     *,
     is_library_file: bool,
+    expand_acl: bool = False,
+    acl_directory: Path | None = None,
 ) -> list[str]:
     source = source.resolve()
 
@@ -84,33 +119,42 @@ def bundle_file(
         if is_library_file and PRAGMA_ONCE_RE.match(line):
             continue
 
-        match = LOCAL_INCLUDE_RE.match(line)
-        if match is None:
-            output.append(line)
-            continue
+        # ACL の判定・探索はオプション指定時だけ行い、従来の処理を維持する。
+        acl_match = ACL_INCLUDE_RE.match(line) if expand_acl else None
+        if acl_match is not None:
+            include_path = acl_match.group("angle") or acl_match.group("quoted")
+            target = resolve_acl_include(include_path, acl_directory)
+            relative = "atcoder/" + target.relative_to(acl_directory).as_posix()
+        else:
+            match = LOCAL_INCLUDE_RE.match(line)
+            if match is None:
+                output.append(line)
+                continue
 
-        include_path = match.group("path")
-        target = resolve_library_include(include_path, source)
+            include_path = match.group("path")
+            target = resolve_library_include(include_path, source)
 
-        if target is None:
-            if is_library_file or looks_like_library_include(include_path):
-                raise BundleError(
-                    f'cannot resolve library include "{include_path}" from {source}'
-                )
+            if target is None:
+                if is_library_file or looks_like_library_include(include_path):
+                    raise BundleError(
+                        f'cannot resolve library include "{include_path}" from {source}'
+                    )
 
-            output.append(line)
-            continue
+                output.append(line)
+                continue
 
+            relative = target.relative_to(ROOT).as_posix()
         if target in included:
             continue
 
-        relative = target.relative_to(ROOT).as_posix()
         output.append(f"// BEGIN: {relative}")
         output.extend(
             bundle_file(
                 target,
                 included,
                 is_library_file=True,
+                expand_acl=expand_acl,
+                acl_directory=acl_directory,
             )
         )
         output.append(f"// END: {relative}")
@@ -118,7 +162,7 @@ def bundle_file(
     return output
 
 
-def bundle(source: Path) -> str:
+def bundle(source: Path, *, expand_acl: bool = False, acl_dir: Path | None = None) -> str:
     source = source.resolve()
 
     if not source.is_file():
@@ -127,7 +171,11 @@ def bundle(source: Path) -> str:
     if not LIBRARY_DIR.is_dir():
         raise BundleError(f"library directory not found: {LIBRARY_DIR}")
 
-    lines = bundle_file(source, set(), is_library_file=False)
+    acl_directory = find_acl_directory(acl_dir) if expand_acl else None
+    lines = bundle_file(
+        source, set(), is_library_file=False,
+        expand_acl=expand_acl, acl_directory=acl_directory,
+    )
     return "\n".join(lines) + "\n"
 
 
@@ -143,6 +191,11 @@ def parse_args() -> argparse.Namespace:
         )
     )
     parser.add_argument("input", type=Path, help="input C++ source file")
+    parser.add_argument("--expand-acl", action="store_true", help="also expand atcoder/ includes")
+    parser.add_argument(
+        "--acl-dir", type=Path,
+        help="ACL checkout/include directory or atcoder/ directory (used with --expand-acl)",
+    )
     output_group = parser.add_mutually_exclusive_group()
     output_group.add_argument(
         "-o",
@@ -162,7 +215,7 @@ def main() -> int:
     args = parse_args()
 
     try:
-        bundled = bundle(args.input)
+        bundled = bundle(args.input, expand_acl=args.expand_acl, acl_dir=args.acl_dir)
 
         if args.stdout or args.output == Path("-"):
             sys.stdout.write(bundled)

@@ -13,6 +13,16 @@ using namespace std;
  * @pre a.size() は int に収まること。
  * @par Complexity
  * O(N log N)
+ *
+ * @note 元の値を復元する表は返さない。重複する値は同じ順位になる。追加空間 O(N)。
+ *
+ * @code
+ * #include "library/data_structure/coordinate_compression.hpp"
+ * #include <cassert>
+ * int main() {
+ *     assert((compress({10, -2, 10}) == std::vector<int>{1, 0, 1}));
+ * }
+ * @endcode
  */
 inline vector<int> compress(vector<int> a){
     // コピー

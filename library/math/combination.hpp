@@ -10,6 +10,20 @@
  * @pre fact[N] が法の下で可逆であること。例: 素数 MOD に対して N < MOD。
  * @par Complexity
  * 構築 O(N)、com / permutation O(1)、メモリ O(N)。
+ *
+ * @note Mint は整数から変換でき、乗算と inv() が同一の法で整合すること。ACL の static_modint を推奨。
+ * @note 計算量は係数演算を O(1) としたもの。構築には逆元計算を 1 回含む。dynamic_modint では構築後に法を変更しない。
+ *
+ * @code
+ * #include "library/math/combination.hpp"
+ * #include <cassert>
+ * #include <atcoder/modint>
+ * int main() {
+ *     Combination<atcoder::modint998244353> combination(10);
+ *     assert(combination.com(5, 2).val() == 10);
+ *     assert(combination.permutation(5, 2).val() == 20);
+ * }
+ * @endcode
  */
 template<class Mint>
 struct Combination {

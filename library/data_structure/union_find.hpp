@@ -8,9 +8,22 @@ using namespace std;
  *
  * 経路圧縮と union by rank により素集合を管理する。
  *
- * @par 計算量
+ * @par Complexity
  * root / issame / unite / getsize / getedges は償却 O(alpha(N))。
  * @pre 頂点番号は [0, N)。辺数は int に収まること。
+ *
+ * @note parent / rank / size / edge_count は内部管理用。直接変更しないこと。保持空間 O(N)。
+ *
+ * @code
+ * #include "library/data_structure/union_find.hpp"
+ * #include <cassert>
+ * int main() {
+ *     UnionFind uf(3);
+ *     assert(uf.unite(0, 1));
+ *     assert(uf.issame(0, 1));
+ *     assert(uf.getsize(0) == 2);
+ * }
+ * @endcode
  */
 struct UnionFind {
     vector<int> parent, rank, size, edge_count;
@@ -18,8 +31,10 @@ struct UnionFind {
     /**
      * @brief n 頂点をそれぞれ独立した集合として初期化する。
      * @param n 頂点数
-     * @par 計算量
+     * @par Complexity
      * O(N)
+     *
+     * @pre n >= 0。
      */
     UnionFind(int n) : parent(n,-1), rank(n,0), size(n,1), edge_count(n,0) { }
 
@@ -27,7 +42,7 @@ struct UnionFind {
      * @brief x が属する集合の代表元を返す。
      * @param x 頂点番号
      * @return x の代表元
-     * @par 計算量
+     * @par Complexity
      * 償却 O(alpha(N))
      */
     int root(int x) {
@@ -40,7 +55,7 @@ struct UnionFind {
      * @param x 頂点番号
      * @param y 頂点番号
      * @return 同じ集合なら true
-     * @par 計算量
+     * @par Complexity
      * 償却 O(alpha(N))
      */
     bool issame(int x, int y) {
@@ -53,7 +68,7 @@ struct UnionFind {
      * @param x 頂点番号
      * @param y 頂点番号
      * @return 新たに併合した場合 true、既に同一集合なら false
-     * @par 計算量
+     * @par Complexity
      * 償却 O(alpha(N))
      */
     bool unite(int x, int y) {
@@ -74,14 +89,18 @@ struct UnionFind {
      * @brief x が属する集合の要素数を返す。
      * @param x 頂点番号
      * @return 集合の要素数
-     * @par 計算量
+     * @par Complexity
      * 償却 O(alpha(N))
      */
     int getsize(int x) {
         return size[root(x)];
     }
 
-    /// @brief x が属する集合の辺数を返す。償却 O(alpha(N))。
+    /**
+     * @brief x が属する集合の辺数を返す。償却 O(alpha(N))。
+     * @param x 0-indexed の頂点番号。
+     * @return x の連結成分へ追加された辺数（自己ループ・多重辺も含む）。
+     */
     int getedges(int x) {
         return edge_count[root(x)];
     }

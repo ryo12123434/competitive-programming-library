@@ -9,6 +9,18 @@
  *
  * @par Complexity
  * 構築 O(N)、メモリ O(N)。
+ *
+ * @note lpf[x] は x >= 2 の最小素因数、lpf[0] / lpf[1] は存在すれば 0。primes は素数の昇順列。
+ *
+ * @code
+ * #include "library/math/linear_sieve.hpp"
+ * #include <cassert>
+ * int main() {
+ *     LinearSieve sieve(100);
+ *     assert(sieve.lpf[12] == 2);
+ *     assert((sieve.factorize(12) == std::vector<std::pair<int, int>>{{2, 2}, {3, 1}}));
+ * }
+ * @endcode
  */
 struct LinearSieve {
     std::vector<int> lpf;
@@ -44,6 +56,8 @@ struct LinearSieve {
      * @pre 1 <= x < lpf.size()
      * @par Complexity
      * O(log x)
+     *
+     * @note 素因数は昇順。x == 1 は空列。出力空間 O(log x)。
      */
     std::vector<std::pair<int, int>> factorize(int x) const {
         assert(1 <= x && static_cast<std::size_t>(x) < lpf.size());

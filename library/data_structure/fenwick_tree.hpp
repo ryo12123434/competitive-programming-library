@@ -14,6 +14,19 @@
  * @note 添字は 0-indexed、区間は半開区間 [l, r)。
  * @par Complexity
  * 初期化 O(N)、add / sum O(log N)、メモリ O(N)。
+ *
+ * @note T の加法は可換・結合的で、区間和には加法逆元が必要（例: long long、ACL modint）。
+ *
+ * @code
+ * #include "library/data_structure/fenwick_tree.hpp"
+ * #include <cassert>
+ * int main() {
+ *     FenwickTree<long long> tree(3);
+ *     tree.add(1, 5);
+ *     assert(tree.sum(0, 2) == 5);
+ *     assert(tree.sum(1, 1) == 0);
+ * }
+ * @endcode
  */
 template <class T>
 class FenwickTree {

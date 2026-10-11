@@ -10,6 +10,17 @@
  * @pre n >= 0
  * @par Complexity
  * 時間 O(N log log N)、メモリ O(N)。
+ *
+ * @note 配列長は n + 1。0 と 1 は素数でない。
+ *
+ * @code
+ * #include "library/math/eratosthenes.hpp"
+ * #include <cassert>
+ * int main() {
+ *     auto prime = eratosthenes(10);
+ *     assert(prime.size() == 11 && prime[2] && !prime[1] && !prime[9]);
+ * }
+ * @endcode
  */
 inline std::vector<bool> eratosthenes(int n) {
     assert(n >= 0);

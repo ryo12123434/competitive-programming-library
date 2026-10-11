@@ -11,16 +11,39 @@
  * @brief 静的配列の区間クエリをオフラインで処理する Mo's algorithm。
  * @note 配列と集計状態は呼び出し側が管理する。添字は 0-indexed、区間は [l, r)。
  * @note 左端のブロック順に並べ、右端はブロックごとに昇順・降順を交互にする。
+ *
+ * @code
+ * #include "library/algorithm/mo.hpp"
+ * #include <cassert>
+ * int main() {
+ *     std::vector<long long> a{1, 2, 3}, answers(1);
+ *     Mo mo(static_cast<int>(a.size()));
+ *     mo.add_query(0, 2);
+ *     long long sum = 0; // run の前に空区間の状態を用意する。
+ *     mo.run([&](int i) { sum += a[i]; },
+ *            [&](int i) { sum -= a[i]; },
+ *            [&](int query_id) { answers[query_id] = sum; });
+ *     assert(answers[0] == 3);
+ * }
+ * @endcode
  */
 class Mo {
 public:
-    /// @brief 長さ n の配列用に構築する。O(1)。@pre n >= 0。
+    /**
+     * @brief 長さ n の配列用に構築する。O(1)。
+     * @pre n >= 0。
+     * @param n 静的配列の要素数。添字は [0, n)。
+     */
     explicit Mo(int n) : n_(n) { assert(n >= 0); }
 
     /**
      * @brief [l, r) を登録し、0-indexed の登録順 ID を返す。償却 O(1)。
      * @pre 0 <= l <= r <= n。クエリ数は int に収まること。
      * @note 空区間・重複クエリも登録できる。
+     *
+     * @param l 左端（含む）。
+     * @param r 右端（含まない）。
+     * @return 登録順のクエリ ID。output に同じ ID が渡される。
      */
     int add_query(int l, int r) {
         assert(0 <= l && l <= r && r <= n_);
@@ -41,8 +64,15 @@ public:
      * @pre コールバック中にこの Mo のクエリを変更しないこと。
      * @note output の呼び出し順は登録順とは限らない。状態は最後の区間のまま残る。
      * @note クエリがなければコールバックは呼ばない。再実行時は状態を初期化すること。
-     * @par 計算量 Q 個のクエリに対し O(Q log Q) の整列と O(N sqrt(Q) + Q) 回の区間操作。
+     * @par Complexity
+     * Q 個のクエリに対し O(Q log Q) の整列と O(N sqrt(Q) + Q) 回の区間操作。
      * コールバックの計算量は別途加算する。追加空間 O(Q)。
+     *
+     * @tparam AddLeft void(int index) として呼び出せる型。戻り値は使用しない。
+     * @tparam AddRight void(int index) として呼び出せる型。戻り値は使用しない。
+     * @tparam EraseLeft void(int index) として呼び出せる型。戻り値は使用しない。
+     * @tparam EraseRight void(int index) として呼び出せる型。戻り値は使用しない。
+     * @tparam Output void(int query_id) として呼び出せる型。集計結果の保存は呼び出し側で行う。
      */
     template <class AddLeft, class AddRight, class EraseLeft, class EraseRight, class Output>
     void run(AddLeft add_left, AddRight add_right,
@@ -73,6 +103,14 @@ public:
      * @brief 左右共通の add(index), erase(index) と output(query_id) で処理する。
      * @pre 集計状態は空区間に初期化済みで、要素の追加・削除が左右によらないこと。
      * @note 計算量・実行後の状態は左右別の run と同じ。
+     *
+     * @tparam Add void(int index) として呼び出せる追加処理。
+     * @tparam Erase void(int index) として呼び出せる削除処理。
+     * @tparam Output void(int query_id) として呼び出せる結果保存処理。
+     * @param add 配列の添字を受け取り、集計にその要素を追加する。
+     * @param erase 配列の添字を受け取り、集計からその要素を削除する。
+     * @param output 登録順の ID を受け取り、現在の区間の答えを保存する。
+     * @note 和・頻度など、追加と削除が左右の位置によらない集計に用いる。順序依存の集計には左右別の run を用いる。
      */
     template <class Add, class Erase, class Output>
     void run(Add add, Erase erase, Output output) const {

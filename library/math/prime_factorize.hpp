@@ -10,6 +10,16 @@
  * @pre N >= 1
  * @par Complexity
  * O(sqrt(N))
+ *
+ * @note 素因数は昇順。N == 1 は空列。大きな素数には試し割りが遅い。出力空間 O(log N)。
+ *
+ * @code
+ * #include "library/math/prime_factorize.hpp"
+ * #include <cassert>
+ * int main() {
+ *     assert((prime_factorize(12) == std::vector<std::pair<long long, long long>>{{2, 2}, {3, 1}}));
+ * }
+ * @endcode
  */
 inline std::vector<std::pair<long long, long long>> prime_factorize(long long N) {
     std::vector<std::pair<long long, long long>> res;

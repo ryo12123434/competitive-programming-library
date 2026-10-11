@@ -12,6 +12,17 @@
  * @note 負の底も扱い、結果は [0, mod)。積は __int128 で計算してオーバーフローを避ける。
  * @par Complexity
  * O(log n)
+ *
+ * @note n == 0 では底によらず 1 % mod（0^0 も同じ）。追加空間 O(1)。
+ *
+ * @code
+ * #include "library/math/mod_pow.hpp"
+ * #include <cassert>
+ * int main() {
+ *     assert(modpow(-2, 3, 5) == 2);
+ *     assert(modpow(0, 0, 1) == 0);
+ * }
+ * @endcode
  */
 inline long long modpow(long long a, long long n, long long mod) {
     assert(n >= 0 && mod > 0);
