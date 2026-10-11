@@ -26,7 +26,7 @@
  * その他の主要操作は期待 O(log N)。保持空間 O(N)。
  *
  * @note 関数のシグネチャは S op(S,S)、S e()、S mapping(F,S,int)、F composition(F,F)、F id()。
- * @note op は区間の連結を表し e() は空区間の値。mapping(f,x,len) は len 個の要素への一様な作用後の区間積を返す。
+ * @note op は区間の連結を表し e() は空区間の値。mapping(f,x,len) は長さを変えず、len 個の要素への一様な作用後の区間積を返す。
  * @pre op(op(a,b),c) == op(a,op(b,c))、op(e(),a) == op(a,e()) == a。
  * @pre mapping(id(),x,n) == x、mapping(f,op(x,y),n+m) == op(mapping(f,x,n),mapping(f,y,m))。
  * @pre composition(f,g) は g の後に f を作用させる合成。mapping(composition(f,g),x,n) == mapping(f,mapping(g,x,n),n)。
