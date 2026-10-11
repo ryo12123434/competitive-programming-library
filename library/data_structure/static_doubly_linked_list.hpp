@@ -10,6 +10,21 @@
  *
  * @note 頂点自体の追加・削除ではなく、既存頂点間の連結を管理する。
  * @pre 頂点番号は [0, n)。connect では自己接続や循環を作らないこと。
+ *
+ * @note nxt / prv の -1 は隣接頂点なしを表す。配列を直接変更せずメソッドを使うこと。
+ * @par Complexity
+ * 構築 O(N) 時間・空間、連結操作 O(1)、get_path O(K) 時間・出力空間。
+ *
+ * @code
+ * #include "library/data_structure/static_doubly_linked_list.hpp"
+ * #include <cassert>
+ * int main() {
+ *     Static_Doubly_LinkedList list(3);
+ *     list.connect(0, 2);
+ *     list.insert_after(0, 1);
+ *     assert((list.get_path(1) == std::vector<int>{0, 1, 2}));
+ * }
+ * @endcode
  */
 struct Static_Doubly_LinkedList {
     int n;
@@ -35,6 +50,8 @@ struct Static_Doubly_LinkedList {
      * @param y 後側の頂点
      * @par Complexity
      * O(1)
+     *
+     * @note x の旧後続・y の旧先行との接続は解除する。移動元の前後をつなぎ直す操作には insert_after / insert_before を使う。
      */
     void connect(int x, int y) {
         assert(0 <= x && x < n && 0 <= y && y < n && x != y);

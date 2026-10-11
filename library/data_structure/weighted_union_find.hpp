@@ -10,6 +10,20 @@
  * @pre 頂点番号は [0, N)。中間値も含めポテンシャルの演算が Abel で表現できること。
  * @par Complexity
  * root / issame / unite / get_size / get_weight / diff は償却 O(alpha(N))。
+ *
+ * @note Abel は 0 から変換可能で、0 は加法単位元。+=、-=、単項 - の演算は可換加法群を成すこと。
+ * @note 各頂点の絶対ポテンシャルは決定しない。保持空間 O(N)。
+ *
+ * @code
+ * #include "library/data_structure/weighted_union_find.hpp"
+ * #include <cassert>
+ * int main() {
+ *     WeightedUnionFind<long long> uf(3);
+ *     uf.unite(0, 1, 4);
+ *     uf.unite(1, 2, -1);
+ *     assert(uf.diff(0, 2) == 3);
+ * }
+ * @endcode
  */
 template<class Abel>
 struct WeightedUnionFind {
@@ -21,6 +35,8 @@ struct WeightedUnionFind {
      * @param n 頂点数
      * @par Complexity
      * O(N)
+     *
+     * @pre n >= 0。
      */
     WeightedUnionFind(int n)
         : parent(n, -1), rank(n, 0), size(n, 1), diff_weight(n, 0) {}
@@ -59,6 +75,8 @@ struct WeightedUnionFind {
      * @return 新たに併合した場合 true、既に同一集合なら false
      * @par Complexity
      * 償却 O(alpha(N))
+     *
+     * @note 同一集合なら w の整合性は検査せず false を返す。矛盾判定は issame(x,y) と diff(x,y) == w で行う。
      */
     bool unite(int x, int y, Abel w) {
         w += get_weight(x);

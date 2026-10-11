@@ -8,7 +8,20 @@
  * @brief i < j かつ A[i] > A[j] を満たす組の数を返す。同じ値同士は数えない。
  * @pre A.size() が int に収まり、T の operator< と operator== が整合すること。
  * @note 最大 N*(N-1)/2 となるため、戻り値は long long。
- * @par 計算量 O(N log N) 時間、O(N) 空間。
+ * @par Complexity
+ * O(N log N) 時間、O(N) 空間。
+ *
+ * @tparam T コピー可能で、< が狭義弱順序、== がその同値関係を表す値型。
+ * @param A 元の順序で並んだ列（変更しない）。
+ * @return 狭義の転倒数。空列は 0。
+ *
+ * @code
+ * #include "library/algorithm/inversion_number.hpp"
+ * #include <cassert>
+ * int main() {
+ *     assert(count_inversions(std::vector<int>{3, 1, 1}) == 2);
+ * }
+ * @endcode
  */
 template <class T>
 long long count_inversions(const std::vector<T>& A) {

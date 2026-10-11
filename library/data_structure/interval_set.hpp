@@ -13,9 +13,26 @@
  * 区間は互いに重ならず、隣接する区間も自動的にマージされる。
  *
  * @tparam T 区間端点の型
- * @par 計算量
+ * @par Complexity
  * insert / erase は O((K + 1) log N)。
  * N は現在の区間数、K は操作で削除・結合される区間数。
+ *
+ * @pre T は狭義弱順序の比較と減算に対応する型（例: int、long long）。浮動小数点では端点・被覆長とも有限値とし、丸め誤差に注意。
+ * @note 既定構築で空集合。端点も被覆長も途中の演算を含め各型に収まること。
+ * @par Complexity
+ * 保持空間 O(N)、空集合の構築 O(1)。
+ *
+ * @code
+ * #include "library/data_structure/interval_set.hpp"
+ * #include <cassert>
+ * int main() {
+ *     IntervalSet<long long> intervals;
+ *     intervals.insert(1, 4);
+ *     intervals.erase(2, 3);
+ *     assert(intervals.covered_length == 2);
+ *     assert(intervals.mex(1) == 2);
+ * }
+ * @endcode
  */
 template <class T>
 struct IntervalSet {
@@ -35,7 +52,7 @@ struct IntervalSet {
      * @param l 区間の左端
      * @param r 区間の右端
      * @note l >= r のときは何もしない。
-     * @par 計算量
+     * @par Complexity
      * O((K + 1) log N)
      */
     void insert(T l, T r) {
@@ -63,7 +80,7 @@ struct IntervalSet {
      * @param l 区間の左端
      * @param r 区間の右端
      * @note l >= r のときは何もしない。
-     * @par 計算量
+     * @par Complexity
      * O((K + 1) log N)
      */
     void erase(T l, T r) {
@@ -98,7 +115,12 @@ struct IntervalSet {
         }
     }
 
-    /// @brief [l, r) と被覆区間が交差するかを O(log N) で判定する。l >= r なら false。
+    /**
+     * @brief [l, r) と被覆区間が交差するかを O(log N) で判定する。l >= r なら false。
+     * @param l 左端（含む）。
+     * @param r 右端（含まない）。
+     * @return 被覆区間と共通部分があれば true。
+     */
     bool intersects(T l, T r) const {
         if (!(l < r)) return false;
         auto it = st.lower_bound({l, l});
@@ -106,14 +128,22 @@ struct IntervalSet {
         return it != st.begin() && l < std::prev(it)->second;
     }
 
-    /// @brief x が被覆区間に含まれるかを O(log N) で判定する。
+    /**
+     * @brief x が被覆区間に含まれるかを O(log N) で判定する。
+     * @param x 判定する値。
+     * @return ある [l, r) に l <= x < r として含まれれば true。
+     */
     bool contains(T x) const {
         auto it = st.lower_bound({x, x});
         if (it != st.end() && it->first == x) return true;
         return it != st.begin() && x < std::prev(it)->second;
     }
 
-    /// @brief x 以上の最小の未被覆値を O(log N) で返す。隣接区間は併合済み。
+    /**
+     * @brief x 以上の最小の未被覆値を O(log N) で返す。隣接区間は併合済み。
+     * @param x 探索の下限（既定値 0）。
+     * @return x が未被覆なら x、被覆されていればその区間の右端。
+     */
     T mex(T x = 0) const {
         auto it = st.lower_bound({x, x});
         if (it != st.end() && it->first == x) return it->second;

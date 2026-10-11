@@ -4,7 +4,19 @@
 #include <limits>
 #include <vector>
 
-/// @brief Bellman-Ford 法で使う有向重み付き辺。頂点番号は 0-indexed。
+/**
+ * @brief Bellman-Ford 法で使う有向重み付き辺。頂点番号は 0-indexed。
+ * @note from / to は始点・終点、cost は負値も許す重み。
+ *
+ * @code
+ * #include "library/graph/bellman_ford.hpp"
+ * #include <cassert>
+ * int main() {
+ *     Edge edge{0, 1, -2};
+ *     assert(edge.cost == -2);
+ * }
+ * @endcode
+ */
 struct Edge { long long from, to, cost; };
 using Edges = std::vector<Edge>;
 /// @brief 到達不能を表す距離。有効な有限距離にはこの値を使わない。
@@ -17,7 +29,25 @@ inline constexpr long long BELLMAN_FORD_INF = std::numeric_limits<long long>::ma
  * @note 中間距離は __int128 で計算する。正のオーバーフローや負閉路でのアンダーフローを避ける。
  * @note dis は毎回初期化する。到達不能な頂点の距離は BELLMAN_FORD_INF。
  * @note true の場合、dis は最短距離を表さない。
- * @par 計算量 O(VE + V) 時間、O(V) 空間。
+ * @par Complexity
+ * O(VE + V) 時間、O(V) 空間。
+ *
+ * @param Es 有向辺の列（負の重みも可）。
+ * @param V 頂点数。
+ * @param s 始点（0-indexed）。
+ * @param dis 出力先。V 要素へ初期化され、到達不能は BELLMAN_FORD_INF。
+ * @return 始点から到達可能な負閉路があれば true、それ以外は false。
+ *
+ * @code
+ * #include "library/graph/bellman_ford.hpp"
+ * #include <cassert>
+ * int main() {
+ *     Edges edges{{0, 1, -2}};
+ *     std::vector<long long> distances;
+ *     assert(!bellman_ford(edges, 3, 0, distances));
+ *     assert(distances[1] == -2 && distances[2] == BELLMAN_FORD_INF);
+ * }
+ * @endcode
  */
 inline bool bellman_ford(const Edges& Es, int V, int s, std::vector<long long>& dis) {
     assert(V > 0 && 0 <= s && s < V);

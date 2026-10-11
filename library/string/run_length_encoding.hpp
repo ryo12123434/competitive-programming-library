@@ -13,6 +13,16 @@
  * @pre s.size() は int に収まること。
  * @par Complexity
  * O(|s|)
+ *
+ * @note 結果は元の順序で並ぶ。出力空間 O(K)（K は連続区間数）。
+ *
+ * @code
+ * #include "library/string/run_length_encoding.hpp"
+ * #include <cassert>
+ * int main() {
+ *     assert((RLE("aaabb") == std::vector<std::pair<char, int>>{{'a', 3}, {'b', 2}}));
+ * }
+ * @endcode
  */
 inline std::vector<std::pair<char, int>> RLE(const std::string& s) {
     assert(s.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()));

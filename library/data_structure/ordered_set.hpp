@@ -17,6 +17,21 @@
  * @note GNU++ 環境を前提とする。
  * @par Complexity
  * 各主要操作 O(log N)。
+ *
+ * @pre T の < が狭義弱順序を満たすこと。重複値は一つだけ保持する。
+ * @note order_of_key(x) は x 未満の要素数。find_by_order(k) は 0-indexed の k 番目のイテレータで、範囲外なら end()。
+ * @note 空集合の構築 O(1)、保持空間 O(N)。
+ *
+ * @code
+ * #include "library/data_structure/ordered_set.hpp"
+ * #include <cassert>
+ * int main() {
+ *     ordered_set<int> values;
+ *     values.insert(7);
+ *     assert(values.order_of_key(7) == 0);
+ *     assert(*values.find_by_order(0) == 7);
+ * }
+ * @endcode
  */
 template<class T>
 using ordered_set = __gnu_pbds::tree<
@@ -35,6 +50,23 @@ using ordered_set = __gnu_pbds::tree<
  * @tparam T 要素の型
  * @note GNU++ 環境を前提とする。
  * @pre 要素数は int に、clear 間の挿入回数は long long に収まること。
+ *
+ * @pre T の < は狭義弱順序で、== / != と整合すること。
+ * @note find_by_order は ordered_set と異なり、イテレータではなく値を返す。
+ * @par Complexity
+ * 空集合の構築 O(1)、保持空間 O(N)、主要操作 O(log N)。
+ *
+ * @code
+ * #include "library/data_structure/ordered_set.hpp"
+ * #include <cassert>
+ * int main() {
+ *     OrderedMultiset<int> values;
+ *     values.insert(7);
+ *     values.insert(7);
+ *     assert(values.count(7) == 2);
+ *     assert(values.find_by_order(1) == 7);
+ * }
+ * @endcode
  */
 template<class T>
 class OrderedMultiset {
@@ -121,14 +153,31 @@ public:
         return r - l;
     }
 
+    /**
+     * @brief 重複を含めた要素数を返す。
+     * @return 現在の要素数。
+     * @par Complexity
+     * O(1)。
+     */
     int size() const {
         return static_cast<int>(tree_.size());
     }
 
+    /**
+     * @brief 空集合か判定する。
+     * @return 要素がなければ true。
+     * @par Complexity
+     * O(1)。
+     */
     bool empty() const {
         return tree_.empty();
     }
 
+    /**
+     * @brief 全要素と内部の挿入 ID を消去する。
+     * @par Complexity
+     * O(N)。
+     */
     void clear() {
         tree_.clear();
         next_id_ = 0;

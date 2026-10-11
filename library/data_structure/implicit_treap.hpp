@@ -20,12 +20,24 @@
  * @tparam composition f(g(x)) を表す写像合成。ACL と同じ順序
  * @tparam id F の恒等写像を返す関数
  * @note 区間 API はすべて半開区間 [l, r)。
- * @pre op は結合的で e が単位元。mapping は長さを保ち、区間積と反転に整合すること。
- * @note 計算量は op / mapping / composition が O(1) の場合。木の高さは乱数に依存する。
+ * @note 計算量は op / mapping / composition が O(1) の場合。木の高さは疑似乱数の優先度に依存し、最悪 O(N)。
  * @par Complexity
- * vector からの構築 O(N)、to_vector O(N)、その他の主要操作は期待 O(log N)。
+ * 構築・to_vector・clear・破棄 O(N)、size / empty / all_prod O(1)。
+ * その他の主要操作は期待 O(log N)。保持空間 O(N)。
+ *
+ * @note 関数のシグネチャは S op(S,S)、S e()、S mapping(F,S,int)、F composition(F,F)、F id()。
+ * @note op は区間の連結を表し e() は空区間の値。mapping(f,x,len) は len 個の要素への一様な作用後の区間積を返す。
+ * @pre op(op(a,b),c) == op(a,op(b,c))、op(e(),a) == op(a,e()) == a。
+ * @pre mapping(id(),x,n) == x、mapping(f,op(x,y),n+m) == op(mapping(f,x,n),mapping(f,y,m))。
+ * @pre composition(f,g) は g の後に f を作用させる合成。mapping(composition(f,g),x,n) == mapping(f,mapping(g,x,n),n)。
+ * @pre 写像の合成は結合的で id() が単位元。一様な作用は要素順の反転と可換であること。
+ * @pre S / F はコピー・代入可能。要素数は int に収まり、途中の演算も各型に収まること。
+ * @note コピー・ムーブはできない。空の構築は Treap tree;、初期列からは下の例のように生成する。
+ * @note 再帰の深さは木の高さ。
  *
  * @code
+ * #include "library/data_structure/implicit_treap.hpp"
+ * #include <cassert>
  * long long op(long long a, long long b) { return a + b; }
  * long long e() { return 0; }
  * long long mapping(long long f, long long x, int len) {
@@ -38,6 +50,12 @@
  *     long long, op, e,
  *     long long, mapping, composition, id
  * >;
+ * int main() {
+ *     Treap tree(std::vector<long long>{1, 2, 3});
+ *     tree.apply(0, 2, 4);
+ *     tree.reverse(0, 3);
+ *     assert(tree.prod(0, 3) == 14);
+ * }
  * @endcode
  */
 template <class S, S (*op)(S, S), S (*e)(), class F,
@@ -195,12 +213,28 @@ private:
     }
 
 public:
+    /**
+     * @brief 空の列を構築する。
+     * @par Complexity
+     * O(1)。
+     */
     ImplicitTreap() = default;
 
+    /**
+     * @brief 初期列から木を構築する。
+     * @param a 0-indexed の要素列。空列も指定できる。
+     * @par Complexity
+     * O(N) 時間・空間。
+     */
     explicit ImplicitTreap(const std::vector<S>& a) {
         build(a);
     }
 
+    /**
+     * @brief 全ノードを解放する。
+     * @par Complexity
+     * O(N)。
+     */
     ~ImplicitTreap() {
         clear();
     }
@@ -208,24 +242,41 @@ public:
     ImplicitTreap(const ImplicitTreap&) = delete;
     ImplicitTreap& operator=(const ImplicitTreap&) = delete;
 
+    /**
+     * @brief 現在の要素数を返す。
+     * @return 要素数（空列は 0）。
+     * @par Complexity
+     * O(1)。
+     */
     int size() const {
         return size(root_);
     }
 
+    /**
+     * @brief 空列か判定する。
+     * @return 要素がなければ true。
+     * @par Complexity
+     * O(1)。
+     */
     bool empty() const {
         return root_ == nullptr;
     }
 
+    /**
+     * @brief 全要素を削除して空列にする。
+     * @par Complexity
+     * O(N)。
+     */
     void clear() {
         destroy(root_);
         root_ = nullptr;
     }
 
     /**
-     * @brief vector の内容で木を再構築する。
-     * @param a 初期列
+     * @brief 既存の列を破棄し、vector の内容で木を再構築する。
+     * @param a 初期列（要素数は int に収まること）。
      * @par Complexity
-     * O(N)
+     * 元の要素数 M、新しい要素数 N として O(M + N) 時間、O(N) 保持空間。
      */
     void build(const std::vector<S>& a) {
         clear();
@@ -307,6 +358,14 @@ public:
         root_ = merge(a, merge(b, c));
     }
 
+    /**
+     * @brief pos 番目の値を取得する。
+     * @param pos 0-indexed の位置。
+     * @return 作用を反映した要素値。
+     * @pre 0 <= pos < size()。
+     * @par Complexity
+     * 期待 O(log N)。
+     */
     S get(int pos) {
         assert(0 <= pos && pos < size());
         return prod(pos, pos + 1);
@@ -316,7 +375,7 @@ public:
      * @brief 区間 [l, r) の積を返す。
      * @param l 区間の左端
      * @param r 区間の右端
-     * @return op による区間積
+     * @return op による左からの区間積。空区間は e()。
      * @pre 0 <= l <= r <= size()
      * @par Complexity
      * 期待 O(log N)
@@ -333,6 +392,12 @@ public:
         return res;
     }
 
+    /**
+     * @brief 列全体の区間積を取得する。
+     * @return 左からの区間積。空列は e()。
+     * @par Complexity
+     * O(1)。
+     */
     S all_prod() const {
         return prod(root_);
     }
@@ -396,6 +461,12 @@ public:
         root_ = merge(a, merge(c, merge(b, d)));
     }
 
+    /**
+     * @brief 現在の列を通常の配列に取り出す。
+     * @return 遅延作用と反転を反映した 0-indexed の要素列。
+     * @par Complexity
+     * O(N) 時間・出力空間。
+     */
     std::vector<S> to_vector() {
         std::vector<S> res;
         res.reserve(size());
@@ -403,6 +474,14 @@ public:
         return res;
     }
 
+    /**
+     * @brief get(pos) と同じ。値を返すため代入による更新はできない。
+     * @param pos 0-indexed の位置。
+     * @return 要素値。
+     * @pre 0 <= pos < size()。
+     * @par Complexity
+     * 期待 O(log N)。
+     */
     S operator[](int pos) {
         return get(pos);
     }

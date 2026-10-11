@@ -1,0 +1,111 @@
+{
+  "Implicit Treap: range add configuration": {
+    "scope": "cpp",
+    "prefix": "cp-treap-add-config",
+    "description": "グローバルに挿入。区間加算・区間和の演算と Treap 型を定義する。整数の中間値のオーバーフローに注意。",
+    "body": [
+      "#include \"library/data_structure/implicit_treap.hpp\"",
+      "namespace ${1:treap_add} {",
+      "using S = ${2:long long};",
+      "using F = ${3:long long};",
+      "S op(S a, S b) { return ${5:a + b}; }",
+      "S e() { return ${6:S(0)}; }",
+      "S mapping(F f, S x, int len) { return ${7:x + f * len}; }",
+      "F composition(F f, F g) { return ${8:f + g}; } // g の後に f",
+      "F id() { return ${9:F(0)}; }",
+      "}",
+      "using ${4:Treap} = ImplicitTreap<${1}::S, ${1}::op, ${1}::e,",
+      "                            ${1}::F, ${1}::mapping, ${1}::composition, ${1}::id>;",
+      "$0"
+    ]
+  },
+  "Implicit Treap: affine configuration": {
+    "scope": "cpp",
+    "prefix": "cp-treap-affine-config",
+    "description": "グローバルに挿入。ACL modint の区間アフィン変換・区間和。写像は {倍率, 加算値}。",
+    "body": [
+      "#include <atcoder/modint>",
+      "#include \"library/data_structure/implicit_treap.hpp\"",
+      "namespace ${1:treap_affine} {",
+      "using S = ${2:atcoder::modint998244353};",
+      "struct F { S a, b; };",
+      "S op(S a, S b) { return ${4:a + b}; }",
+      "S e() { return ${5:S(0)}; }",
+      "S mapping(F f, S x, int len) { return ${6:f.a * x + f.b * len}; }",
+      "F composition(F f, F g) { return {${7:f.a * g.a, f.a * g.b + f.b}}; } // g の後に f",
+      "F id() { return {${8:S(1), S(0)}}; }",
+      "}",
+      "using ${3:Treap} = ImplicitTreap<${1}::S, ${1}::op, ${1}::e,",
+      "                            ${1}::F, ${1}::mapping, ${1}::composition, ${1}::id>;",
+      "$0"
+    ]
+  },
+  "Implicit Treap: initialize": {
+    "scope": "cpp",
+    "prefix": "cp-treap-init",
+    "description": "関数内に挿入。先に cp-treap-*-config で型を定義する。係数型は設定の S と同じにする。",
+    "body": [
+      "std::vector<${2:long long}> ${3:initial}{${4:1, 2, 3}};",
+      "${1:Treap} ${5:tree}(${3});",
+      "$0"
+    ]
+  },
+  "Mo: range sum": {
+    "scope": "cpp",
+    "prefix": "cp-mo-sum",
+    "description": "関数内に挿入。mo.hpp を include 済みとする。a と [l,r) のクエリは事前に用意。集計は毎回空区間から開始。",
+    "body": [
+      "Mo ${1:mo}(static_cast<int>(${2:a}.size()));",
+      "for (auto [l, r] : ${3:queries}) ${1}.add_query(l, r);",
+      "using ${4:Answer} = ${5:long long};",
+      "std::vector<${4}> ${6:answers}(${3}.size());",
+      "${4} ${7:sum} = 0;",
+      "auto ${8:add} = [&](int i) { ${7} += ${2}[i]; };",
+      "auto ${9:erase} = [&](int i) { ${7} -= ${2}[i]; };",
+      "${1}.run(${8}, ${9}, [&](int query_id) { ${6}[query_id] = ${7}; });",
+      "$0"
+    ]
+  },
+  "Mo: directional callbacks": {
+    "scope": "cpp",
+    "prefix": "cp-mo-directional",
+    "description": "関数内に挿入。mo.hpp を include 済みとする。左右別処理用の枠。初期状態は空区間。空のコールバックを実装してから使う。",
+    "body": [
+      "Mo ${1:mo}(static_cast<int>(${2:a}.size()));",
+      "for (auto [l, r] : ${3:queries}) ${1}.add_query(l, r);",
+      "// 集計状態を空区間 [0, 0) に初期化する。",
+      "${1}.run(",
+      "    [&](int index) { ${4:(void)index; /* 左端に追加 */} },",
+      "    [&](int index) { ${5:(void)index; /* 右端に追加 */} },",
+      "    [&](int index) { ${6:(void)index; /* 左端から削除 */} },",
+      "    [&](int index) { ${7:(void)index; /* 右端から削除 */} },",
+      "    [&](int query_id) { ${8:(void)query_id; /* 登録順 ID へ結果を保存 */} }",
+      ");",
+      "$0"
+    ]
+  },
+  "Sparse Table: minimum configuration": {
+    "scope": "cpp",
+    "prefix": "cp-sparse-min-config",
+    "description": "グローバルに挿入。非空区間の最小値用。op を変える場合は結合則・冪等則を満たす必要がある（和は不可）。",
+    "body": [
+      "#include \"library/data_structure/sparse_table.hpp\"",
+      "namespace ${1:sparse_min} {",
+      "using S = ${2:int};",
+      "S op(S a, S b) { return ${4:a < b ? a : b}; }",
+      "}",
+      "using ${3:StaticRMQ} = SparseTable<${1}::S, ${1}::op>;",
+      "$0"
+    ]
+  },
+  "Sparse Table: initialize and query": {
+    "scope": "cpp",
+    "prefix": "cp-sparse-init",
+    "description": "関数内に挿入。cp-sparse-min-config で型を定義し初期配列を用意する。非空 [l,r) のみ。",
+    "body": [
+      "${1:StaticRMQ} ${2:table}(${3:a});",
+      "auto ${4:minimum} = ${2}.prod(${5:0}, ${6:1}); // 0 <= l < r <= a.size()",
+      "$0"
+    ]
+  }
+}

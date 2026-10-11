@@ -9,7 +9,20 @@
 /**
  * @brief 無向木の最小共通祖先を二分累乗で求める。
  * @note 頂点は 0-indexed。構築は反復 DFS で行う。
- * @par 計算量 構築 O(N log N) 時間・空間、祖先・LCA・距離のクエリ O(log N)。
+ * @par Complexity
+ * 構築 O(N log N) 時間・空間、祖先・LCA・距離のクエリ O(log N)。
+ *
+ * @code
+ * #include "library/graph/lca.hpp"
+ * #include <cassert>
+ * int main() {
+ *     std::vector<std::vector<int>> tree{{1, 2}, {0}, {0}};
+ *     LCA lca(tree, 0);
+ *     assert(lca.query(1, 2) == 0);
+ *     assert(lca.distance(1, 2) == 2);
+ *     assert(lca.kth_ancestor(1, 2) == -1);
+ * }
+ * @endcode
  */
 class LCA {
 public:
@@ -17,6 +30,9 @@ public:
      * @brief tree を root を根とする木として前計算する。
      * @pre tree は N > 0 の連結な無向木で、各辺を両方向に格納すること。
      * @pre N は int に収まり、頂点と root は [0, N)。
+     *
+     * @param tree 無向木の隣接リスト（各辺を両方向に格納）。
+     * @param root 根の頂点番号。既定値 0。
      */
     explicit LCA(const std::vector<std::vector<int>>& tree, int root = 0) {
         assert(!tree.empty() && tree.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()));
@@ -48,19 +64,37 @@ public:
         }
     }
 
-    /// @brief v の深さを O(1) で返す。根の深さは 0。@pre v は [0, N)。
+    /**
+     * @brief v の深さを O(1) で返す。根の深さは 0。
+     * @pre v は [0, N)。
+     * @param v 頂点番号（0-indexed）。
+     * @return 根から v までの辺数。
+     */
     int depth(int v) const {
         assert(0 <= v && v < static_cast<int>(depth_.size()));
         return depth_[v];
     }
 
-    /// @brief v の親を O(1) で返す。根の親は -1。@pre v は [0, N)。
+    /**
+     * @brief v の親を O(1) で返す。根の親は -1。
+     * @pre v は [0, N)。
+     * @param v 頂点番号（0-indexed）。
+     * @return v の親の頂点番号。根なら -1。
+     */
     int parent(int v) const {
         assert(0 <= v && v < static_cast<int>(depth_.size()));
         return parent_[0][v];
     }
 
-    /// @brief v の k 個上の祖先を返す。根より上なら -1。@pre v は [0, N)。
+    /**
+     * @brief v の k 個上の祖先を返す。根より上なら -1。
+     * @pre v は [0, N)。
+     * @param v 出発頂点（0-indexed）。
+     * @param k 上にたどる辺数。0 なら v。
+     * @return 祖先の頂点番号。根を越えると -1。
+     * @par Complexity
+     * O(log N) 時間、追加空間 O(1)。
+     */
     int kth_ancestor(int v, unsigned long long k) const {
         assert(0 <= v && v < static_cast<int>(depth_.size()));
         if (k > static_cast<unsigned long long>(depth_[v])) return -1;
@@ -70,7 +104,15 @@ public:
         return v;
     }
 
-    /// @brief u, v の最小共通祖先を返す。@pre u, v は [0, N)。
+    /**
+     * @brief u, v の最小共通祖先を返す。
+     * @pre u, v は [0, N)。
+     * @param u 一方の頂点（0-indexed）。
+     * @param v 他方の頂点（0-indexed）。
+     * @return 指定した根に対する最小共通祖先の頂点番号。
+     * @par Complexity
+     * O(log N)。
+     */
     int query(int u, int v) const {
         assert(0 <= u && u < static_cast<int>(depth_.size()));
         assert(0 <= v && v < static_cast<int>(depth_.size()));
@@ -86,7 +128,15 @@ public:
         return parent_[0][u];
     }
 
-    /// @brief u と v の距離（辺数）を返す。@pre u, v は [0, N)。
+    /**
+     * @brief u と v の距離（辺数）を返す。
+     * @pre u, v は [0, N)。
+     * @param u 一方の頂点（0-indexed）。
+     * @param v 他方の頂点（0-indexed）。
+     * @return u と v 間の唯一の経路の辺数（同じ頂点なら 0）。
+     * @par Complexity
+     * O(log N)。
+     */
     int distance(int u, int v) const {
         int w = query(u, v);
         return (depth_[u] - depth_[w]) + (depth_[v] - depth_[w]);

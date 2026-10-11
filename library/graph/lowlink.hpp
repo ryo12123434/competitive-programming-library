@@ -10,8 +10,36 @@
  * @brief 無向グラフの Lowlink で関節点と橋を求める。
  * @note 頂点・辺 ID は 0-indexed。非連結グラフ・多重辺・自己ループに対応する。
  * @note DFS は反復処理で行い、親への辺は辺 ID で区別する。
+ *
+ * @par Complexity
+ * 構築 O(V)、保持空間 O(V + E)、build O(V + E) 時間・追加空間 O(V)。
+ *
+ * @code
+ * #include "library/graph/lowlink.hpp"
+ * #include <cassert>
+ * int main() {
+ *     Lowlink graph(3);
+ *     graph.add_edge(0, 1);
+ *     graph.add_edge(1, 2);
+ *     graph.build();
+ *     assert((graph.articulation_points == std::vector<int>{1}));
+ *     assert(graph.bridges.size() == 2);
+ * }
+ * @endcode
  */
 struct Lowlink {
+    /**
+     * @brief 隣接リスト用の無向辺の片方向の情報。
+     * @note to は隣接頂点、id は add_edge の戻り値。同じ無向辺の両方向で共通。
+     * @code
+     * #include "library/graph/lowlink.hpp"
+     * #include <cassert>
+     * int main() {
+     *     Lowlink::Edge edge{1, 0};
+     *     assert(edge.id == 0);
+     * }
+     * @endcode
+     */
     struct Edge { int to, id; };
     int V;
     std::vector<std::vector<Edge>> G;
@@ -24,13 +52,23 @@ struct Lowlink {
     /// @brief 橋の辺 ID（順序は不定）。@pre 最後の辺追加後に build 実行済み。
     std::vector<int> bridges;
 
-    /// @brief V 頂点のグラフを O(V) で構築する。@pre V >= 0。
+    /**
+     * @brief V 頂点のグラフを O(V) で構築する。
+     * @pre V >= 0。
+     * @param V 頂点数。頂点番号は [0, V)。
+     */
     explicit Lowlink(int V) : V(V) {
         assert(V >= 0);
         G.resize(V);
     }
 
-    /// @brief 無向辺を償却 O(1) で追加し、辺 ID を返す。@pre 端点は [0, V)、辺数は int に収まること。
+    /**
+     * @brief 無向辺を償却 O(1) で追加し、辺 ID を返す。
+     * @pre 端点は [0, V)、辺数は int に収まること。
+     * @param u 一方の端点（0-indexed）。
+     * @param v 他方の端点（0-indexed）。
+     * @return 登録順の辺 ID。橋の端点は edges[bridges[i]] で取得できる。
+     */
     int add_edge(int u, int v) {
         assert(0 <= u && u < V && 0 <= v && v < V);
         assert(edges.size() < static_cast<std::size_t>(std::numeric_limits<int>::max()));
@@ -41,7 +79,10 @@ struct Lowlink {
         return id;
     }
 
-    /// @brief 全連結成分を調べて結果を毎回再構築する。O(V + E) 時間、追加空間 O(V)。
+    /**
+     * @brief 全連結成分を調べて結果を毎回再構築する。O(V + E) 時間、追加空間 O(V)。
+     * @note 辺の追加後は再実行する。ord / low / articulation_points / bridges に結果を格納する。
+     */
     void build() {
         ord.assign(V, -1);
         low.assign(V, -1);

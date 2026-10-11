@@ -11,7 +11,20 @@
  * @return base 進表現の文字列
  * @pre 0 <= n、2 <= base <= 36
  * @par Complexity
- * O(log_base(n))
+ * O(1 + log_base(n+1)) 時間・出力空間。
+ *
+ * @note 0 は "0"。10 以上の桁は大文字 A..Z。
+ *
+ * @code
+ * #include "library/math/base_conversion.hpp"
+ * #include <cassert>
+ * int main() {
+ *     assert(to_base(255, 16) == "FF");
+ *     assert(from_base("ff", 16) == 255);
+ *     assert((to_digits(13, 2) == std::vector<int>{1, 1, 0, 1}));
+ *     assert((to_digits_rev(13, 2) == std::vector<int>{1, 0, 1, 1}));
+ * }
+ * @endcode
  */
 inline std::string to_base(long long n, int base) {
     const std::string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -36,6 +49,8 @@ inline std::string to_base(long long n, int base) {
  * @pre 2 <= base <= 36、s は正しい base 進表現で、結果が long long に収まること。
  * @par Complexity
  * O(|s|)
+ *
+ * @note 英字は大文字・小文字とも対応。符号・空白は扱わず、入力の妥当性検査はしない。追加空間 O(1)。
  */
 inline long long from_base(const std::string& s, int base) {
     long long res = 0;
@@ -64,7 +79,9 @@ inline long long from_base(const std::string& s, int base) {
  * @pre 0 <= n、2 <= base
  * @note 例: to_digits(13, 2) -> {1, 1, 0, 1}
  * @par Complexity
- * O(log_base(n))
+ * O(1 + log_base(n+1)) 時間・出力空間。
+ *
+ * @note 0 は {0}。各桁は [0, base)。
  */
 inline std::vector<int> to_digits(long long n, int base) {
     if (n == 0) return {0};
@@ -87,7 +104,9 @@ inline std::vector<int> to_digits(long long n, int base) {
  * @pre 0 <= n、2 <= base
  * @note 例: to_digits_rev(13, 2) -> {1, 0, 1, 1}
  * @par Complexity
- * O(log_base(n))
+ * O(1 + log_base(n+1)) 時間・出力空間。
+ *
+ * @note 0 は {0}。各桁は [0, base)。
  */
 inline std::vector<int> to_digits_rev(long long n, int base) {
     if (n == 0) return {0};
