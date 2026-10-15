@@ -1,14 +1,7 @@
+// https://github.com/ryo12123434/competitive-programming-library
 #include<bits/stdc++.h>
-#include<atcoder/all>
-//#include <boost/multiprecision/cpp_int.hpp>
-#include <ext/pb_ds/assoc_container.hpp>
-#include <ext/pb_ds/tree_policy.hpp>
-
 using namespace std;
-using namespace atcoder;
-//using boost::multiprecision::cpp_int;
-using namespace __gnu_pbds;
- 
+
 #pragma region template
 using ull = unsigned long long;
 using ll = long long;
@@ -61,12 +54,20 @@ template<typename T> struct is_vector<vector<T>> : true_type {};
 template<typename T> inline constexpr bool is_vector_v = is_vector<T>::value;
 template<typename T> void print_vec(const vector<T>& v);
 const long long INF = 1LL<<60;
-// 順序統計木
-template<typename T>
-using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
-using ordered_multiset = tree<pii, null_type, less<pii>, rb_tree_tag, tree_order_statistics_node_update>;
 #pragma endregion
 
+//#include <ext/pb_ds/assoc_container.hpp>
+//#include <ext/pb_ds/tree_policy.hpp>
+//using boost::multiprecision::cpp_int;
+//using namespace __gnu_pbds;
+//// 順序統計木
+//template<typename T>
+//using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+//using ordered_multiset = tree<pii, null_type, less<pii>, rb_tree_tag, tree_order_statistics_node_update>;
+
+//#include<atcoder/all>
+//using namespace atcoder;
+//#include "../competitive-programming-library/library"
 
 
 int main(void) {ios::sync_with_stdio(false); std::cin.tie(nullptr);
@@ -83,7 +84,6 @@ g++ main.cpp -o main.exe
 main.exe < in.txt > out.txt
 */
 template<typename T>
-void print_vec(const vector<T>& v) {if (v.empty()) {cout << endl;return;}if constexpr (is_same_v<T, string>) 
-{for (const auto& s : v) {cout << s << endl;}}
+void print_vec(const vector<T>& v) {if (v.empty()) {cout << endl;return;}if constexpr (is_same_v<T, string>) {for (const auto& s : v) {cout << s << endl;}}
 else if constexpr (is_vector_v<T>) {for (const auto& row : v) {print_vec(row);}}
 else{for (size_t i = 0; i < v.size(); ++i) {cout << v[i] << (i == v.size() - 1 ? "" : " ");}cout << el;}}
