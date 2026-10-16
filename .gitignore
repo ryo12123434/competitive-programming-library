@@ -30,3 +30,6 @@ Thumbs.db
 # Python テストのキャッシュ
 __pycache__/
 *.py[cod]
+
+# ランダムテストの反例とビルド出力
+.stress/
