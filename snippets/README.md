@@ -2,37 +2,7 @@
 
 C++ ファイルで prefix を入力し、補完候補を選んで展開します。候補が出ない場合は `Ctrl+Space`、
 またはコマンドパレットの「Snippets: Insert Snippet」を使います。`Tab` で編集項目を順に移動し、
-最後に `$0` の位置へ移ります。すべて `scope: "cpp"`、GNU++23 用です。
-
-## 導入
-
-`snippets/` に置くだけでは VSCode は自動で読み込みません。次のどちらかに
-必要な `.code-snippets` ファイルをコピーしてください。Markdown ファイルはコピー不要です。
-
-- **すべての作業フォルダで使う**：ユーザースニペットのフォルダへコピーする。
-  Windows は `%APPDATA%\Code\User\snippets`、Linux は `~/.config/Code/User/snippets`、
-  macOS は `~/Library/Application Support/Code/User/snippets`。
-- **特定のワークスペースだけで使う**：そのフォルダの `.vscode/` にコピーする。
-
-Windows の PowerShell で、このリポジトリのルートから全5ファイルを導入する例です。
-
-```powershell
-$snippetDir = Join-Path $env:APPDATA 'Code\User\snippets'
-New-Item -ItemType Directory -Force $snippetDir | Out-Null
-Copy-Item .\snippets\*.code-snippets $snippetDir
-```
-
-別の VSCode プロファイル、Insiders、リモート環境では保存先が異なる場合があります。
-「Snippets: Configure Snippets」から利用中の環境の保存先を開いてください。
-同じスニペットをユーザー領域と `.vscode/` の両方に置くと補完が重複します。
-
-更新時はコピー先も上書きします。以前の `competitive-programming.code-snippets` と
-`competitive-programming-lazy.code-snippets` はコピー先から削除してください。
-別途 `cpp.json` などに登録していた `atcmain` も、本ファイル群と併用するなら重複登録を解除します。
-
-スニペットは include パスや ACL をインストールしません。リポジトリ外から自作ヘッダを使う場合は、
-コンパイラに `-I <このリポジトリのルート>`、IntelliSense の includePath に同じルートを設定します。
-ACL のヘッダもコンパイラから見える状態にします。`main` のデバッグ用 include は `-DLOCAL` 時に有効です。
+最後に `$0` の位置へ移ります。GNU++23 用です。
 
 ## 一覧
 
@@ -74,35 +44,3 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 
 添字は 0-indexed、区間は `[l,r)` です。整数の演算では中間値を含むオーバーフローに注意してください。
 同じ設定を複数回挿入する場合は、名前空間と型名を変えて定義の衝突を避けます。
-
-## 旧名からの移行
-
-| 旧 prefix | 新 prefix |
-| --- | --- |
-| `atcmain` | `main`（`atcmain` も同じスニペットの別名として維持） |
-| `cp-lazy-assign-min-config` | `lazy-assign-min` |
-| `cp-lazy-assign-max-config` | `lazy-assign-max` |
-| `cp-lazy-assign-sum-config` | `lazy-assign-sum` |
-| `cp-lazy-add-min-config` | `lazy-add-min` |
-| `cp-lazy-add-max-config` | `lazy-add-max` |
-| `cp-lazy-add-sum-config` | `lazy-add-sum` |
-| `cp-lazy-init` | `lazy-init` |
-| `cp-treap-add-config` | `treap-add` |
-| `cp-treap-affine-config` | `treap-affine` |
-| `cp-treap-init` | `treap-init` |
-| `cp-mo-sum` | `mo-sum` |
-| `cp-mo-directional` | `mo-directional` |
-| `cp-sparse-min-config` | `sparse-min` |
-| `cp-sparse-init` | `sparse-init` |
-
-旧 `cp-*` の別名は登録していません。既存スニペットの C++ 本文とタブストップは維持しています。
-
-## 検証
-
-```sh
-python -m unittest discover -s .verify-helper/tests -p test_snippets.py -v
-```
-
-全ファイルの JSON、重複キー・prefix、別名、説明・scope、プレースホルダーの展開を検査します。
-展開結果を GNU++23 でコンパイル・実行し、全6種類の遅延セグ木を愚直配列と比較します。
-メインテンプレートは `LOCAL` 有効・無効の両方を検証します。実行には `g++` と ACL が必要です。
