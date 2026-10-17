@@ -73,6 +73,75 @@ class BundleTest(unittest.TestCase):
         with self.assertRaisesRegex(bundler.BundleError, "cannot resolve"):
             bundler.bundle(source)
 
+    def test_local_only_includes_are_preserved(self):
+        local_block = ('#ifdef LOCAL // ローカル専用\n'
+                       '  #include "library/debug/not_installed.hpp" // そのまま残す\n'
+                       '#if OTHER\n#include <atcoder/not_installed>\n#else\n'
+                       '#include "another_debug.hpp"\n#endif\n#endif\n')
+        self.write("library/value.hpp", "#pragma once\ninline int value() { return 42; }\n")
+        source = self.write("submission.cpp", local_block + '#include "library/value.hpp"\nint main() { return value() != 42; }\n')
+        for expand_acl in (False, True):
+            with self.subTest(expand_acl=expand_acl):
+                result = bundler.bundle(source, expand_acl=expand_acl, acl_dir=self.root / "missing-acl")
+                self.assertIn(local_block, result)
+                self.assertIn("inline int value()", result)
+                self.assertNotIn('#include "library/value.hpp"', result)
+                # debug / ACL が存在しなくても、リポジトリ外で提出コードをコンパイルできる。
+                with tempfile.TemporaryDirectory() as directory:
+                    root = Path(directory)
+                    output, executable = root / "submission.cpp", root / "submission.exe"
+                    output.write_text(result, encoding="utf-8")
+                    subprocess.run(["g++", "-std=gnu++23", str(output), "-o", str(executable)],
+                                   cwd=directory, check=True, capture_output=True)
+                    subprocess.run([str(executable)], check=True, capture_output=True)
+
+    def test_local_condition_alternatives(self):
+        self.write("library/release.hpp", "#pragma once\nstruct Release {};\n")
+        for directive, release_first in [
+            ("#ifdef LOCAL", False), ("#if defined(LOCAL)", False),
+            ("#if defined LOCAL", False), ("#if LOCAL", False),
+            ("#ifndef LOCAL", True), ("#if !defined(LOCAL)", True),
+            ("#if ! defined LOCAL", True), ("#if !LOCAL", True),
+        ]:
+            with self.subTest(directive=directive):
+                debug = '#include "library/missing_debug.hpp"\n'
+                release = '#include "library/release.hpp"\n'
+                first, second = (release, debug) if release_first else (debug, release)
+                source = self.write("submission.cpp", f'{directive}\n{first}#else\n{second}#endif\n')
+                result = bundler.bundle(source)
+                self.assertIn(debug, result)
+                self.assertIn("struct Release {};", result)
+                self.assertNotIn(release, result)
+
+    def test_nested_local_branches_and_recursive_headers(self):
+        self.write("library/detail.hpp", "#pragma once\nstruct Detail {};\n")
+        self.write("library/root.hpp", '#pragma once\n#ifdef LOCAL\n#include "missing.hpp"\n'
+                   '#else\n#include "detail.hpp"\n#endif\n')
+        self.write("library/other.hpp", "#pragma once\nstruct Other {};\n")
+        self.write("library/fallback.hpp", "#pragma once\nstruct Fallback {};\n")
+        source = self.write("submission.cpp", '#ifdef LOCAL\n#if OTHER\n#include "library/skip_a.hpp"\n'
+                            '#else\n#include "library/skip_b.hpp"\n#endif\n'
+                            '#elif defined(LOCAL)\n#include "library/skip_c.hpp"\n'
+                            '#elif OTHER\n#include "library/root.hpp"\n'
+                            '#else\n#include "library/other.hpp"\n#endif\n'
+                            '#if FEATURE\n#include "library/fallback.hpp"\n#endif\n')
+        result = bundler.bundle(source)
+        for name in ("skip_a", "skip_b", "skip_c"):
+            self.assertIn(f'#include "library/{name}.hpp"', result)
+        self.assertIn('#include "missing.hpp"', result)
+        for name in ("Detail", "Other", "Fallback"):
+            self.assertEqual(result.count(f"struct {name} {{}};"), 1)
+        self.assertNotIn('#include "detail.hpp"', result)
+
+    def test_preserved_local_include_does_not_suppress_later_expansion(self):
+        self.write("library/shared.hpp", "#pragma once\nstruct Shared {};\n")
+        source = self.write("submission.cpp", '#ifdef LOCAL\n#include "library/shared.hpp"\n#endif\n'
+                            '#include "library/shared.hpp"\n#include "library/shared.hpp"\n')
+        result = bundler.bundle(source)
+        self.assertIn('#ifdef LOCAL\n#include "library/shared.hpp"\n#endif', result)
+        self.assertEqual(result.count('#include "library/shared.hpp"'), 1)
+        self.assertEqual(result.count("struct Shared {};"), 1)
+
     def test_cli_stdout_modes(self):
         source = self.write("submission.cpp", '#include <iostream>\nint main() { std::cout << 42; }\n')
         expected = bundler.bundle(source)

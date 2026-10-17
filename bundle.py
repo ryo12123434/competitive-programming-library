@@ -19,6 +19,45 @@ ACL_INCLUDE_RE = re.compile(
     r'^\s*#\s*include\s*(?:<(?P<angle>atcoder/[^>]+)>|"(?P<quoted>atcoder/[^"]+)")'
     r'\s*(?:/\*.*?\*/\s*)*(?://.*)?$'
 )
+CONDITIONAL_RE = re.compile(r"^\s*#\s*(ifdef|ifndef|if|elif|else|endif)\b(.*)$")
+
+
+class LocalBranches:
+    """LOCAL 未定義時に到達不能な分岐だけを識別し、その他の条件は評価しない。"""
+
+    def __init__(self) -> None:
+        self.active = True
+        # 親の到達可能性と、この条件列の次の分岐へ到達できる可能性。
+        self.stack: list[tuple[bool, bool]] = []
+
+    def update(self, line: str) -> None:
+        match = CONDITIONAL_RE.match(line)
+        if match is None:
+            return
+        directive, expression = match.groups()
+        expression = re.sub(r"/\*.*?\*/", "", expression).split("//", 1)[0].strip()
+        condition = None
+        if directive in {"ifdef", "ifndef"} and expression == "LOCAL":
+            condition = directive == "ifndef"
+        elif directive in {"if", "elif"}:
+            local = re.fullmatch(r"(!\s*)?(?:defined\s*\(\s*LOCAL\s*\)|defined\s+LOCAL|LOCAL)", expression)
+            if local is not None:
+                condition = local[1] is not None
+
+        if directive in {"ifdef", "ifndef", "if"}:
+            self.stack.append((self.active, condition is not True))
+            self.active = self.active and condition is not False
+        elif self.stack:
+            parent, remaining = self.stack[-1]
+            if directive == "elif":
+                self.active = parent and remaining and condition is not False
+                self.stack[-1] = (parent, remaining and condition is not True)
+            elif directive == "else":
+                self.active = parent and remaining
+                self.stack[-1] = (parent, False)
+            elif directive == "endif":
+                self.stack.pop()
+                self.active = parent
 
 
 class BundleError(RuntimeError):
@@ -114,8 +153,15 @@ def bundle_file(
         raise BundleError(f"failed to read {source}: {exc}") from exc
 
     output: list[str] = []
+    branches = LocalBranches()
 
     for line in lines:
+        branches.update(line)
+        if not branches.active:
+            # 無効な分岐は include の解決・既展開集合への登録もせず、そのまま残す。
+            output.append(line)
+            continue
+
         if is_library_file and PRAGMA_ONCE_RE.match(line):
             continue
 

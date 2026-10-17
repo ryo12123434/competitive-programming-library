@@ -75,6 +75,34 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 添字は 0-indexed、区間は `[l,r)` です。整数の演算では中間値を含むオーバーフローに注意してください。
 同じ設定を複数回挿入する場合は、名前空間と型名を変えて定義の衝突を避けます。
 
+## main のデバッグ設定
+
+`-DLOCAL` を付けると、`debug.hpp`・`timer.hpp`・`random.hpp` を読み込みます。
+テーブル表示は `debug.hpp` に統合済みなので、互換用の `table_debug.hpp` は重ねて include しません。
+`LOCAL` 未定義時の `debug(...)`・`debug_table(...)`・`CPL_SCOPED_TIMER(...)` は何も実行せず、
+引数も評価しません。副作用のある式を渡す場合、提出時にはその副作用も消える点に注意してください。
+
+`cpl::debug::Timer` や `cpl::random::Random` などの**クラスを直接使う宣言・式は自動では消えません**。
+このテンプレートは `LOCAL` 未定義時にヘッダ自体を読み込まないため、提出時だけ無効にしたいコードは
+次のように `#ifdef LOCAL` で囲みます。乱数生成は、ヘッダを常時 include すれば提出時にも実行されます。
+Timer 自体には `LOCAL` 無効時に時計を読まず 0 を返す実装がありますが、呼び出し式の削除とは異なります。
+
+関数内に書く例です。
+
+```cpp
+CPL_SCOPED_TIMER("solve"); // LOCAL 時にスコープ終了までの時間を表示
+#ifdef LOCAL
+cpl::debug::Timer timer;
+cpl::random::Random rng(42);
+debug(rng.integer(-10, 10), timer.elapsed_ms());
+#endif
+```
+
+`bundle.py` は `#ifdef LOCAL` 内の include と条件分岐をそのまま残します。
+展開後の提出コードは `LOCAL` 未定義ならデバッグ用ヘッダがなくてもコンパイルできます。
+展開後も `-DLOCAL` で動かす場合は、従来どおりリポジトリの include パスが必要です。
+通常の自作ライブラリは従来どおり展開します。
+
 ## 旧名からの移行
 
 | 旧 prefix | 新 prefix |
@@ -95,7 +123,7 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 | `cp-sparse-min-config` | `sparse-min` |
 | `cp-sparse-init` | `sparse-init` |
 
-旧 `cp-*` の別名は登録していません。既存スニペットの C++ 本文とタブストップは維持しています。
+旧 `cp-*` の別名は登録していません。命名整理では本文・タブストップを維持し、main のデバッグ設定だけを上記構成に更新しています。
 
 ## 検証
 
@@ -105,4 +133,5 @@ python -m unittest discover -s .verify-helper/tests -p test_snippets.py -v
 
 全ファイルの JSON、重複キー・prefix、別名、説明・scope、プレースホルダーの展開を検査します。
 展開結果を GNU++23 でコンパイル・実行し、全6種類の遅延セグ木を愚直配列と比較します。
-メインテンプレートは `LOCAL` 有効・無効の両方を検証します。実行には `g++` と ACL が必要です。
+メインテンプレートは bundle 前後とも `LOCAL` 有効・無効を検証し、提出版はリポジトリの include パスなしでもコンパイルします。
+実行には `g++` と ACL が必要です。
