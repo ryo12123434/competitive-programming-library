@@ -1,0 +1,53 @@
+{
+  "Mo: range sum": {
+    "scope": "cpp",
+    "prefix": "mo-sum",
+    "description": "関数内に挿入。mo.hpp を include 済みとする。a と [l,r) のクエリは事前に用意。集計は毎回空区間から開始。",
+    "body": [
+      "Mo ${1:mo}(static_cast<int>(${2:a}.size()));",
+      "for (auto [l, r] : ${3:queries}) ${1}.add_query(l, r);",
+      "using ${4:Answer} = ${5:long long};",
+      "std::vector<${4}> ${6:answers}(${3}.size());",
+      "${4} ${7:sum} = 0;",
+      "auto ${8:add} = [&](int i) { ${7} += ${2}[i]; };",
+      "auto ${9:erase} = [&](int i) { ${7} -= ${2}[i]; };",
+      "${1}.run(${8}, ${9}, [&](int query_id) { ${6}[query_id] = ${7}; });",
+      "$0"
+    ]
+  },
+  "Mo: directional callbacks": {
+    "scope": "cpp",
+    "prefix": "mo-directional",
+    "description": "関数内に挿入。mo.hpp を include 済みとする。左右別処理用の枠。初期状態は空区間。空のコールバックを実装してから使う。",
+    "body": [
+      "Mo ${1:mo}(static_cast<int>(${2:a}.size()));",
+      "for (auto [l, r] : ${3:queries}) ${1}.add_query(l, r);",
+      "// 集計状態を空区間 [0, 0) に初期化する。",
+      "${1}.run(",
+      "    [&](int index) { ${4:(void)index; /* 左端に追加 */} },",
+      "    [&](int index) { ${5:(void)index; /* 右端に追加 */} },",
+      "    [&](int index) { ${6:(void)index; /* 左端から削除 */} },",
+      "    [&](int index) { ${7:(void)index; /* 右端から削除 */} },",
+      "    [&](int query_id) { ${8:(void)query_id; /* 登録順 ID へ結果を保存 */} }",
+      ");",
+      "$0"
+    ]
+  },
+  "Mo: quick reference": {
+    "scope": "cpp",
+    "prefix": "mo-help",
+    "description": "コメントとして挿入する早見表。初期化・主要 API・区間規約・注意点・計算量を確認できる。",
+    "body": [
+      "// Mo: #include \"library/algorithm/mo.hpp\" を用意し、関数内で mo-sum / mo-directional。",
+      "// Mo mo(n); mo.add_query(l, r);  // 静的配列、0 <= l <= r <= n、区間 [l, r)。",
+      "// mo.run(add, erase, output);   // 左右共通の void(int index) と void(int query_id)。",
+      "// mo.run(add_left, add_right, erase_left, erase_right, output);  // 順序依存の集計。",
+      "// 集計状態は run のたびに空区間 [0, 0) へ初期化する。配列の更新には使わない。",
+      "// output の実行順は登録順とは限らない。答えは query_id の位置へ保存する。",
+      "// 空区間・重複クエリも可。コールバック内でクエリを変更しない。",
+      "// Q 件: 整列 O(Q log Q)、区間操作 O(N sqrt(Q) + Q) 回、追加空間 O(Q)。",
+      "// 各コールバックの処理時間は別途必要。",
+      "$0"
+    ]
+  }
+}

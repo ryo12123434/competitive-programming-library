@@ -1,8 +1,11 @@
 {
   "Competitive Programming Main Template": {
     "scope": "cpp",
-    "prefix": "atcmain",
-    "description": "競プロ用C++23テンプレート",
+    "prefix": [
+      "main",
+      "atcmain"
+    ],
+    "description": "ファイル全体に挿入する GNU++23 用テンプレート。main / atcmain は同じ内容。LOCAL 時は debug.hpp を読み込む。",
     "body": [
       "// https://github.com/ryo12123434/competitive-programming-library",
       "#include<bits/stdc++.h>",
