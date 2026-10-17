@@ -12,6 +12,8 @@
       "using namespace std;",
       "#ifdef LOCAL",
       "#include \"library/debug/debug.hpp\"",
+      "#include \"library/debug/table_debug.hpp\"",
+      "#include \"library/debug/timer.hpp\"",
       "#else",
       "#define debug(...) ((void)0)",
       "#define debug_table(...) ((void)0)",
