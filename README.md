@@ -26,14 +26,6 @@ snippets/
 - `template/`: AtCoder 提出用テンプレート
 - `snippets/`: VSCode の C++ 用スニペット
 
-## VSCode スニペット
-
-`main`（別名 `atcmain`）、遅延セグ木・Treap・Mo・Sparse Table の設定と初期化、
-`*-help` のコメント形式の早見表を用意しています。
-[一覧・導入方法・使い方](snippets/README.md)を参照してください。
-リポジトリ外の作業フォルダでも、VSCode のユーザースニペットへコピーして利用できます。
-
-
 ## 提出用 bundler
 
 `bundle.py` は `library/` 以下の自作ヘッダを展開し、提出用の 1 ファイルにまとめます。
