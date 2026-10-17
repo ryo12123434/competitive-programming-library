@@ -1,8 +1,8 @@
 {
   "Lazy Segment Tree: assign min configuration": {
     "scope": "cpp",
-    "prefix": "cp-lazy-assign-min-config",
-    "description": "区間代入・区間最小値。F=optional<ll>（nullopt=操作なし）。Sは区間長を保持。long longのオーバーフローに注意。",
+    "prefix": "lazy-assign-min",
+    "description": "グローバルに挿入。区間代入・区間最小値。F=optional<ll>（nullopt=操作なし）。Sは区間長を保持。long longのオーバーフローに注意。 初期化は lazy-init。",
     "body": [
       "#include <atcoder/lazysegtree>",
       "#include <vector>",
@@ -33,8 +33,8 @@
   },
   "Lazy Segment Tree: assign max configuration": {
     "scope": "cpp",
-    "prefix": "cp-lazy-assign-max-config",
-    "description": "区間代入・区間最大値。F=optional<ll>（nullopt=操作なし）。Sは区間長を保持。long longのオーバーフローに注意。",
+    "prefix": "lazy-assign-max",
+    "description": "グローバルに挿入。区間代入・区間最大値。F=optional<ll>（nullopt=操作なし）。Sは区間長を保持。long longのオーバーフローに注意。 初期化は lazy-init。",
     "body": [
       "#include <atcoder/lazysegtree>",
       "#include <vector>",
@@ -65,8 +65,8 @@
   },
   "Lazy Segment Tree: assign sum configuration": {
     "scope": "cpp",
-    "prefix": "cp-lazy-assign-sum-config",
-    "description": "区間代入・区間総和。F=optional<ll>（nullopt=操作なし）。Sは区間長を保持。long longのオーバーフローに注意。",
+    "prefix": "lazy-assign-sum",
+    "description": "グローバルに挿入。区間代入・区間総和。F=optional<ll>（nullopt=操作なし）。Sは区間長を保持。long longのオーバーフローに注意。 初期化は lazy-init。",
     "body": [
       "#include <atcoder/lazysegtree>",
       "#include <vector>",
@@ -93,8 +93,8 @@
   },
   "Lazy Segment Tree: add min configuration": {
     "scope": "cpp",
-    "prefix": "cp-lazy-add-min-config",
-    "description": "区間加算・区間最小値。F=ll（0=操作なし）。Sは区間長を保持。long longのオーバーフローに注意。",
+    "prefix": "lazy-add-min",
+    "description": "グローバルに挿入。区間加算・区間最小値。F=ll（0=操作なし）。Sは区間長を保持。long longのオーバーフローに注意。 初期化は lazy-init。",
     "body": [
       "#include <atcoder/lazysegtree>",
       "#include <vector>",
@@ -124,8 +124,8 @@
   },
   "Lazy Segment Tree: add max configuration": {
     "scope": "cpp",
-    "prefix": "cp-lazy-add-max-config",
-    "description": "区間加算・区間最大値。F=ll（0=操作なし）。Sは区間長を保持。long longのオーバーフローに注意。",
+    "prefix": "lazy-add-max",
+    "description": "グローバルに挿入。区間加算・区間最大値。F=ll（0=操作なし）。Sは区間長を保持。long longのオーバーフローに注意。 初期化は lazy-init。",
     "body": [
       "#include <atcoder/lazysegtree>",
       "#include <vector>",
@@ -155,8 +155,8 @@
   },
   "Lazy Segment Tree: add sum configuration": {
     "scope": "cpp",
-    "prefix": "cp-lazy-add-sum-config",
-    "description": "区間加算・区間総和。F=ll（0=操作なし）。Sは区間長を保持。long longのオーバーフローに注意。",
+    "prefix": "lazy-add-sum",
+    "description": "グローバルに挿入。区間加算・区間総和。F=ll（0=操作なし）。Sは区間長を保持。long longのオーバーフローに注意。 初期化は lazy-init。",
     "body": [
       "#include <atcoder/lazysegtree>",
       "#include <vector>",
@@ -182,11 +182,28 @@
   },
   "Lazy Segment Tree: initialize": {
     "scope": "cpp",
-    "prefix": "cp-lazy-init",
-    "description": "関数内に挿入。先にcp-lazy-*-configをグローバルで展開する。各要素len=1で初期化。",
+    "prefix": "lazy-init",
+    "description": "関数内に挿入。先に lazy-assign-* または lazy-add-* をグローバルで展開する。名前空間と型名を設定に合わせる。各要素len=1で初期化。",
     "body": [
       "std::vector<${1:lazy_assign_min}::S> ${2:a}(${3:n}, {${4:0}, 1});",
       "${5:LazyAssignMin} ${6:seg}(${2});",
+      "$0"
+    ]
+  },
+  "Lazy Segment Tree: quick reference": {
+    "scope": "cpp",
+    "prefix": "lazy-help",
+    "description": "コメントとして挿入する早見表。初期化・主要 API・区間規約・注意点・計算量を確認できる。",
+    "body": [
+      "// ACL 遅延セグ木: lazy-assign-{min,max,sum} / lazy-add-{min,max,sum}",
+      "// 設定をグローバルに挿入 → 関数内で lazy-init。名前空間・型名を設定とそろえる。",
+      "// S = {値, len}。葉の len は 1、単位元 e() の len は 0。添字 0-indexed、区間 [l, r)。",
+      "// seg.apply(l, r, f);  // 区間更新。代入は optional<ll>、加算は ll。",
+      "// seg.prod(l, r);      // S を返す。値は .mn / .mx / .sum、空区間は e()。",
+      "// seg.get(p); seg.set(p, {x, 1}); seg.all_prod();",
+      "// composition(f, g) は g の後に f。代入の id() は nullopt、加算の id() は 0。",
+      "// 初期化 O(N)、更新・区間取得 O(log N)、all_prod O(1)、空間 O(N)。",
+      "// 中間値を含め long long の範囲内に収める。位置 p は 0 <= p < N。",
       "$0"
     ]
   }

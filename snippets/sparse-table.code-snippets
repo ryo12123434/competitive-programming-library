@@ -1,0 +1,40 @@
+{
+  "Sparse Table: minimum configuration": {
+    "scope": "cpp",
+    "prefix": "sparse-min",
+    "description": "グローバルに挿入。非空区間の最小値用。op を変える場合は結合則・冪等則を満たす必要がある（和は不可）。",
+    "body": [
+      "#include \"library/data_structure/sparse_table.hpp\"",
+      "namespace ${1:sparse_min} {",
+      "using S = ${2:int};",
+      "S op(S a, S b) { return ${4:a < b ? a : b}; }",
+      "}",
+      "using ${3:StaticRMQ} = SparseTable<${1}::S, ${1}::op>;",
+      "$0"
+    ]
+  },
+  "Sparse Table: initialize and query": {
+    "scope": "cpp",
+    "prefix": "sparse-init",
+    "description": "関数内に挿入。sparse-min で型を定義し初期配列を用意する。非空 [l,r) のみ。",
+    "body": [
+      "${1:StaticRMQ} ${2:table}(${3:a});",
+      "auto ${4:minimum} = ${2}.prod(${5:0}, ${6:1}); // 0 <= l < r <= a.size()",
+      "$0"
+    ]
+  },
+  "Sparse Table: quick reference": {
+    "scope": "cpp",
+    "prefix": "sparse-help",
+    "description": "コメントとして挿入する早見表。初期化・主要 API・区間規約・注意点・計算量を確認できる。",
+    "body": [
+      "// Sparse Table: sparse-min をグローバルに挿入 → 初期配列 a を用意して sparse-init。",
+      "// StaticRMQ table(a); auto answer = table.prod(l, r); table.size();",
+      "// 0-indexed、非空 [l, r) のみ。0 <= l < r <= table.size()。構築後の更新は不可。",
+      "// S op(S,S) は結合的かつ冪等: op(op(a,b),c) == op(a,op(b,c)), op(a,a) == a。",
+      "// min / max / gcd などに使える。区間和には使えない。可換性は不要。",
+      "// op が O(1) なら構築 O(N log N) 時間・空間、prod O(1)。",
+      "$0"
+    ]
+  }
+}
