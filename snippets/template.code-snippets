@@ -4,7 +4,7 @@
     "prefix": "atcmain",
     "description": "競プロ用C++23テンプレート",
     "body": [
-      "// https://ryo12123434.github.io/competitive-programming-library/",
+      "// https://github.com/ryo12123434/competitive-programming-library",
       "#include<bits/stdc++.h>",
       "using namespace std;",
       "#ifdef LOCAL",
