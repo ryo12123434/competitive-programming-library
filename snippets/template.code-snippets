@@ -5,16 +5,19 @@
       "main",
       "atcmain"
     ],
-    "description": "ファイル全体に挿入する GNU++23 用テンプレート。main / atcmain は同じ内容。LOCAL 時は debug.hpp を読み込む。",
+    "description": "ファイル全体に挿入する GNU++23 用テンプレート。main / atcmain は同じ内容。LOCAL 時はデバッグ表示・タイマー・乱数生成を利用できる。",
     "body": [
       "// https://github.com/ryo12123434/competitive-programming-library",
       "#include<bits/stdc++.h>",
       "using namespace std;",
       "#ifdef LOCAL",
       "#include \"library/debug/debug.hpp\"",
+      "#include \"library/debug/timer.hpp\"",
+      "#include \"library/debug/random.hpp\"",
       "#else",
       "#define debug(...) ((void)0)",
       "#define debug_table(...) ((void)0)",
+      "#define CPL_SCOPED_TIMER(...) ((void)0)",
       "#endif",
       "",
       "#pragma region template",
@@ -104,6 +107,37 @@
       "",
       "    return 0;",
       "}"
+    ]
+  },
+  "Lambda: expression": {
+    "scope": "cpp",
+    "prefix": "lambda",
+    "description": "関数内に挿入する通常のラムダ式。名前・キャプチャ・引数・戻り値型・本体の順に編集する。",
+    "body": [
+      "auto ${1:func} = [${2:&}](${3:int x}) -> ${4:int} {",
+      "    ${5:return x;}",
+      "};",
+      "$0"
+    ]
+  },
+  "Lambda: recursive expression": {
+    "scope": "cpp",
+    "prefix": "lambda-rec",
+    "description": "関数内に挿入する再帰ラムダ式。dfs(dfs, n) と呼び、内部は self(self, ...) で再帰する。追加引数は先頭のカンマを含めて編集する。",
+    "body": [
+      "auto ${1:dfs} = [${2:&}](auto&& self${3:, int n}) -> ${4:long long} {",
+      "    ${5:if (n <= 1) return 1LL;\n    return n * self(self, n - 1);}",
+      "};",
+      "$0"
+    ]
+  },
+  "Grid: skip out-of-bounds coordinates": {
+    "scope": "cpp",
+    "prefix": "grid-check",
+    "description": "ループ内に挿入。高さ h・幅 w に対して (y,x) が範囲外なら continue。Tab は h→w→y→x の順。座標は負値を表せる整数型を想定する。",
+    "body": [
+      "if (${3:y} < 0 || ${3} >= ${1:h} || ${4:x} < 0 || ${4} >= ${2:w}) continue;",
+      "$0"
     ]
   }
 }

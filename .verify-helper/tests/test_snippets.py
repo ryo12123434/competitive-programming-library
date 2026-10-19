@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -60,17 +61,19 @@ class SnippetTest(unittest.TestCase):
     def code(self, prefix, replacements=None):
         return expand(self.snippets[prefix]["body"], replacements)
 
-    def compile_and_run(self, source, *flags):
+    def compile_and_run(self, source, *flags, include_repository=True):
         with tempfile.TemporaryDirectory() as directory:
             executable = Path(directory) / "snippet.exe"
             result = subprocess.run(
-                ["g++", "-std=gnu++23", "-O2", "-Wall", "-Wextra", "-Werror", "-I", str(REPOSITORY),
+                ["g++", "-std=gnu++23", "-O2", "-Wall", "-Wextra", "-Werror",
+                 *(["-I", str(REPOSITORY)] if include_repository else []),
                  *flags, "-x", "c++", "-", "-o", str(executable)],
-                input=source, text=True, capture_output=True,
+                input=source, text=True, capture_output=True, cwd=directory,
             )
             self.assertEqual(result.returncode, 0, result.stderr)
             result = subprocess.run([str(executable)], text=True, capture_output=True, timeout=10)
             self.assertEqual(result.returncode, 0, result.stderr)
+            return result
 
     def test_catalog(self):
         self.assertEqual({path.name for path in SNIPPET_DIRECTORY.glob("*.code-snippets")}, {
@@ -83,6 +86,7 @@ class SnippetTest(unittest.TestCase):
             "mo-sum", "mo-directional", "mo-help", "sparse-min", "sparse-init", "sparse-help",
             "lazy-assign-min", "lazy-assign-max", "lazy-assign-sum",
             "lazy-add-min", "lazy-add-max", "lazy-add-sum", "lazy-init", "lazy-help",
+            "lambda", "lambda-rec", "grid-check",
         })
         for prefix, snippet in self.snippets.items():
             with self.subTest(prefix=prefix):
@@ -112,19 +116,114 @@ class SnippetTest(unittest.TestCase):
     rep(i, 0, 3) sum += a[i];
     assert(sum == 6);
     int evaluated = 0;
+    std::vector<std::vector<int>> dp{{1,2}, {3,4}};
     debug(++evaluated);
+    debug_table((++evaluated, dp));
+    { CPL_SCOPED_TIMER((++evaluated, "solve")); }
 #ifdef LOCAL
-    assert(evaluated == 1);
+    assert(evaluated == 3);
+    cpl::debug::Timer timer;
+    timer.reset();
+    assert(timer.elapsed_ms() >= 0);
+    cpl::random::Random rng(42), same(42);
+    assert(rng.integer(-10,10) == same.integer(-10,10));
 #else
     assert(evaluated == 0);
     debug(undefined_value());
     debug_table(undefined_table());
+    CPL_SCOPED_TIMER(undefined_label());
 #endif
 '''
         # 既存テンプレートの折り畳み用 pragma は GCC が認識しないため、この警告だけ除外する。
         for flags in ([], ["-DLOCAL"]):
             with self.subTest(flags=flags):
-                self.compile_and_run(self.code("main", {0: body}), "-Wno-unknown-pragmas", *flags)
+                result = self.compile_and_run(self.code("main", {0: body}), "-Wno-unknown-pragmas", *flags)
+                self.check_debug_output(result, bool(flags))
+
+        # 通常の自作ライブラリは展開し、LOCAL 内の debug include だけが残ることを実証する。
+        source = (self.code("sparse-min") + "\n" +
+                  self.code("main", {0: body + '\nStaticRMQ table(std::vector<int>{3,1,2}); assert(table.prod(0,3) == 1);\n'}))
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "main.cpp"
+            path.write_text(source, encoding="utf-8")
+            result = subprocess.run([sys.executable, str(REPOSITORY / "bundle.py"), str(path), "--stdout"],
+                                    text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+        bundled = result.stdout
+        for name in ("debug", "timer", "random"):
+            self.assertIn(f'#include "library/debug/{name}.hpp"', bundled)
+        self.assertNotIn('library/debug/table_debug.hpp', bundled)
+        self.assertNotIn('// BEGIN: library/debug/', bundled)
+        self.assertIn('// BEGIN: library/data_structure/sparse_table.hpp', bundled)
+        for local in (False, True):
+            with self.subTest(bundled=True, local=local):
+                result = self.compile_and_run(bundled, "-Wno-unknown-pragmas", *(["-DLOCAL"] if local else []),
+                                              include_repository=local)
+                self.check_debug_output(result, local)
+
+    def check_debug_output(self, result, local):
+        self.assertEqual(result.stdout, "")
+        if local:
+            self.assertIn("++evaluated", result.stderr)
+            self.assertIn("r/c", result.stderr)
+            self.assertIn("solve:", result.stderr)
+            self.assertIn(" ms", result.stderr)
+        else:
+            self.assertEqual(result.stderr, "")
+
+    def test_lambda(self):
+        source = '#include <cassert>\nint main() {\n' + self.code("lambda") + '\nassert(func(7) == 7);\n'
+        source += 'int offset = 8;\n' + self.code("lambda", {
+            1: "add", 2: "offset", 3: "int value", 4: "long long",
+            5: "return static_cast<long long>(value) + offset;",
+        }) + '\nassert(add(5) == 13);\n'
+        source += self.code("lambda", {
+            1: "append", 2: "", 3: "int value, int& total", 4: "void", 5: "total += value;",
+        }) + '\nint total = 0; append(4, total); assert(total == 4);\n'
+        source += self.code("lambda", {
+            1: "constant", 2: "", 3: "", 4: "int", 5: "return 42;",
+        }) + '\nassert(constant() == 42);\n}\n'
+        self.compile_and_run(source, include_repository=False)
+
+    def test_recursive_lambda(self):
+        source = '#include <cassert>\nint main() {\n' + self.code("lambda-rec") + '\n'
+        source += 'assert(dfs(dfs, 0) == 1 && dfs(dfs, 5) == 120 && dfs(dfs, 20) == 2432902008176640000LL);\n'
+        source += self.code("lambda-rec", {
+            1: "factorial", 2: "", 3: ", int count", 4: "unsigned long long",
+            5: "if (count <= 1) return 1ULL;\n    return count * self(self, count - 1);",
+        }) + '\nassert(factorial(factorial, 6) == 720ULL);\n'
+        source += 'int total = 0;\n' + self.code("lambda-rec", {
+            1: "visit", 3: ", int value", 4: "void",
+            5: "if (value < 0) return;\n    total += value;\n    self(self, value - 1);",
+        }) + '\nvisit(visit, 4); assert(total == 10);\n'
+        source += 'int remaining = 3;\n' + self.code("lambda-rec", {
+            1: "countdown", 3: "", 4: "int",
+            5: "if (remaining == 0) return 0;\n    --remaining;\n    return 1 + self(self);",
+        }) + '\nassert(countdown(countdown) == 3 && remaining == 0);\n}\n'
+        self.compile_and_run(source, include_repository=False)
+
+    def test_grid_check(self):
+        # 空・1 マス・境界内外を列挙し、continue が内側のループだけを進めることも確認する。
+        default = self.code("grid-check")
+        renamed = self.code("grid-check", {1: "height", 2: "width", 3: "ny", 4: "nx"})
+        source = '#include <cassert>\nint main() {\n'
+        for h, w, y, x, code in [("h", "w", "y", "x", default), ("height", "width", "ny", "nx", renamed)]:
+            source += f'''
+    for (int {h} = 0; {h} <= 3; ++{h}) {{
+        for (int {w} = 0; {w} <= 3; ++{w}) {{
+            int count = 0;
+            for (int {y} = -1; {y} <= {h}; ++{y}) {{
+                for (int {x} = -1; {x} <= {w}; ++{x}) {{
+                    {code}
+                    assert(0 <= {y} && {y} < {h} && 0 <= {x} && {x} < {w});
+                    ++count;
+                }}
+            }}
+            assert(count == {h} * {w});
+        }}
+    }}
+'''
+        self.compile_and_run(source + '}\n', include_repository=False)
 
     def test_treap(self):
         self.compile_and_run(self.code("treap-add") + "\n#include <cassert>\nint main() {\n" +

@@ -26,9 +26,22 @@ snippets/
 - `template/`: AtCoder 提出用テンプレート
 - `snippets/`: VSCode の C++ 用スニペット
 
+## VSCode スニペット
+
+`main`（別名 `atcmain`）、遅延セグ木・Treap・Mo・Sparse Table の設定と初期化、
+`*-help` のコメント形式の早見表を用意しています。
+[一覧・導入方法・使い方](snippets/README.md)を参照してください。
+リポジトリ外の作業フォルダでも、VSCode のユーザースニペットへコピーして利用できます。
+
+
 ## 提出用 bundler
 
 `bundle.py` は `library/` 以下の自作ヘッダを展開し、提出用の 1 ファイルにまとめます。
+
+`#ifdef LOCAL` 内の include は、条件分岐ごとそのまま残します。`LOCAL` 未定義の提出版では
+デバッグ用ヘッダが不要です。展開後のコードを `-DLOCAL` で動かす場合は、そのヘッダを参照できる include パスを指定します。
+`#ifndef LOCAL` の else 側や `#if defined(LOCAL)` など、LOCAL を直接判定する同等の分岐も扱います。
+他の条件式は評価せず、通常の自作ヘッダと `--expand-acl` による ACL の展開は従来どおりです。
 
 通常は bundled ファイルを生成します。
 
