@@ -123,10 +123,11 @@
   "Lambda: recursive expression": {
     "scope": "cpp",
     "prefix": "lambda-rec",
-    "description": "関数内に挿入する再帰ラムダ式。dfs(dfs, n) と呼び、内部は self(self, ...) で再帰する。追加引数は先頭のカンマを含めて編集する。",
+    "description": "関数内に挿入する再帰ラムダ式。dfs(dfs, ) と呼び、内部は self(self, ...) で再帰する。追加引数は先頭のカンマを含めて編集する。",
     "body": [
-      "auto ${1:dfs} = [${2:&}](auto&& self${3:, int n}) -> ${4:long long} {",
-      "    ${5:if (n <= 1) return 1LL;\n    return n * self(self, n - 1);}",
+      "auto ${1:dfs} = [${2:&}](auto&& self${3:, }) -> ${4:long long} {",
+      "    ",
+      "    ${5:self(self, );}",
       "};",
       "$0"
     ]
