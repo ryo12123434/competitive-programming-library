@@ -86,6 +86,7 @@ class SnippetTest(unittest.TestCase):
             "mo-sum", "mo-directional", "mo-help", "sparse-min", "sparse-init", "sparse-help",
             "lazy-assign-min", "lazy-assign-max", "lazy-assign-sum",
             "lazy-add-min", "lazy-add-max", "lazy-add-sum", "lazy-init", "lazy-help",
+            "lambda", "lambda-rec", "grid-check",
         })
         for prefix, snippet in self.snippets.items():
             with self.subTest(prefix=prefix):
@@ -169,6 +170,60 @@ class SnippetTest(unittest.TestCase):
             self.assertIn(" ms", result.stderr)
         else:
             self.assertEqual(result.stderr, "")
+
+    def test_lambda(self):
+        source = '#include <cassert>\nint main() {\n' + self.code("lambda") + '\nassert(func(7) == 7);\n'
+        source += 'int offset = 8;\n' + self.code("lambda", {
+            1: "add", 2: "offset", 3: "int value", 4: "long long",
+            5: "return static_cast<long long>(value) + offset;",
+        }) + '\nassert(add(5) == 13);\n'
+        source += self.code("lambda", {
+            1: "append", 2: "", 3: "int value, int& total", 4: "void", 5: "total += value;",
+        }) + '\nint total = 0; append(4, total); assert(total == 4);\n'
+        source += self.code("lambda", {
+            1: "constant", 2: "", 3: "", 4: "int", 5: "return 42;",
+        }) + '\nassert(constant() == 42);\n}\n'
+        self.compile_and_run(source, include_repository=False)
+
+    def test_recursive_lambda(self):
+        source = '#include <cassert>\nint main() {\n' + self.code("lambda-rec") + '\n'
+        source += 'assert(dfs(dfs, 0) == 1 && dfs(dfs, 5) == 120 && dfs(dfs, 20) == 2432902008176640000LL);\n'
+        source += self.code("lambda-rec", {
+            1: "factorial", 2: "", 3: ", int count", 4: "unsigned long long",
+            5: "if (count <= 1) return 1ULL;\n    return count * self(self, count - 1);",
+        }) + '\nassert(factorial(factorial, 6) == 720ULL);\n'
+        source += 'int total = 0;\n' + self.code("lambda-rec", {
+            1: "visit", 3: ", int value", 4: "void",
+            5: "if (value < 0) return;\n    total += value;\n    self(self, value - 1);",
+        }) + '\nvisit(visit, 4); assert(total == 10);\n'
+        source += 'int remaining = 3;\n' + self.code("lambda-rec", {
+            1: "countdown", 3: "", 4: "int",
+            5: "if (remaining == 0) return 0;\n    --remaining;\n    return 1 + self(self);",
+        }) + '\nassert(countdown(countdown) == 3 && remaining == 0);\n}\n'
+        self.compile_and_run(source, include_repository=False)
+
+    def test_grid_check(self):
+        # 空・1 マス・境界内外を列挙し、continue が内側のループだけを進めることも確認する。
+        default = self.code("grid-check")
+        renamed = self.code("grid-check", {1: "height", 2: "width", 3: "ny", 4: "nx"})
+        source = '#include <cassert>\nint main() {\n'
+        for h, w, y, x, code in [("h", "w", "y", "x", default), ("height", "width", "ny", "nx", renamed)]:
+            source += f'''
+    for (int {h} = 0; {h} <= 3; ++{h}) {{
+        for (int {w} = 0; {w} <= 3; ++{w}) {{
+            int count = 0;
+            for (int {y} = -1; {y} <= {h}; ++{y}) {{
+                for (int {x} = -1; {x} <= {w}; ++{x}) {{
+                    {code}
+                    assert(0 <= {y} && {y} < {h} && 0 <= {x} && {x} < {w});
+                    ++count;
+                }}
+            }}
+            assert(count == {h} * {w});
+        }}
+    }}
+'''
+        self.compile_and_run(source + '}\n', include_repository=False)
 
     def test_treap(self):
         self.compile_and_run(self.code("treap-add") + "\n#include <cassert>\nint main() {\n" +
