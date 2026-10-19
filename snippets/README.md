@@ -78,60 +78,6 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 添字は 0-indexed、区間は `[l,r)` です。整数の演算では中間値を含むオーバーフローに注意してください。
 同じ設定を複数回挿入する場合は、名前空間と型名を変えて定義の衝突を避けます。
 
-## ラムダ式とグリッドの範囲チェック
-
-`lambda` と `lambda-rec` は関数内に展開します。`Tab` の順序は共通で、
-**名前 → キャプチャ → 引数 → 戻り値型 → 本体 → 宣言の次の行**です。
-本体は複数行をまとめて編集できます。通常ラムダの引数を空欄にすると引数なしになります。
-再帰ラムダの追加引数は先頭のカンマも含むため、追加引数なしならその項目全体を空欄にします。
-
-通常の `lambda` は、例えば名前を `add`、キャプチャを `offset`、本体を `return x + offset;`
-に変更して次のように使います。
-
-```cpp
-int offset = 10;
-auto add = [offset](int x) -> int {
-    return x + offset;
-};
-int result = add(3); // 13
-```
-
-`lambda-rec` の既定値は階乗の例です。名前を `factorial` に変更すると次のようになります。
-
-```cpp
-auto factorial = [&](auto&& self, int n) -> long long {
-    if (n <= 1) return 1LL;
-    return n * self(self, n - 1);
-};
-long long result = factorial(factorial, 5); // 120
-```
-
-通常のラムダは `add(3)` のように呼びます。再帰版は **最初の引数にラムダ自身を渡し**、
-外からは `factorial(factorial, 5)`、内部からは `self(self, n - 1)` と呼びます。
-`self` はラムダ自身を受け取る補助引数であり、`std::function` や追加ライブラリは不要です。
-普通の `auto` 変数名を初期化中のラムダ内から直接呼ぶと型の推論が完了していないため、再帰版を使います。
-再帰呼び出し時の型推論を避けるため、戻り値型は `-> long long` や `-> void` と明示します。
-
-既定のキャプチャ `[&]` は外側の変数を参照します。その変数の寿命と再帰の終了条件に注意してください。
-階乗の例は `0 <= n <= 20` を想定し、深い再帰ではスタック使用量にも注意します。
-引数名・型を変えた場合は、本体の参照や `return` も合わせて編集します。
-
-`grid-check` は座標を計算した**ループの本体内**に挿入します。`Tab` は **h → w → y → x** の順で、
-同じ座標の複数箇所は連動して変更されます。次は座標を `ny, nx` にした例です。
-
-```cpp
-int h = 2, w = 3, y = 0, x = 0;
-const int dy[4] = {-1, 0, 1, 0}, dx[4] = {0, 1, 0, -1};
-for (int direction = 0; direction < 4; ++direction) {
-    int ny = y + dy[direction], nx = x + dx[direction];
-    if (ny < 0 || ny >= h || nx < 0 || nx >= w) continue;
-    // ここでは 0 <= ny < h、0 <= nx < w。
-}
-```
-
-高さ・幅の名前も編集可能です。座標は負値を表せる `int` などを想定します。
-`continue` は最も内側のループの次の反復へ進みます。ループ自体は挿入しないため、ループ外では使えません。
-
 ## main のデバッグ設定
 
 `-DLOCAL` を付けると、`debug.hpp`・`timer.hpp`・`random.hpp` を読み込みます。
@@ -159,28 +105,6 @@ debug(rng.integer(-10, 10), timer.elapsed_ms());
 展開後の提出コードは `LOCAL` 未定義ならデバッグ用ヘッダがなくてもコンパイルできます。
 展開後も `-DLOCAL` で動かす場合は、従来どおりリポジトリの include パスが必要です。
 通常の自作ライブラリは従来どおり展開します。
-
-## 旧名からの移行
-
-| 旧 prefix | 新 prefix |
-| --- | --- |
-| `atcmain` | `main`（`atcmain` も同じスニペットの別名として維持） |
-| `cp-lazy-assign-min-config` | `lazy-assign-min` |
-| `cp-lazy-assign-max-config` | `lazy-assign-max` |
-| `cp-lazy-assign-sum-config` | `lazy-assign-sum` |
-| `cp-lazy-add-min-config` | `lazy-add-min` |
-| `cp-lazy-add-max-config` | `lazy-add-max` |
-| `cp-lazy-add-sum-config` | `lazy-add-sum` |
-| `cp-lazy-init` | `lazy-init` |
-| `cp-treap-add-config` | `treap-add` |
-| `cp-treap-affine-config` | `treap-affine` |
-| `cp-treap-init` | `treap-init` |
-| `cp-mo-sum` | `mo-sum` |
-| `cp-mo-directional` | `mo-directional` |
-| `cp-sparse-min-config` | `sparse-min` |
-| `cp-sparse-init` | `sparse-init` |
-
-旧 `cp-*` の別名は登録していません。命名整理では本文・タブストップを維持し、main のデバッグ設定だけを上記構成に更新しています。
 
 ## 検証
 
