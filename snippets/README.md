@@ -14,7 +14,7 @@ C++ ファイルで prefix を入力し、補完候補を選んで展開しま�
   macOS は `~/Library/Application Support/Code/User/snippets`。
 - **特定のワークスペースだけで使う**：そのフォルダの `.vscode/` にコピーする。
 
-Windows の PowerShell で、このリポジトリのルートから全6ファイルを導入する例です。
+Windows の PowerShell で、このリポジトリのルートから直下の全8ファイルを導入する例です。
 
 ```powershell
 $snippetDir = Join-Path $env:APPDATA 'Code\User\snippets'
@@ -57,6 +57,9 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 | `geometry.code-snippets` | `geometry` | グローバル：必要なヘッダと `Point` の型を定義 |
 | 同上 | `polar-sort` / `hull` | 関数内：偏角ソート／凸包 |
 | 同上 | `segment-cross` / `ccw` / `polygon-area` | 関数内：閉線分交差／3点の向き／符号付き面積の2倍 |
+| `hld.code-snippets` | `hld` | 関数内：無向木から構築・根の指定 |
+| 同上 | `hld-path` / `hld-ordered` | 関数内：ACL セグ木による経路和／経路順の一次関数合成 |
+| `li-chao-tree.code-snippets` | `li-chao` | 関数内：座標圧縮木の構築・直線追加・最小値取得 |
 
 `*-help` は実行処理を追加しないコメントの早見表です。関数内・グローバルのどちらにも挿入できます。
 生成される変数名はプレースホルダーで変更できますが、早見表内の `tree` / `seg` などは代表名です。
@@ -80,6 +83,20 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 
 添字は 0-indexed、区間は `[l,r)` です。整数の演算では中間値を含むオーバーフローに注意してください。
 同じ設定を複数回挿入する場合は、名前空間と型名を変えて定義の衝突を避けます。
+
+## HLD・Li Chao Tree の逆引き
+
+HLD の値は `hld.tin(v)` の位置へ置きます。`hld-path` は和用の `seg` が構築済みであることが前提です。
+辺の値は根から深い端点の位置に置き、`path_segments(u,v,true)` を使います。
+部分木は `subtree_range(v)`、部分木内の辺だけなら `subtree_range(v,true)` です。
+可換な和では区間の向きを無視できますが、非可換演算は正順・逆順の集約が必要です。
+`hld-ordered` は [HLD の完全な ACL 設定例](../library/graph/hld.md)の `Affine`・`Node`・`combine` を使います。
+単に集約済みの値を反転する処理に置き換えないでください。
+
+`li-chao` はクエリ座標配列 `xs` を事前に用意します。返り値は `optional<__int128>` です。
+`if (answer)` で存在を調べ、`*answer` で値を取得します。未登録座標へのクエリは不可です。
+`long long` へ変換・出力する場合の範囲確認は呼び出し側で行います。
+[初期化・数値保証・方式比較](../library/data_structure/li_chao_tree.md)を参照してください。
 
 ## 整数幾何の逆引き
 

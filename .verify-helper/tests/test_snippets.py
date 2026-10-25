@@ -79,6 +79,7 @@ class SnippetTest(unittest.TestCase):
         self.assertEqual({path.name for path in SNIPPET_DIRECTORY.glob("*.code-snippets")}, {
             "template.code-snippets", "lazy-segtree.code-snippets", "implicit-treap.code-snippets",
             "mo.code-snippets", "sparse-table.code-snippets", "geometry.code-snippets",
+            "hld.code-snippets", "li-chao-tree.code-snippets",
         })
         # 全スニペットを下のコンパイル・動作確認へ対応付ける。追加時は検証も追加する。
         self.assertEqual(set(self.snippets), {
@@ -88,6 +89,7 @@ class SnippetTest(unittest.TestCase):
             "lazy-add-min", "lazy-add-max", "lazy-add-sum", "lazy-init", "lazy-help",
             "lambda", "lambda-rec", "grid-check",
             "geometry", "polar-sort", "hull", "segment-cross", "ccw", "polygon-area",
+            "hld", "hld-path", "hld-ordered", "li-chao",
         })
         for prefix, snippet in self.snippets.items():
             with self.subTest(prefix=prefix):
@@ -339,6 +341,52 @@ class SnippetTest(unittest.TestCase):
 ''')
         self.compile_and_run("\n".join(headers) + "\n#include <cassert>\n#include <random>\n#include <limits>\n"
                              "int main() {\n" + "\n".join(blocks) + "\n}")
+
+    def test_hld(self):
+        prelude = ('#include "library/graph/hld.hpp"\n#include <atcoder/segtree>\n#include <cassert>\n'
+                   'long long op(long long a,long long b){return a+b;} long long e(){return 0;}\n'
+                   'int main(){ std::vector<std::vector<int>> tree{{1,2},{0,3},{0},{1}};\n')
+        self.compile_and_run(prelude + self.code("hld") + '\n'
+                             'atcoder::segtree<long long,op,e> seg(hld.size());\n'
+                             'for(int v=0;v<hld.size();++v)seg.set(hld.tin(v),v+1);\n'
+                             'int u=3,v=2;\n' + self.code("hld-path") + '\nassert(answer==10);\n' +
+                             self.code("hld-path", {2: "edges", 6: "true"}) + '\nassert(edges==9);\n}\n')
+        # 構築・経路取得の変数名、根、辺モード、型を編集しても API に一致する。
+        self.compile_and_run(prelude + 'auto adjacency=tree;\n' +
+                             self.code("hld", {1: "decomposition", 2: "adjacency", 3: "3"}) + '\n'
+                             'atcoder::segtree<long long,op,e> sums(4);\n'
+                             'for(int v=0;v<4;++v)sums.set(decomposition.tin(v),v+1);\n' +
+                             self.code("hld-path", {1: "auto", 2: "total", 3: "decomposition",
+                                                    4: "0", 5: "3", 6: "true", 7: "sums"}) +
+                             '\nassert(total==3);\n}\n')
+        ordered = ('#include "library/graph/hld.hpp"\n#include <atcoder/modint>\n'
+                   '#include <atcoder/segtree>\n#include <cassert>\n'
+                   'using Mint=atcoder::modint998244353; struct Affine{Mint a,b;};\n'
+                   'Affine combine(Affine f,Affine g){return {g.a*f.a,g.a*f.b+g.b};}\n'
+                   'struct Node{Affine forward,backward;};\n'
+                   'Node op(Node l,Node r){return {combine(l.forward,r.forward),combine(r.backward,l.backward)};}\n'
+                   'Node e(){return {{1,0},{1,0}};}\n'
+                   'int main(){HLD hld(std::vector<std::vector<int>>{{1},{0}});\n'
+                   'atcoder::segtree<Node,op,e> seg(2);\n'
+                   'seg.set(hld.tin(0),{{2,1},{2,1}});seg.set(hld.tin(1),{{3,4},{3,4}});\n'
+                   'int u=1,v=0;\n')
+        self.compile_and_run(ordered + self.code("hld-ordered") + '\nassert(result.a+result.b==15);\n' +
+                             self.code("hld-ordered", {1: "other", 3: "0", 4: "1"}) +
+                             '\nassert(other.a+other.b==13);\n' +
+                             self.code("hld-ordered", {1: "edge", 3: "0", 4: "1", 5: "true"}) +
+                             '\nassert(edge.a+edge.b==7);\n}\n')
+
+    def test_li_chao(self):
+        prelude = ('#include "library/data_structure/li_chao_tree.hpp"\n'
+                   '#include <cassert>\n#include <limits>\nint main(){\n')
+        self.compile_and_run(prelude + 'std::vector<long long> xs{-2,4};\n'
+                             'long long a=std::numeric_limits<long long>::max(),b=0,x=4;\n' +
+                             self.code("li-chao") +
+                             '\nassert(answer && *answer==static_cast<LiChaoTree::Value>(a)*4);\n}\n')
+        self.compile_and_run(prelude + 'std::vector<long long> coords{-1,0};\n' +
+                             self.code("li-chao", {1: "envelope", 2: "coords", 3: "-2", 4: "3",
+                                                   5: "minimum", 6: "-1"}) +
+                             '\nassert(minimum && *minimum==5);\n}\n')
 
     def test_quick_references(self):
         for prefix in ("lazy-help", "treap-help", "mo-help", "sparse-help"):

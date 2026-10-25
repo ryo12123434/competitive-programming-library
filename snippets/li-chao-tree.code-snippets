@@ -1,0 +1,14 @@
+{
+  "Li Chao Tree": {
+    "scope": "cpp",
+    "prefix": "li-chao",
+    "description": "クエリ座標を先に指定して直線追加・最小値取得。answerはoptional<__int128>（関数内）",
+    "body": [
+      "// グローバルに #include \"library/data_structure/li_chao_tree.hpp\"",
+      "LiChaoTree ${1:tree}(${2:xs});",
+      "$1.add_line(${3:a}, ${4:b});",
+      "auto ${5:answer} = $1.query(${6:x}); // xはxsに含まれること。値は*answer。",
+      "$0"
+    ]
+  }
+}
