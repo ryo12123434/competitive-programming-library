@@ -1,0 +1,70 @@
+{
+  "Geometry: integer setup": {
+    "prefix": "geometry",
+    "scope": "cpp",
+    "description": "グローバルに挿入。整数幾何の6ヘッダと点の型を用意する。各座標の絶対値 <= 2^62-1、面積の累積は別途128bit範囲内に収める。",
+    "body": [
+      "#include <vector>",
+      "#include \"library/geometry/point.hpp\"",
+      "#include \"library/geometry/ccw.hpp\"",
+      "#include \"library/geometry/polar_angle_sort.hpp\"",
+      "#include \"library/geometry/segment.hpp\"",
+      "#include \"library/geometry/convex_hull.hpp\"",
+      "#include \"library/geometry/polygon.hpp\"",
+      "using ${1:P} = cpl::geometry::Point<${2:long long}>;",
+      "$0"
+    ]
+  },
+  "Geometry: polar sort": {
+    "prefix": "polar-sort",
+    "scope": "cpp",
+    "description": "関数内に挿入。原点基準で正のx軸から反時計回りにその場ソート。ゼロが先、同方向は短い順。",
+    "body": [
+      "// 関数の外で #include \"library/geometry/polar_angle_sort.hpp\"",
+      "cpl::geometry::polar_angle_sort(${1:points});",
+      "$0"
+    ]
+  },
+  "Geometry: convex hull": {
+    "prefix": "hull",
+    "scope": "cpp",
+    "description": "関数内に挿入。凸包を辞書順最小点から反時計回りに取得する。第2引数をtrueにすると辺上の共線点も残す。",
+    "body": [
+      "// 関数の外で #include \"library/geometry/convex_hull.hpp\"",
+      "auto ${1:boundary} = cpl::geometry::convex_hull(${2:points}, ${3:false});",
+      "$0"
+    ]
+  },
+  "Geometry: segment intersection": {
+    "prefix": "segment-cross",
+    "scope": "cpp",
+    "description": "関数内に挿入。線分abとcdの閉線分交差判定。端点・共線の重なり・長さ0を含む。点の座標型を指定する。",
+    "body": [
+      "// 関数の外で #include \"library/geometry/segment.hpp\"",
+      "bool ${1:intersects} = cpl::geometry::segments_intersect(",
+      "    cpl::geometry::Segment<${2:long long}>{${3:a}, ${4:b}},",
+      "    cpl::geometry::Segment<${2}>{${5:c}, ${6:d}});",
+      "$0"
+    ]
+  },
+  "Geometry: orientation": {
+    "prefix": "ccw",
+    "scope": "cpp",
+    "description": "関数内に挿入。3点の向きを+1（反時計回り）/0（一直線）/-1（時計回り）で取得する。",
+    "body": [
+      "// 関数の外で #include \"library/geometry/ccw.hpp\"",
+      "int ${1:turn} = cpl::geometry::ccw(${2:a}, ${3:b}, ${4:c});",
+      "$0"
+    ]
+  },
+  "Geometry: polygon area": {
+    "prefix": "polygon-area",
+    "scope": "cpp",
+    "description": "関数内に挿入。境界順の頂点列から符号付き面積の2倍を128bitで取得する。正は反時計回り。標準のcoutで直接出力できない。",
+    "body": [
+      "// 関数の外で #include \"library/geometry/polygon.hpp\"",
+      "cpl::geometry::Wide ${1:area2} = cpl::geometry::signed_area2(${2:polygon});",
+      "$0"
+    ]
+  }
+}

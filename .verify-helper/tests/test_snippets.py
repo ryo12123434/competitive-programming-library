@@ -78,7 +78,7 @@ class SnippetTest(unittest.TestCase):
     def test_catalog(self):
         self.assertEqual({path.name for path in SNIPPET_DIRECTORY.glob("*.code-snippets")}, {
             "template.code-snippets", "lazy-segtree.code-snippets", "implicit-treap.code-snippets",
-            "mo.code-snippets", "sparse-table.code-snippets",
+            "mo.code-snippets", "sparse-table.code-snippets", "geometry.code-snippets",
         })
         # 全スニペットを下のコンパイル・動作確認へ対応付ける。追加時は検証も追加する。
         self.assertEqual(set(self.snippets), {
@@ -87,6 +87,7 @@ class SnippetTest(unittest.TestCase):
             "lazy-assign-min", "lazy-assign-max", "lazy-assign-sum",
             "lazy-add-min", "lazy-add-max", "lazy-add-sum", "lazy-init", "lazy-help",
             "lambda", "lambda-rec", "grid-check",
+            "geometry", "polar-sort", "hull", "segment-cross", "ccw", "polygon-area",
         })
         for prefix, snippet in self.snippets.items():
             with self.subTest(prefix=prefix):
@@ -186,7 +187,10 @@ class SnippetTest(unittest.TestCase):
         self.compile_and_run(source, include_repository=False)
 
     def test_recursive_lambda(self):
-        source = '#include <cassert>\nint main() {\n' + self.code("lambda-rec") + '\n'
+        # 再帰ラムダの既定値は入力用の枠なので、引数・本体を埋めてコンパイルする。
+        source = '#include <cassert>\nint main() {\n' + self.code("lambda-rec", {
+            3: ", int n", 5: "if (n <= 1) return 1LL;\n    return n * self(self, n - 1);",
+        }) + '\n'
         source += 'assert(dfs(dfs, 0) == 1 && dfs(dfs, 5) == 120 && dfs(dfs, 20) == 2432902008176640000LL);\n'
         source += self.code("lambda-rec", {
             1: "factorial", 2: "", 3: ", int count", 4: "unsigned long long",
@@ -205,9 +209,9 @@ class SnippetTest(unittest.TestCase):
     def test_grid_check(self):
         # 空・1 マス・境界内外を列挙し、continue が内側のループだけを進めることも確認する。
         default = self.code("grid-check")
-        renamed = self.code("grid-check", {1: "height", 2: "width", 3: "ny", 4: "nx"})
+        renamed = self.code("grid-check", {1: "height", 2: "width", 3: "row", 4: "column"})
         source = '#include <cassert>\nint main() {\n'
-        for h, w, y, x, code in [("h", "w", "y", "x", default), ("height", "width", "ny", "nx", renamed)]:
+        for h, w, y, x, code in [("h", "w", "ny", "nx", default), ("height", "width", "row", "column", renamed)]:
             source += f'''
     for (int {h} = 0; {h} <= 3; ++{h}) {{
         for (int {w} = 0; {w} <= 3; ++{w}) {{
@@ -224,6 +228,26 @@ class SnippetTest(unittest.TestCase):
     }}
 '''
         self.compile_and_run(source + '}\n', include_repository=False)
+
+    def test_geometry(self):
+        self.compile_and_run(self.code("geometry") + '\n#include <cassert>\nint main() {\n'
+                             'std::vector<P> points{{0,-1}, {1,0}, {0,1}, {-1,0}, {0,0}};\n' +
+                             self.code("polar-sort") + '\nassert((points[0] == P{0,0}) && (points[1] == P{1,0}));\n' +
+                             self.code("hull") + '\nassert(boundary.size() == 4); auto polygon = boundary;\n' +
+                             self.code("polygon-area") + '\nassert(area2 == 4);\n'
+                             'P a{0,0}, b{2,0}, c{1,0}, d{1,2};\n' + self.code("ccw") +
+                             '\nassert(turn == 0);\n' + self.code("segment-cross") + '\nassert(intersects);\n}\n')
+        self.compile_and_run(self.code("geometry", {1: "Q", 2: "int"}) + '\n#include <cassert>\nint main() {\n'
+                             'std::vector<Q> vectors{{0,0}, {1,0}, {2,0}, {0,2}};\n' +
+                             self.code("polar-sort", {1: "vectors"}) + '\n' +
+                             self.code("hull", {1: "outline", 2: "vectors", 3: "true"}) +
+                             '\nassert(outline.size() == 4);\n' +
+                             self.code("polygon-area", {1: "twice", 2: "outline"}) + '\nassert(twice == 4);\n'
+                             'Q origin{0,0}, right{2,0}, up{0,2};\n' +
+                             self.code("ccw", {1: "direction", 2: "origin", 3: "right", 4: "up"}) +
+                             '\nassert(direction == 1);\n' +
+                             self.code("segment-cross", {1: "touch", 2: "int", 3: "origin", 4: "right", 5: "origin", 6: "up"}) +
+                             '\nassert(touch);\n}\n')
 
     def test_treap(self):
         self.compile_and_run(self.code("treap-add") + "\n#include <cassert>\nint main() {\n" +
