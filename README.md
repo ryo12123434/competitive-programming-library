@@ -30,7 +30,7 @@ snippets/
 
 ## VSCode スニペット
 
-`main`（別名 `atcmain`）、遅延セグ木・Treap・Mo・Sparse Table・整数幾何の設定と呼び出し、
+`main`（別名 `atcmain`）、遅延セグ木・Treap・Mo・Sparse Table・整数幾何・HLD・Li Chao Treeの設定と呼び出し、
 `*-help` のコメント形式の早見表を用意しています。
 [一覧・導入方法・使い方](snippets/README.md)を参照してください。
 リポジトリ外の作業フォルダでも、VSCode のユーザースニペットへコピーして利用できます。
@@ -40,6 +40,11 @@ snippets/
 `library/geometry/` に整数の点・向き・偏角ソート・閉線分判定・凸包・多角形の面積を用意しています。
 [API・境界ケース・数値保証](library/geometry/README.md)を確認してください。
 計算には符号付き128bit整数を使い、座標差は拡張してから求めます。面積の累積には別途上限があります。
+
+## 木の経路・直線クエリ
+
+- [HLD](library/graph/hld.md)：反復探索による O(N) 構築。頂点・辺の経路と部分木を区間に分解し、ACL Segtree / Lazy Segtree と組み合わせます。非可換演算用に経路順・区間の向きを保持します。
+- [Li Chao Tree](library/data_structure/li_chao_tree.md)：クエリ座標を事前指定する座標圧縮方式。直線追加と最小値取得 O(log M)、保持空間 O(M)。評価値は `__int128`、空状態は `std::nullopt` です。
 
 
 ## 提出用 bundler
