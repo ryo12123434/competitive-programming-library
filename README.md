@@ -9,12 +9,14 @@ library/
   algorithm/
   data_structure/
   graph/
+  geometry/
   math/
   string/
 verify/
   algorithm/
   data_structure/
   graph/
+  geometry/
   math/
   string/
 template/
@@ -28,10 +30,16 @@ snippets/
 
 ## VSCode スニペット
 
-`main`（別名 `atcmain`）、遅延セグ木・Treap・Mo・Sparse Table の設定と初期化、
+`main`（別名 `atcmain`）、遅延セグ木・Treap・Mo・Sparse Table・整数幾何の設定と呼び出し、
 `*-help` のコメント形式の早見表を用意しています。
 [一覧・導入方法・使い方](snippets/README.md)を参照してください。
 リポジトリ外の作業フォルダでも、VSCode のユーザースニペットへコピーして利用できます。
+
+## 整数幾何
+
+`library/geometry/` に整数の点・向き・偏角ソート・閉線分判定・凸包・多角形の面積を用意しています。
+[API・境界ケース・数値保証](library/geometry/README.md)を確認してください。
+計算には符号付き128bit整数を使い、座標差は拡張してから求めます。面積の累積には別途上限があります。
 
 
 ## 提出用 bundler

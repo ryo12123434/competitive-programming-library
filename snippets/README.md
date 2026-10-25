@@ -14,7 +14,7 @@ C++ ファイルで prefix を入力し、補完候補を選んで展開しま�
   macOS は `~/Library/Application Support/Code/User/snippets`。
 - **特定のワークスペースだけで使う**：そのフォルダの `.vscode/` にコピーする。
 
-Windows の PowerShell で、このリポジトリのルートから全5ファイルを導入する例です。
+Windows の PowerShell で、このリポジトリのルートから全6ファイルを導入する例です。
 
 ```powershell
 $snippetDir = Join-Path $env:APPDATA 'Code\User\snippets'
@@ -54,6 +54,9 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 | `sparse-table.code-snippets` | `sparse-min` | グローバル：最小値用の演算・型 |
 | 同上 | `sparse-init` | 関数内：初期配列から構築・非空区間の取得 |
 | 同上 | `sparse-help` | コメント：演算の条件・区間規約・計算量 |
+| `geometry.code-snippets` | `geometry` | グローバル：必要なヘッダと `Point` の型を定義 |
+| 同上 | `polar-sort` / `hull` | 関数内：偏角ソート／凸包 |
+| 同上 | `segment-cross` / `ccw` / `polygon-area` | 関数内：閉線分交差／3点の向き／符号付き面積の2倍 |
 
 `*-help` は実行処理を追加しないコメントの早見表です。関数内・グローバルのどちらにも挿入できます。
 生成される変数名はプレースホルダーで変更できますが、早見表内の `tree` / `seg` などは代表名です。
@@ -77,6 +80,38 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 
 添字は 0-indexed、区間は `[l,r)` です。整数の演算では中間値を含むオーバーフローに注意してください。
 同じ設定を複数回挿入する場合は、名前空間と型名を変えて定義の衝突を避けます。
+
+## 整数幾何の逆引き
+
+共通の名前空間は `cpl::geometry`、通常の座標型は `long long` です。
+まずグローバルで `geometry` を展開すると、6ヘッダと `using P = cpl::geometry::Point<long long>;` を用意できます。
+個別の呼び出しスニペットには、必要な include をコメントで明示しています。
+ヘッダを関数内に include せず、グローバル側に用意してください。
+
+| やりたいこと | API | snippet / include |
+| --- | --- | --- |
+| 点を作る・辞書順比較 | `P p{x,y}`、`p < q` | `geometry` / `point.hpp` |
+| 内積・外積・向き | `dot(a,b)`、`cross(a,b)`、`cross(a,b,c)`、`ccw(a,b,c)` | `ccw` / `point.hpp`・`ccw.hpp` |
+| 距離の2乗 | `norm2(p)`、`dist2(a,b)` | `point.hpp` |
+| 原点からの偏角順 | `polar_angle_sort(points)` | `polar-sort` / `polar_angle_sort.hpp` |
+| 閉線分上・閉線分交差 | `on_segment(p,s)`、`segments_intersect(s,t)` | `segment-cross` / `segment.hpp` |
+| 凸包 | `convex_hull(points, false)` | `hull` / `convex_hull.hpp` |
+| 符号付き面積の2倍・向き | `signed_area2(polygon)`、`polygon_orientation(polygon)` | `polygon-area` / `polygon.hpp` |
+
+関数内で呼ぶ例です。`points` は `std::vector<P>` とします。
+
+```cpp
+auto boundary = cpl::geometry::convex_hull(points, true); // 辺上の共線点も残す
+cpl::geometry::Wide twice = cpl::geometry::signed_area2(boundary);
+```
+
+偏角は正の x 軸から反時計回りで、ゼロが先、同方向は短い順です。
+凸包は辞書順最小点から反時計回り、始点の再掲なし。全点共線なら `false` は両端、`true` は辞書順全点です。
+線分は端点接触・共線の重なり・長さ0も扱います。面積は境界順の単純多角形を想定し、正なら反時計回りです。
+
+各座標の絶対値 `<= 2^62-1` は点演算・各種判定の十分な保証範囲です。
+Point の加減算の結果は座標型に収め、面積は各外積と累積の途中も128bitに収めてください。
+`Wide` を `cout` に直接渡せない点にも注意します。[数値保証の詳細](../library/geometry/README.md)を参照してください。
 
 ## main のデバッグ設定
 
@@ -114,6 +149,7 @@ python -m unittest discover -s .verify-helper/tests -p test_snippets.py -v
 
 全ファイルの JSON、重複キー・prefix、別名、説明・scope、プレースホルダーの展開を検査します。
 展開結果を GNU++23 でコンパイル・実行し、全6種類の遅延セグ木を愚直配列と比較します。
-ラムダは既定値・型や引数の変更・引数なし・再帰を検証し、グリッドは空・境界内外・変数名変更を検証します。
+通常ラムダとグリッドは既定値・型や引数の変更・空や境界のケースを検証します。
+再帰ラムダは現在の入力用の枠に引数・本体を補い、引数なし・再帰呼び出しも検証します。
 メインテンプレートは bundle 前後とも `LOCAL` 有効・無効を検証し、提出版はリポジトリの include パスなしでもコンパイルします。
 実行には `g++` と ACL が必要です。
