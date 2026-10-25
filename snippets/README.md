@@ -14,7 +14,7 @@ C++ ファイルで prefix を入力し、補完候補を選んで展開しま�
   macOS は `~/Library/Application Support/Code/User/snippets`。
 - **特定のワークスペースだけで使う**：そのフォルダの `.vscode/` にコピーする。
 
-Windows の PowerShell で、このリポジトリのルートから直下の全8ファイルを導入する例です。
+Windows の PowerShell で、このリポジトリのルートから全6ファイルを導入する例です。
 
 ```powershell
 $snippetDir = Join-Path $env:APPDATA 'Code\User\snippets'
