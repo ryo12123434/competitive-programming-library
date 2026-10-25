@@ -1,0 +1,62 @@
+{
+  "Functional Graph": {
+    "scope": "cpp",
+    "prefix": "functional",
+    "description": "Functional Graphの閉路・流入距離・到達頂点数を前計算（関数内）",
+    "body": [
+      "// グローバルに #include \"library/graph/functional_graph.hpp\"",
+      "FunctionalGraph ${1:graph}(${2:next});",
+      "$0"
+    ]
+  },
+  "Euler Tour": {
+    "scope": "cpp",
+    "prefix": "euler",
+    "description": "無向木をDFS順に一次元化。subtree_range(v)が部分木区間（関数内）",
+    "body": [
+      "// グローバルに #include \"library/graph/euler_tour.hpp\"",
+      "EulerTour ${1:tour}(${2:tree}, ${3:0});",
+      "$0"
+    ]
+  },
+  "2D Prefix Sum": {
+    "scope": "cpp",
+    "prefix": "prefix2d",
+    "description": "2次元累積和。query(上端,下端,左端,右端)の半開矩形（関数内）",
+    "body": [
+      "// グローバルに #include \"library/data_structure/prefix_sum_2d.hpp\"",
+      "PrefixSum2D<${1:long long}> ${2:sum}(${3:grid});",
+      "$0"
+    ]
+  },
+  "Tree Diameter": {
+    "scope": "cpp",
+    "prefix": "diameter",
+    "description": "無向木の直径。int隣接リストは重み1、Edge隣接リストは非負重み（関数内）",
+    "body": [
+      "// グローバルに #include \"library/graph/tree_diameter.hpp\"",
+      "TreeDiameter<${1:long long}> ${2:diameter}(${3:tree});",
+      "$0"
+    ]
+  },
+  "Matrix": {
+    "scope": "cpp",
+    "prefix": "matrix",
+    "description": "行列を零で初期化。要素アクセスはa(行,列)。型にACL modintも指定可（関数内）",
+    "body": [
+      "// グローバルに #include \"library/math/matrix.hpp\"",
+      "Matrix<${1:long long}> ${2:a}(${3:n}, ${4:m});",
+      "$0"
+    ]
+  },
+  "Matrix Power": {
+    "scope": "cpp",
+    "prefix": "matrix-pow",
+    "description": "正方行列の非負整数乗。0乗は単位行列（関数内）",
+    "body": [
+      "// グローバルに #include \"library/math/matrix.hpp\"",
+      "auto ${1:result} = ${2:a}.pow(${3:exponent});",
+      "$0"
+    ]
+  }
+}
