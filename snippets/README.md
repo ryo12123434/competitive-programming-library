@@ -14,7 +14,7 @@ C++ ファイルで prefix を入力し、補完候補を選んで展開しま�
   macOS は `~/Library/Application Support/Code/User/snippets`。
 - **特定のワークスペースだけで使う**：そのフォルダの `.vscode/` にコピーする。
 
-Windows の PowerShell で、このリポジトリのルートから全6ファイルを導入する例です。
+Windows の PowerShell で、このリポジトリのルートから直下のスニペットを導入する例です。
 
 ```powershell
 $snippetDir = Join-Path $env:APPDATA 'Code\User\snippets'
@@ -60,6 +60,10 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 | `hld.code-snippets` | `hld` | 関数内：無向木から構築・根の指定 |
 | 同上 | `hld-path` / `hld-ordered` | 関数内：ACL セグ木による経路和／経路順の一次関数合成 |
 | `li-chao-tree.code-snippets` | `li-chao` | 関数内：座標圧縮木の構築・直線追加・最小値取得 |
+| `manacher.code-snippets` | `manacher` | 関数内：回文半径・区間回文判定 |
+| `xor-basis.code-snippets` | `xor-basis` | 関数内：符号なし整数のXOR基底 |
+| `binary-trie.code-snippets` | `binary-trie` | 関数内：XOR用多重集合 |
+| `rerooting.code-snippets` | `rerooting` | 関数内：全頂点への距離和。辺重みをTabで編集 |
 
 `*-help` は実行処理を追加しないコメントの早見表です。関数内・グローバルのどちらにも挿入できます。
 生成される変数名はプレースホルダーで変更できますが、早見表内の `tree` / `seg` などは代表名です。

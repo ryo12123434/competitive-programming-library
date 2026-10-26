@@ -80,6 +80,7 @@ class SnippetTest(unittest.TestCase):
             "template.code-snippets", "lazy-segtree.code-snippets", "implicit-treap.code-snippets",
             "mo.code-snippets", "sparse-table.code-snippets", "geometry.code-snippets",
             "hld.code-snippets", "li-chao-tree.code-snippets",
+            "manacher.code-snippets", "xor-basis.code-snippets", "binary-trie.code-snippets", "rerooting.code-snippets",
         })
         # 全スニペットを下のコンパイル・動作確認へ対応付ける。追加時は検証も追加する。
         self.assertEqual(set(self.snippets), {
@@ -90,6 +91,7 @@ class SnippetTest(unittest.TestCase):
             "lambda", "lambda-rec", "grid-check",
             "geometry", "polar-sort", "hull", "segment-cross", "ccw", "polygon-area",
             "hld", "hld-path", "hld-ordered", "li-chao",
+            "manacher", "xor-basis", "binary-trie", "rerooting",  # API 展開検証は test_phase_b.py
         })
         for prefix, snippet in self.snippets.items():
             with self.subTest(prefix=prefix):

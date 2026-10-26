@@ -47,6 +47,11 @@ snippets/
 - [Li Chao Tree](library/data_structure/li_chao_tree.md)：クエリ座標を事前指定する座標圧縮方式。直線追加と最小値取得 O(log M)、保持空間 O(M)。評価値は `__int128`、空状態は `std::nullopt` です。
 
 
+## 全方位DP・整数集合・回文
+
+`rerooting.hpp`、`binary_trie.hpp`、`xor_basis.hpp`、`manacher.hpp` を用意しています。
+各ヘッダの Doxygen に API・前提条件・使用例があります。対応するスニペットも同名ファイルにあります。
+
 ## 提出用 bundler
 
 `bundle.py` は `library/` 以下の自作ヘッダを展開し、提出用の 1 ファイルにまとめます。
