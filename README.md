@@ -50,7 +50,8 @@ snippets/
 ## 全方位DP・整数集合・回文
 
 `rerooting.hpp`、`binary_trie.hpp`、`xor_basis.hpp`、`manacher.hpp` を用意しています。
-各ヘッダの Doxygen に API・前提条件・使用例があります。対応するスニペットも同名ファイルにあります。
+各ヘッダの Doxygen に API・前提条件・使用例があります。対応するスニペットは `snippets/` にあります。
+静的な区間順位には `wavelet_matrix.hpp`、履歴の巻き戻しには `rollback_union_find.hpp` を利用できます。
 
 ## 提出用 bundler
 

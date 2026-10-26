@@ -1,0 +1,12 @@
+{
+  "Wavelet Matrix": {
+    "scope": "cpp",
+    "prefix": "wavelet",
+    "description": "静的整数列の区間順位・頻度・k番目。負数対応、kは0-indexed（関数内）",
+    "body": [
+      "// グローバルに #include \"library/data_structure/wavelet_matrix.hpp\"",
+      "WaveletMatrix<${1:long long}> ${2:matrix}(${3:values});",
+      "$0"
+    ]
+  }
+}

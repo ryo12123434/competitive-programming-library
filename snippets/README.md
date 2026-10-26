@@ -64,6 +64,8 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 | `xor-basis.code-snippets` | `xor-basis` | 関数内：符号なし整数のXOR基底 |
 | `binary-trie.code-snippets` | `binary-trie` | 関数内：XOR用多重集合 |
 | `rerooting.code-snippets` | `rerooting` | 関数内：全頂点への距離和。辺重みをTabで編集 |
+| `wavelet-matrix.code-snippets` | `wavelet` | 関数内：静的整数列の区間順位・頻度・k番目 |
+| `rollback-union-find.code-snippets` | `rollback-uf` | 関数内：snapshot・merge・巻き戻し |
 
 `*-help` は実行処理を追加しないコメントの早見表です。関数内・グローバルのどちらにも挿入できます。
 生成される変数名はプレースホルダーで変更できますが、早見表内の `tree` / `seg` などは代表名です。

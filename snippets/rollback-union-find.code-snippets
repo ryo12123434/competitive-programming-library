@@ -1,0 +1,15 @@
+{
+  "Rollback Union Find": {
+    "scope": "cpp",
+    "prefix": "rollback-uf",
+    "description": "保存・merge・巻き戻し。snapshotは個体と履歴分岐に固有（関数内）",
+    "body": [
+      "// グローバルに #include \"library/data_structure/rollback_union_find.hpp\"",
+      "RollbackUnionFind ${1:uf}(${2:n});",
+      "auto ${3:token} = $1.snapshot();",
+      "$1.merge(${4:u}, ${5:v});",
+      "$0",
+      "$1.rollback($3);"
+    ]
+  }
+}
