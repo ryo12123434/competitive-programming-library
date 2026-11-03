@@ -1,0 +1,19 @@
+{
+  "Rerooting Distance Sum": {
+    "scope": "cpp",
+    "prefix": "rerooting",
+    "description": "全頂点への距離総和。treeはRerootingEdgeの隣接リスト、辺重みを編集可能（関数内）",
+    "body": [
+      "// グローバルに #include \"library/graph/rerooting.hpp\"",
+      "struct ${1:RerootState} { long long sum, count; };",
+      "auto ${2:dp} = rerooting<$1>(${3:tree},",
+      "    []($1 a, $1 b) { return $1{a.sum+b.sum, a.count+b.count}; }, $1{0,0},",
+      "    []($1 a, int) { return $1{a.sum, a.count+1}; },",
+      "    [&]($1 a, int, int, int id) {",
+      "        (void)id;",
+      "        return $1{a.sum+a.count*(${4:1LL}), a.count};",
+      "    });",
+      "$0"
+    ]
+  }
+}
