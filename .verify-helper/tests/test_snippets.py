@@ -78,7 +78,7 @@ class SnippetTest(unittest.TestCase):
     def test_catalog(self):
         self.assertEqual({path.name for path in SNIPPET_DIRECTORY.glob("*.code-snippets")}, {
             "template.code-snippets", "lazy-segtree.code-snippets", "implicit-treap.code-snippets",
-            "mo.code-snippets", "sparse-table.code-snippets", "geometry.code-snippets",
+            "mo.code-snippets", "sparse-table.code-snippets", "geometry.code-snippets", "geometry.code-snippets",
             "hld.code-snippets", "li-chao-tree.code-snippets",
             "manacher.code-snippets", "xor-basis.code-snippets", "binary-trie.code-snippets", "rerooting.code-snippets",
             "wavelet-matrix.code-snippets", "rollback-union-find.code-snippets",
@@ -94,6 +94,7 @@ class SnippetTest(unittest.TestCase):
             "hld", "hld-path", "hld-ordered", "li-chao",
             "manacher", "xor-basis", "binary-trie", "rerooting",  # API 展開検証は test_phase_b.py
             "wavelet", "rollback-uf",  # API 展開検証は test_phase_d.py
+            "geometry", "polar-sort", "hull", "segment-cross", "ccw", "polygon-area",
         })
         for prefix, snippet in self.snippets.items():
             with self.subTest(prefix=prefix):
