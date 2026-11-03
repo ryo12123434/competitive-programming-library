@@ -1,0 +1,12 @@
+{
+  "XOR Basis": {
+    "scope": "cpp",
+    "prefix": "xor-basis",
+    "description": "符号なし整数のXOR基底。insert、rank、can_represent、max_xor（関数内）",
+    "body": [
+      "// グローバルに #include \"library/math/xor_basis.hpp\"",
+      "XorBasis<${1:std::uint64_t}> ${2:basis};",
+      "$0"
+    ]
+  }
+}

@@ -30,10 +30,17 @@ snippets/
 
 ## VSCode スニペット
 
+`main`（別名 `atcmain`）、遅延セグ木・Treap・Mo・Sparse Table・整数幾何の設定と呼び出し、
 `main`（別名 `atcmain`）、遅延セグ木・Treap・Mo・Sparse Table・整数幾何・HLD・Li Chao Treeの設定と呼び出し、
 `*-help` のコメント形式の早見表を用意しています。
 [一覧・導入方法・使い方](snippets/README.md)を参照してください。
 リポジトリ外の作業フォルダでも、VSCode のユーザースニペットへコピーして利用できます。
+
+## 整数幾何
+
+`library/geometry/` に整数の点・向き・偏角ソート・閉線分判定・凸包・多角形の面積を用意しています。
+[API・境界ケース・数値保証](library/geometry/README.md)を確認してください。
+計算には符号付き128bit整数を使い、座標差は拡張してから求めます。面積の累積には別途上限があります。
 
 ## 整数幾何
 
@@ -46,6 +53,12 @@ snippets/
 - [HLD](library/graph/hld.md)：反復探索による O(N) 構築。頂点・辺の経路と部分木を区間に分解し、ACL Segtree / Lazy Segtree と組み合わせます。非可換演算用に経路順・区間の向きを保持します。
 - [Li Chao Tree](library/data_structure/li_chao_tree.md)：クエリ座標を事前指定する座標圧縮方式。直線追加と最小値取得 O(log M)、保持空間 O(M)。評価値は `__int128`、空状態は `std::nullopt` です。
 
+
+## 全方位DP・整数集合・回文
+
+`rerooting.hpp`、`binary_trie.hpp`、`xor_basis.hpp`、`manacher.hpp` を用意しています。
+各ヘッダの Doxygen に API・前提条件・使用例があります。対応するスニペットは `snippets/` にあります。
+静的な区間順位には `wavelet_matrix.hpp`、履歴の巻き戻しには `rollback_union_find.hpp` を利用できます。
 
 ## 提出用 bundler
 

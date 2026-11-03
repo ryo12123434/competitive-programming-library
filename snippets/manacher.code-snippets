@@ -1,0 +1,12 @@
+{
+  "Manacher": {
+    "scope": "cpp",
+    "prefix": "manacher",
+    "description": "奇数・偶数回文半径を構築。is_palindrome(l,r)は半開区間（関数内）",
+    "body": [
+      "// グローバルに #include \"library/string/manacher.hpp\"",
+      "auto ${1:pal} = manacher(${2:s});",
+      "$0"
+    ]
+  }
+}
