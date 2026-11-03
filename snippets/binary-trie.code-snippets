@@ -1,0 +1,12 @@
+{
+  "Binary Trie": {
+    "scope": "cpp",
+    "prefix": "binary-trie",
+    "description": "XOR用多重集合。min_xorは要素でなくXOR値を返す（関数内）",
+    "body": [
+      "// グローバルに #include \"library/data_structure/binary_trie.hpp\"",
+      "BinaryTrie<${1:std::uint64_t}, ${2:64}> ${3:trie};",
+      "$0"
+    ]
+  }
+}

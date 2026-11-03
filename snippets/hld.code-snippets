@@ -1,0 +1,39 @@
+{
+  "HLD": {
+    "scope": "cpp",
+    "prefix": "hld",
+    "description": "無向木をHLDで一次元化。根・変数名を指定（関数内）",
+    "body": [
+      "// グローバルに #include \"library/graph/hld.hpp\"",
+      "HLD ${1:hld}(${2:tree}, ${3:0});",
+      "$0"
+    ]
+  },
+  "HLD Path Sum": {
+    "scope": "cpp",
+    "prefix": "hld-path",
+    "description": "ACLセグ木で経路和。辺は深い端点に格納しedge=true（関数内）",
+    "body": [
+      "// 必要なinclude: library/graph/hld.hpp と <atcoder/segtree>。segはtin順に構築済み。",
+      "${1:long long} ${2:answer} = 0;",
+      "for (auto part : ${3:hld}.path_segments(${4:u}, ${5:v}, ${6:false})) {",
+      "    $2 += ${7:seg}.prod(part.l, part.r);",
+      "}",
+      "$0"
+    ]
+  },
+  "HLD Ordered Path": {
+    "scope": "cpp",
+    "prefix": "hld-ordered",
+    "description": "経路順に非可換な一次関数を合成。Node等はhld.mdのACL設定を使用（関数内）",
+    "body": [
+      "// 必要なinclude: library/graph/hld.hpp と <atcoder/segtree>。設定例はlibrary/graph/hld.md。",
+      "Affine ${1:result}{1, 0};",
+      "for (auto part : ${2:hld}.path_segments(${3:u}, ${4:v}, ${5:false})) {",
+      "    const Node node = ${6:seg}.prod(part.l, part.r);",
+      "    $1 = combine($1, part.reversed ? node.backward : node.forward);",
+      "}",
+      "$0"
+    ]
+  }
+}

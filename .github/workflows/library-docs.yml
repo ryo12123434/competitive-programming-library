@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -60,7 +62,7 @@ jobs:
 
       - name: Verify libraries
         if: steps.verification-cache.outputs.cache-hit != 'true'
-        run: oj-verify all
+        run: oj-verify all --timeout 1800
 
       - name: Generate documentation
         run: oj-verify docs
