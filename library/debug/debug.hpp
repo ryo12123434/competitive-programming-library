@@ -5,8 +5,10 @@
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <queue>
 #include <ranges>
 #include <sstream>
+#include <stack>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -19,6 +21,7 @@ namespace cpl::debug {
 /**
  * @brief 再帰表示の上限。print_options() の返す設定を変更して使う。
  * @note max_items は各コンテナの表示件数、max_depth は入れ子の深さ。0 も指定できる。
+ * 最外層を深さ 0 とし、max_depth に達したコンテナは空でも ... に省略する。
  * @code
  * #include "library/debug/debug.hpp"
  * #include <vector>
@@ -42,6 +45,16 @@ inline PrintOptions& print_options() {
 }
 
 namespace detail {
+// 標準のコンテナアダプタだけを識別し、range や独自型の判定に影響させない。
+template <class T>
+inline constexpr std::string_view adapter_name = "";
+template <class T, class Container>
+inline constexpr std::string_view adapter_name<std::queue<T, Container>> = "queue";
+template <class T, class Container>
+inline constexpr std::string_view adapter_name<std::stack<T, Container>> = "stack";
+template <class T, class Container, class Compare>
+inline constexpr std::string_view adapter_name<std::priority_queue<T, Container, Compare>> = "priority_queue";
+
 inline std::string quote(std::string_view value, char delimiter) {
     std::string result(1, delimiter);
     for (unsigned char ch : value) {
@@ -84,6 +97,27 @@ void write(std::ostream& out, const T& value, std::size_t depth, const PrintOpti
     } else if constexpr (std::is_same_v<U, char*> || std::is_same_v<U, const char*>) {
         if (value) out << quote(value, '"');
         else out << "nullptr";
+    } else if constexpr (!adapter_name<U>.empty()) {
+        if (depth >= options.max_depth) { out << "..."; return; }
+        out << adapter_name<U> << '[';
+        if (value.empty() || options.max_items == 0) {
+            if (!value.empty()) out << "...";
+        } else {
+            auto copy = value;
+            std::size_t count = 0;
+            while (!copy.empty() && count < options.max_items) {
+                if (count) out << ", ";
+                if constexpr (requires { copy.front(); }) {
+                    write(out, copy.front(), depth + 1, options);
+                } else {
+                    write(out, copy.top(), depth + 1, options);
+                }
+                copy.pop();
+                ++count;
+            }
+            if (!copy.empty()) out << ", ...";
+        }
+        out << ']';
     } else if constexpr (std::ranges::input_range<const T>) {
         if (depth >= options.max_depth) { out << "..."; return; }
         constexpr bool associative = requires { typename U::key_type; };
@@ -123,13 +157,33 @@ void write(std::ostream& out, const T& value, std::size_t depth, const PrintOpti
 
 /**
  * @brief 値を再帰的に文字列化する。LOCAL に関係なく実行する補助関数。
- * @tparam T 文字列、range、pair / tuple、または ostream に出力可能な型。
+ * @tparam T 文字列、range、pair / tuple、queue / stack / priority_queue、または ostream に出力可能な型。
  * @param value 表示する値。STL の operator<< は追加・変更しない。
  * @param options 各コンテナの件数・深さの上限。
  * @return 文字列・文字は引用符付き。未対応型は <unprintable>。
+ * @pre コンテナアダプタの要素・内部コンテナ・比較関数はコピー可能であること。
+ * @note vector / array / deque / list は []、set / map 系（multi / unordered を含む）は {} で表示する。
+ * これらと pair / tuple / コンテナアダプタは任意に入れ子にでき、各階層に options を適用する。
+ * queue は front から、stack は top から、priority_queue は比較関数に従った pop 順に表示する。
+ * 例: queue[1, 2]、stack[2, 1]、priority_queue[3, 1]。元のコンテナは変更しない。
  * @note unordered コンテナの順序は不定。文字列自体の長さは制限しない。
  * @par Complexity
  * 表示する要素数と文字数に比例する時間・出力空間。
+ * ただし、要素数 N のアダプタは表示件数 K を制限してもコピー・破棄に O(N) 時間・コピーに O(N) 追加空間を使う。
+ * priority_queue はさらに O(K log N) の取り出し時間が必要。要素の表示・コピーと比較は別途加算する。
+ * 空・max_items = 0・深さ上限で省略するアダプタはコピーしない。ネスト時は各アダプタのコストを加算する。
+ * @code
+ * #include "library/debug/debug.hpp"
+ * #include <set>
+ * int main() {
+ *     std::vector<std::set<int>> groups{{1, 2}, {3}};
+ *     std::priority_queue<int> heap;
+ *     heap.push(1); heap.push(3);
+ *     debug(groups, heap); // LOCAL 時に [{1, 2}, {3}] と priority_queue[3, 1] を表示
+ *     const auto text = cpl::debug::repr(heap, {1, 8}); // priority_queue[3, ...]
+ *     (void)text;
+ * }
+ * @endcode
  */
 template <class T>
 std::string repr(const T& value, const PrintOptions& options = print_options()) {

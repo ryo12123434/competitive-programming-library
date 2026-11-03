@@ -28,6 +28,23 @@ class DebugTest(unittest.TestCase):
             with self.subTest(flags=flags), tempfile.TemporaryDirectory() as directory:
                 self.compile_run(REPOSITORY / ".verify-helper/tests/fixtures/debug_random.cpp", directory, *flags)
 
+    def test_container_display_cpp20_and_cpp23(self):
+        for standard in ("c++20", "gnu++23"):
+            for local in ([], ["-DLOCAL"]):
+                with self.subTest(standard=standard, local=local), tempfile.TemporaryDirectory() as directory:
+                    self.compile_run(REPOSITORY / ".verify-helper/tests/fixtures/debug_containers.cpp",
+                                     directory, f"-std={standard}", *local)
+
+    @unittest.skipIf(os.name == "nt", "Sanitizer は非 Windows 環境で検証する")
+    def test_sanitized_container_display(self):
+        flags = ["-fsanitize=address,undefined", "-fno-sanitize-recover=all", "-fno-omit-frame-pointer"]
+        if sys.platform.startswith("linux"):
+            flags.append("-no-pie")
+        for local in ([], ["-DLOCAL"]):
+            with self.subTest(local=local), tempfile.TemporaryDirectory() as directory:
+                self.compile_run(REPOSITORY / ".verify-helper/tests/fixtures/debug_containers.cpp",
+                                 directory, "-std=c++20", *flags, *local)
+
     def test_bundled_debug_library(self):
         fixture = (REPOSITORY / ".verify-helper/tests/fixtures/debug_random.cpp").read_text(encoding="utf-8")
         with tempfile.TemporaryDirectory() as directory:
@@ -46,6 +63,19 @@ class DebugTest(unittest.TestCase):
                     bundled.write_text(result.stdout, encoding="utf-8")
                     self.compile_run(bundled, directory)
                     self.compile_run(bundled, directory, "-DLOCAL")
+
+    def test_bundled_container_display(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = REPOSITORY / ".verify-helper/tests/fixtures/debug_containers.cpp"
+            result = subprocess.run([sys.executable, str(REPOSITORY / "bundle.py"), str(source), "--stdout"],
+                                    text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertFalse(any(line.lstrip().startswith('#include "library/')
+                                 for line in result.stdout.splitlines()))
+            bundled = Path(directory) / "containers.cpp"
+            bundled.write_text(result.stdout, encoding="utf-8")
+            self.compile_run(bundled, directory, "-std=c++20")
+            self.compile_run(bundled, directory, "-std=c++20", "-DLOCAL")
 
     def test_table_header_compatibility(self):
         body = r'''
