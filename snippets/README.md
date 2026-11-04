@@ -62,6 +62,15 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 | 同上 | `dynamic-connect` / `virtual-tree` | 関数内：辺の追加削除を一括処理／仮想木 |
 | 同上 | `dsu-tree` / `two-edge` | 関数内：部分木の異なる色数／2辺連結成分 |
 | 同上 | `swag` / `disjoint-table` | 関数内：順序付き Queue 集約／静的な非冪等区間集約 |
+| `gaps.code-snippets` | `mst` / `cycle` / `euler-trail` / `floyd` / `namori` | 関数内：無向辺IDは入力配列の添字。有向・無向を指定 |
+| 同上 | `cartesian` / `slide-min` | 関数内：Min Cartesian Tree／固定窓最小値。最大値版もヘッダに用意 |
+| 同上 | `slope` / `monotone-min` / `dc-dp` | 関数内：凸関数／単調な最適位置を持つ行列・DP専用 |
+| 同上 | `gf2-solve` / `knapsack` | 関数内：係数1の変数添字から方程式を登録／0/1 Knapsack |
+| 同上 | `bit2d` / `range2d` / `range-add-bit` | 関数内：点加算矩形和／静的矩形内点数／区間加算和 |
+| 同上 | `parallel-bs` / `mo-updates` | 関数内：更新回数に単調なクエリ／点更新付きオフライン区間和 |
+
+`gaps` も先頭コメントのヘッダをグローバルで include します。`mo-updates` は1更新・1クエリの例なので、
+実際の入力では登録処理と回答配列のサイズを変更してください。`dc-dp` の到達不能値は `std::nullopt` です。
 
 `advanced` の各スニペットは先頭コメントのヘッダをグローバルで include します。
 `persistent-seg`・`swag` は `S op(S,S)` と単位元 `S e()`、`disjoint-table` は `S op(S,S)` を定義してください。

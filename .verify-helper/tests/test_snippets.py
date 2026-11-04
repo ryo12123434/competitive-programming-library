@@ -77,7 +77,7 @@ class SnippetTest(unittest.TestCase):
 
     def test_catalog(self):
         self.assertEqual({path.name for path in SNIPPET_DIRECTORY.glob("*.code-snippets")}, {
-            "advanced.code-snippets", "template.code-snippets", "lazy-segtree.code-snippets", "implicit-treap.code-snippets",
+            "gaps.code-snippets", "advanced.code-snippets", "template.code-snippets", "lazy-segtree.code-snippets", "implicit-treap.code-snippets",
             "mo.code-snippets", "sparse-table.code-snippets", "geometry.code-snippets", "geometry.code-snippets",
             "hld.code-snippets", "li-chao-tree.code-snippets",
             "manacher.code-snippets", "xor-basis.code-snippets", "binary-trie.code-snippets", "rerooting.code-snippets",
@@ -93,6 +93,9 @@ class SnippetTest(unittest.TestCase):
             "geometry", "polar-sort", "hull", "segment-cross", "ccw", "polygon-area",
             "hld", "hld-path", "hld-ordered", "li-chao",
             "manacher", "xor-basis", "binary-trie", "rerooting",  # API 展開検証は test_phase_b.py
+            "bit2d", "range2d", "parallel-bs", "mo-updates", "range-add-bit",
+            "slope", "monotone-min", "dc-dp", "gf2-solve", "knapsack",
+            "mst", "cycle", "euler-trail", "floyd", "namori", "cartesian", "slide-min",
             "swag", "disjoint-table", "dynamic-connect", "virtual-tree", "dsu-tree", "two-edge",
             "kmp", "aho", "sam", "booth", "beats", "persistent-seg",  # API 展開検証は test_expansion_integration.py
             "wavelet", "rollback-uf",  # API 展開検証は test_phase_d.py

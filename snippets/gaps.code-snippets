@@ -1,0 +1,189 @@
+{
+  "Minimum Spanning Forest": {
+    "scope": "cpp",
+    "prefix": "mst",
+    "description": "Kruskalの最小全域森。辺IDはedgesの添字、総重みは128bit（関数内）",
+    "body": [
+      "// #include \"library/graph/minimum_spanning_tree.hpp\"",
+      "auto ${1:forest} = kruskal(${2:n}, ${3:edges});",
+      "$0"
+    ]
+  },
+  "Cycle Detection": {
+    "scope": "cpp",
+    "prefix": "cycle",
+    "description": "閉路を1つ復元。directed=falseなら無向。始点再掲なし（関数内）",
+    "body": [
+      "// #include \"library/graph/cycle_detection.hpp\"",
+      "auto ${1:cycle} = find_cycle(${2:n}, ${3:edges}, ${4:true});",
+      "$0"
+    ]
+  },
+  "Euler Trail": {
+    "scope": "cpp",
+    "prefix": "euler-trail",
+    "description": "全辺を一度ずつ使う経路。失敗はnullopt（関数内）",
+    "body": [
+      "// #include \"library/graph/euler_trail.hpp\"",
+      "auto ${1:trail} = euler_trail(${2:n}, ${3:edges}, ${4:false});",
+      "$0"
+    ]
+  },
+  "Warshall Floyd": {
+    "scope": "cpp",
+    "prefix": "floyd",
+    "description": "全点対最短路。distanceのstateで到達不能・負閉路を区別（関数内）",
+    "body": [
+      "// #include \"library/graph/warshall_floyd.hpp\"",
+      "WarshallFloyd ${1:graph}(${2:n});",
+      "for (auto [u, v, cost] : ${3:weighted_edges}) $1.add_edge(u, v, cost);",
+      "$1.solve();",
+      "$0"
+    ]
+  },
+  "Namori Decomposition": {
+    "scope": "cpp",
+    "prefix": "namori",
+    "description": "連結・辺数=頂点数の無向グラフを閉路と木に分解（関数内）",
+    "body": [
+      "// #include \"library/graph/namori.hpp\"",
+      "auto ${1:namori} = decompose_namori(${2:n}, ${3:edges});",
+      "$0"
+    ]
+  },
+  "Cartesian Tree": {
+    "scope": "cpp",
+    "prefix": "cartesian",
+    "description": "Min Cartesian Tree。比較同値は左の添字を優先（関数内）",
+    "body": [
+      "// #include \"library/algorithm/cartesian_tree.hpp\"",
+      "auto ${1:tree} = cartesian_tree(${2:a});",
+      "$0"
+    ]
+  },
+  "Sliding Window Minimum": {
+    "scope": "cpp",
+    "prefix": "slide-min",
+    "description": "固定窓の最小値と元添字。最大値はsliding_window_max（関数内）",
+    "body": [
+      "// #include \"library/algorithm/sliding_window_extrema.hpp\"",
+      "auto ${1:extrema} = sliding_window_min(${2:a}, ${3:width});",
+      "$0"
+    ]
+  },
+  "Slope Trick": {
+    "scope": "cpp",
+    "prefix": "slope",
+    "description": "凸区分線形関数。ヒンジ・絶対値を足し最小値を取得（関数内）",
+    "body": [
+      "// #include \"library/algorithm/slope_trick.hpp\"",
+      "SlopeTrick ${1:function};",
+      "$1.add_abs(${2:a});",
+      "auto ${3:minimum} = $1.minimum();",
+      "$0"
+    ]
+  },
+  "Monotone Minima": {
+    "scope": "cpp",
+    "prefix": "monotone-min",
+    "description": "左端最小列が行に沿って単調な行列専用（関数内）",
+    "body": [
+      "// #include \"library/algorithm/monotone_minima.hpp\"",
+      "auto ${1:minima} = monotone_minima(${2:rows}, ${3:columns}, ${4:cost});",
+      "$0"
+    ]
+  },
+  "Divide Conquer DP": {
+    "scope": "cpp",
+    "prefix": "dc-dp",
+    "description": "最適kが単調なDPの1段。previousはvector<optional<T>>（関数内）",
+    "body": [
+      "// #include \"library/algorithm/divide_and_conquer_dp.hpp\"",
+      "auto ${1:next} = divide_and_conquer_dp(${2:previous}, ${3:cost});",
+      "$0"
+    ]
+  },
+  "GF2 Linear System": {
+    "scope": "cpp",
+    "prefix": "gf2-solve",
+    "description": "係数1の変数添字を登録しGF(2)方程式を解く（関数内）",
+    "body": [
+      "// #include \"library/math/gauss_elimination_gf2.hpp\"",
+      "GF2LinearSystem ${1:system}(${2:variables});",
+      "for (const auto& [ones, rhs] : ${3:equations}) $1.add_equation(ones, rhs);",
+      "auto ${4:solution} = $1.solve(${5:false});",
+      "$0"
+    ]
+  },
+  "Knapsack": {
+    "scope": "cpp",
+    "prefix": "knapsack",
+    "description": "重さ状態の0/1 Knapsack。品物はKnapsackItem{weight,value}（関数内）",
+    "body": [
+      "// #include \"library/algorithm/knapsack.hpp\"",
+      "auto ${1:best} = knapsack_by_weight(${2:items}, ${3:capacity});",
+      "$0"
+    ]
+  },
+  "Dense 2D Fenwick": {
+    "scope": "cpp",
+    "prefix": "bit2d",
+    "description": "点加算と矩形和。座標(y,x)、矩形(上,下,左,右)（関数内）",
+    "body": [
+      "// #include \"library/data_structure/fenwick_tree_2d.hpp\"",
+      "FenwickTree2D<${1:long long}> ${2:bit}(${3:height}, ${4:width});",
+      "$2.add(${5:y}, ${6:x}, ${7:value});",
+      "auto ${8:sum} = $2.sum(${9:0}, $3, ${10:0}, $4);",
+      "$0"
+    ]
+  },
+  "Static 2D Range Tree": {
+    "scope": "cpp",
+    "prefix": "range2d",
+    "description": "重複を含む静的点集合の矩形内点数。引数はx区間,y区間（関数内）",
+    "body": [
+      "// #include \"library/data_structure/range_tree_2d.hpp\"",
+      "RangeTree2D<${1:long long}> ${2:tree}(${3:points});",
+      "auto ${4:count} = $2.count(${5:x_lower}, ${6:x_upper}, ${7:y_lower}, ${8:y_upper});",
+      "$0"
+    ]
+  },
+  "Parallel Binary Search": {
+    "scope": "cpp",
+    "prefix": "parallel-bs",
+    "description": "更新t回後の最小成立t。未成立はupdates+1（関数内）",
+    "body": [
+      "// #include \"library/algorithm/parallel_binary_search.hpp\"",
+      "auto ${1:boundaries} = parallel_binary_search(${2:updates}, ${3:query_count}, ${4:reset}, ${5:apply}, ${6:check});",
+      "$0"
+    ]
+  },
+  "Mo With Updates": {
+    "scope": "cpp",
+    "prefix": "mo-updates",
+    "description": "点更新を登録して区間和。before/afterはライブラリで管理（関数内）",
+    "body": [
+      "// #include \"library/algorithm/mo_with_updates.hpp\"",
+      "MoWithUpdates<${1:long long}> ${2:mo}(${3:a});",
+      "$2.add_update(${4:index}, ${5:value});",
+      "$2.add_query(${6:l}, ${7:r});",
+      "std::vector<$1> ${8:answers}(1); $1 ${9:sum}{};",
+      "$2.run([&](int, const $1& x) { $9 += x; },",
+      "       [&](int, const $1& x) { $9 -= x; },",
+      "       [&](int id) { $8[id] = $9; });",
+      "$0"
+    ]
+  },
+  "Range Add Fenwick": {
+    "scope": "cpp",
+    "prefix": "range-add-bit",
+    "description": "既存Fenwick2本で区間加算・区間和（関数内）",
+    "body": [
+      "// #include \"library/data_structure/range_add_fenwick_tree.hpp\"",
+      "RangeAddFenwickTree<${1:long long}> ${2:bit}(${3:n});",
+      "$2.add(${4:l}, ${5:r}, ${6:value});",
+      "auto ${7:sum} = $2.sum($4, $5);",
+      "$0"
+    ]
+  }
+}
