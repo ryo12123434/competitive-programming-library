@@ -1,0 +1,144 @@
+{
+  "Segment Tree Beats": {
+    "scope": "cpp",
+    "prefix": "beats",
+    "description": "区間chmin/chmax/add・和。グローバルにヘッダをinclude（関数内）",
+    "body": [
+      "// #include \"library/data_structure/segment_tree_beats.hpp\"",
+      "SegmentTreeBeats ${1:seg}(${2:a});",
+      "$1.range_chmin(${3:0}, ${4:n}, ${5:upper});",
+      "auto ${6:sum} = $1.range_sum($3, $4); // __int128_t",
+      "$0"
+    ]
+  },
+  "Persistent Segment Tree": {
+    "scope": "cpp",
+    "prefix": "persistent-seg",
+    "description": "モノイドの永続セグ木。S op(S,S), S e()を定義（関数内）",
+    "body": [
+      "// #include \"library/data_structure/persistent_segment_tree.hpp\"",
+      "PersistentSegmentTree<${1:long long}, ${2:op}, ${3:e}> ${4:seg}(${5:a});",
+      "int ${6:version} = $4.set(${7:0}, ${8:index}, ${9:value});",
+      "auto ${10:answer} = $4.prod($6, ${11:0}, ${12:n});",
+      "$0"
+    ]
+  },
+  "KMP": {
+    "scope": "cpp",
+    "prefix": "kmp",
+    "description": "パターンの全出現位置。重なり・空パターンに対応（関数内）",
+    "body": [
+      "// #include \"library/string/kmp.hpp\"",
+      "auto ${1:positions} = kmp_search(${2:text}, ${3:pattern});",
+      "$0"
+    ]
+  },
+  "Aho Corasick": {
+    "scope": "cpp",
+    "prefix": "aho",
+    "description": "複数パターンの出現数。登録後buildし、以後は追加不可（関数内）",
+    "body": [
+      "// #include \"library/string/aho_corasick.hpp\"",
+      "AhoCorasick ${1:ac}(${2:\"abcdefghijklmnopqrstuvwxyz\"});",
+      "for (const auto& pattern : ${3:patterns}) $1.add_pattern(pattern);",
+      "$1.build();",
+      "auto ${4:counts} = $1.count_occurrences(${5:text});",
+      "$0"
+    ]
+  },
+  "Suffix Automaton": {
+    "scope": "cpp",
+    "prefix": "sam",
+    "description": "逐次追加可能な部分文字列オートマトン（関数内）",
+    "body": [
+      "// #include \"library/string/suffix_automaton.hpp\"",
+      "SuffixAutomaton ${1:sam}(${2:s});",
+      "auto ${3:distinct} = $1.distinct_substrings();",
+      "$0"
+    ]
+  },
+  "Booth": {
+    "scope": "cpp",
+    "prefix": "booth",
+    "description": "最小巡回シフトの開始位置。最小位置を返す（関数内）",
+    "body": [
+      "// #include \"library/string/booth.hpp\"",
+      "int ${1:start} = booth(${2:s});",
+      "$0"
+    ]
+  },
+  "Offline Dynamic Connectivity": {
+    "scope": "cpp",
+    "prefix": "dynamic-connect",
+    "description": "無向辺の追加・削除を登録後に一括回答（関数内）",
+    "body": [
+      "// #include \"library/graph/offline_dynamic_connectivity.hpp\"",
+      "OfflineDynamicConnectivity ${1:graph}(${2:n});",
+      "$1.add_edge(${3:u}, ${4:v});",
+      "int ${5:id} = $1.query_same($3, $4);",
+      "$1.remove_edge($3, $4);",
+      "auto ${6:answers} = $1.solve();",
+      "$0"
+    ]
+  },
+  "Virtual Tree": {
+    "scope": "cpp",
+    "prefix": "virtual-tree",
+    "description": "LCAを含む仮想木。結果の添字からverticesで元頂点へ変換（関数内）",
+    "body": [
+      "// #include \"library/graph/virtual_tree.hpp\"",
+      "VirtualTree ${1:vt}(${2:tree}, ${3:0});",
+      "auto ${4:compressed} = $1.build(${5:selected});",
+      "$0"
+    ]
+  },
+  "DSU on Tree": {
+    "scope": "cpp",
+    "prefix": "dsu-tree",
+    "description": "部分木の異なる色数。color[v]は[0,n)、countは初期0（関数内）",
+    "body": [
+      "// #include \"library/graph/dsu_on_tree.hpp\"",
+      "std::vector<int> ${1:count}(${2:n}), ${3:answer}($2);",
+      "int ${4:distinct} = 0;",
+      "dsu_on_tree(${5:tree},",
+      "    [&](int v) { if ($1[${6:color}[v]]++ == 0) ++$4; },",
+      "    [&](int v) { if (--$1[$6[v]] == 0) --$4; },",
+      "    [&](int v) { $3[v] = $4; }, ${7:0});",
+      "$0"
+    ]
+  },
+  "Two Edge Connected Components": {
+    "scope": "cpp",
+    "prefix": "two-edge",
+    "description": "Lowlinkをbuildした後、橋の森と成分を取得（関数内）",
+    "body": [
+      "// #include \"library/graph/two_edge_connected_components.hpp\"",
+      "${1:graph}.build();",
+      "TwoEdgeConnectedComponents ${2:components}($1);",
+      "$0"
+    ]
+  },
+  "SWAG": {
+    "scope": "cpp",
+    "prefix": "swag",
+    "description": "Queueの順序付き集約。S op(S,S), S e()を定義（関数内）",
+    "body": [
+      "// #include \"library/data_structure/swag.hpp\"",
+      "SWAG<${1:long long}, ${2:op}, ${3:e}> ${4:queue};",
+      "$4.push(${5:value});",
+      "auto ${6:aggregate} = $4.fold();",
+      "$0"
+    ]
+  },
+  "Disjoint Sparse Table": {
+    "scope": "cpp",
+    "prefix": "disjoint-table",
+    "description": "冪等性不要の静的区間集約。S op(S,S)を定義、区間は非空（関数内）",
+    "body": [
+      "// #include \"library/data_structure/disjoint_sparse_table.hpp\"",
+      "DisjointSparseTable<${1:long long}, ${2:op}> ${3:table}(${4:a});",
+      "auto ${5:aggregate} = $3.prod(${6:0}, ${7:n});",
+      "$0"
+    ]
+  }
+}
