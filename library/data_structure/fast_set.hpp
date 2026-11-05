@@ -60,7 +60,9 @@ public:
         }
         build_upper();
     }
+    /// @brief 集合の要素数。O(1)。
     int size() const { return count_; }
+    /// @brief 空集合か。O(1)。
     bool empty() const { return count_ == 0; }
     /// @brief 含むかを返す。宇宙外はfalse。
     bool contains(int x) const { return 0 <= x && x < n_ && (levels_[0][x / 64] >> (x % 64) & 1); }
@@ -139,7 +141,9 @@ public:
         }
         return std::nullopt;
     }
+    /// @brief 最小要素。空ならnullopt。計算量はnextと同じ。
     std::optional<int> min() const { return next(0); }
+    /// @brief 最大要素。空ならnullopt。計算量はprevと同じ。
     std::optional<int> max() const { return prev(n_ - 1); }
     /// @brief 半開区間[l,r)に要素があるか。@pre 0<=l<=r<=n。
     bool any(int l, int r) const {

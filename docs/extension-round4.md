@@ -101,10 +101,40 @@ Minkowski和は凸境界順が前提。整数PointとWideを再利用し、出�
 
 - Phase別C++20+ASan/UBSan、GNU++23で境界・全探索・独立な愚直比較を実行。
 - 25ヘッダの単独コンパイル、複数翻訳単位、全使用例、25スニペット、bundleを実行。
-- Library Checkerの新規14 adapterで公式データ290ケースを実行して成功。外部サーバーへの提出ではない。
-- φ/μ、二部判定、重心分解、Block-Cut、木同型、SMAWK、CHT、成分モノイド、Minkowski和など、直接の公式adapterがない機能は独立なローカルテストで検証。
+- Library Checker 14 adapter・AOJ 1 adapterの公式データ計313ケースを実行して成功。外部サーバーへの提出ではない。
+- μ、二部判定、重心分解、Block-Cut、木同型、SMAWK、CHT、成分モノイド、Minkowski和など、直接の公式adapterがない機能は独立なローカルテストで検証。
 - Miller–Rabin/Pollard Rhoの公式問題は上限10^18。2^64近傍はローカルで既知の素数・合成数・素数冪・積の復元を追加検証。
 - AtCoder ABC293 E・DP Nは公式データ取得を成功扱いにせず、adapterを各60ケースでローカル比較。
 
 詳細な使用例は各ヘッダのDoxygen、テスト対応は `.verify-helper/tests/round4_manifest.json`。
 Phase Eの追加候補は今回実装せず、必須25機能の検証を優先する。
+
+## 埋めた機能差の対応
+
+| 機能群 | 実際に確認した比較先の例 | このリポジトリでの補完 |
+| --- | --- | --- |
+| 64bit素数判定・分解・φ/μ | maspy `nt/`、drken `Math/`、Nyaan `prime/` | 試し割り・線形篩だけでは難しい大きい単一整数 |
+| 集合変換・Subset Convolution | maspy `setfunc/`、drken `Math/fast_zeta_transform.cpp`、Nyaan `set-function/` | OR/AND/XORと重複なし部分集合畳み込み |
+| 素数法平方根 | maspy `mod/mod_sqrt.hpp`、drken `Math/mod_sqrt.cpp`、Nyaan `modulo/mod-sqrt.hpp` | 平方根なし・法2を明示した取得 |
+| 二部判定・マッチング | maspy `graph/bipartite_vertex_coloring.hpp`, `flow/bipartite_matching.hpp`、drken `Flow/hopcroft_karp.cpp` | 奇閉路証拠・HK・最小頂点被覆 |
+| 重心分解・Block-Cut | maspy `graph/`、drken `Tree/`, `Graph/biconnected_components.cpp`、Nyaan `tree/`, `graph/` | 距離付き重心祖先、頂点連結性の分解 |
+| 木同型 | drken `Tree/rooted_tree_isomorphism.cpp`, `Tree/tree_isomorphism.cpp` | 共有辞書で複数木を厳密比較 |
+| 漸化式・DP高速化 | drken `Polynomial/`, `Optimization/`、maspy `convex/smawk.hpp`, `convex/cht_monotone.hpp`、Nyaan `fps/` | 係数規約統一、前提条件付き高速化 |
+| FastSet・動的セグ木 | maspy `ds/fastset.hpp`、Nyaan `segment-tree/dynamic-segment-tree.hpp` | 整数の固定宇宙・巨大座標域それぞれの用途 |
+| 成分モノイド | tatyam `UnionFindMonoid.cpp` | ACL DSUに成分値を付加。非可換時の順序を明記 |
+| 回文木 | maspy `string/palindromic_tree.hpp` | Manacherとは異なる異種回文・出現集計 |
+| 最小包含円・Minkowski和 | maspy `geo/`、drken `Geometry/smallest_enclosing_circle.cpp` | 実数の包含円近似・整数凸多角形の線形マージ |
+
+## 最終の全体検証
+
+- 既存テストを含む154 unittestが全件成功（スキップなし）。追加で4 phaseのNDEBUG有効時のAPI使用例を検証して成功。
+- 全120ヘッダの単独コンパイル、120ヘッダ同時include、複数翻訳単位、新規25ヘッダのC++20/GNU++23を確認。既存FPS/ACLの複数TU除外理由は従来テストでも再現確認。
+- ヘッダ内Doxygen使用例143個をコンパイル・実行。新規の全例はC++20でも実行。
+- 25スニペットを展開・コンパイル・bundle。全107 prefix（task-a配下とmain別名を含む）に重複なし。
+- ASan/UBSanで異常なし。大規模な木・増加路・変換・回文・動的ノードプール・実数点集合を含む。
+- `oj-verify all`の外部取得不可はAtCoderの3対象（既存Slope Trick、ABC293 E、DP N）。`--system`データ取得に必要なDropbox認証がない。実装・出力の失敗とは区別する。
+- 公式成功15対象以外の既存対象は成功キャッシュを利用。サーバーへの提出はしていない。
+- ドキュメント生成で従来の`bundle.py`/`tools/stress.py`のPython依存解析タイムアウト警告が残る。新規25ヘッダのMarkdown生成と通常の提出bundleは確認済み。
+
+最終レビューでは、φ表のループとBCCの隣接走査の型上限、同型IDの容量検査、
+NDEBUG時の未使用定数、公開getterのDoxygenを補強した。既存ライブラリ本体は変更していない。

@@ -7,7 +7,7 @@
 
 /**
  * @brief 二部判定の結果。成功時colorは0/1、失敗時odd_cycleとodd_cycle_edgesが奇閉路を表す。
- * @note 閉路の始点は末尾に重ねない。edges[i]がvertices[i]とvertices[(i+1)%k]を結ぶ。
+ * @note 閉路の始点は末尾に重ねない。odd_cycle_edges[i]がodd_cycle[i]とodd_cycle[(i+1)%k]を結ぶ。
  * 自己ループは頂点1個・辺1個。失敗時colorは部分的で、未探索頂点は-1。
  * @code
  * #include "library/graph/bipartite_graph.hpp"

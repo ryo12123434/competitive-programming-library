@@ -9,6 +9,7 @@
  * @brief Hopcroft–Karpによる二部グラフ最大マッチング。左右の頂点番号は独立に0-indexed。
  * @note 多重辺・孤立点・空の側も許す。再帰を使わない。solve後にmatch_left/rightを参照する。
  * ACL最大流でも解けるが、容量ネットワークを作らず二部専用に処理し、最小頂点被覆も返す。
+ * @pre 各頂点数・各隣接リストの長さはintに収まること。
  * @par Complexity solveは初期化O(V)に加え O(E*sqrt(V+1)) 時間、O(V+E)空間。
  * 孤立点は各増加段階の走査から除く。構築O(V)、add_edgeは償却O(1)。
  * @code

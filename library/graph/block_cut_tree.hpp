@@ -5,6 +5,7 @@
 /**
  * @brief 二重頂点連結成分と関節点のBlock-Cut森。非連結・孤立点を許す。
  * @param b build済みのBiconnectedComponents。自己ループの所属規約も引き継ぐ。
+ * @pre 結果のブロック数と関節点数の和はintに収まること。
  * @note [0,block_count)はブロック、後続は関節点。vertex_node[v]は元頂点の対応ノード。
  * 非関節点は所属ブロック、関節点は専用ノードに対応する。articulation_vertex[node]は元の関節点、ブロックなら-1。
  * @par Complexity O(V+E)時間・空間。元グラフが木でも通常の頂点隣接リストとはノードが異なる。

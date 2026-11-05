@@ -31,8 +31,11 @@ public:
     /// @brief 各頂点の初期値から構築。@pre 長さはintに収まる。
     explicit UnionFindMonoid(const std::vector<S> &values)
         : dsu_(static_cast<int>(values.size())), values_(values) {}
+    /// @brief 代表元。@pre v∈[0,N)。償却O(alpha(N))。
     int leader(int v) { return dsu_.leader(v); }
+    /// @brief 連結判定。@pre a,b∈[0,N)。償却O(alpha(N))。
     bool same(int a, int b) { return dsu_.same(a, b); }
+    /// @brief 成分の頂点数。@pre v∈[0,N)。償却O(alpha(N))。
     int size(int v) { return dsu_.size(v); }
     /// @brief a側・b側の順に値を結合し、新しい代表元を返す。同一成分なら値を変えない。
     int merge(int a, int b) {

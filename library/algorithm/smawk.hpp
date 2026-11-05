@@ -9,6 +9,7 @@
  * @param columns 列IDの順序付き集合。行があるのに空ならinvalid_argument。
  * @param value value(row_id,column_id)で値を評価するコールバック。
  * @pre 同値時に左を優先する比較で、すべての部分行列の行最小位置が単調であること。
+ * 行数・列数はintに収めること。
  * 行全体の最適位置が単調なだけなら既存Monotone Minimaを使う。Monge行列は十分条件。
  * @par Complexity O(H+W)回の評価・比較、O(H+W)追加空間。再帰深さO(log(H+1))。
  * @code

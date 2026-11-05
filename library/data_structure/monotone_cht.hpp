@@ -43,7 +43,7 @@ public:
     MonotoneCHT() = default;
     /// @brief 直線a*x+bを追加。傾き順序と数値制約はクラスの前提条件に従う。
     void add_line(long long a, long long b) {
-        constexpr long long bound = (1LL << 62) - 1;
+        [[maybe_unused]] constexpr long long bound = (1LL << 62) - 1;
         assert(-bound <= a && a <= bound && -bound <= b && b <= bound);
         if constexpr (Max) {
             a = -a;

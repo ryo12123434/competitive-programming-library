@@ -1,6 +1,7 @@
 #pragma once
 #include "lowlink.hpp"
 #include <cassert>
+#include <cstddef>
 #include <vector>
 
 /**
@@ -31,7 +32,8 @@ struct BiconnectedComponents {
         component_edges.clear();
         int n = lowlink.V;
         std::vector<bool> seen(n);
-        std::vector<int> parent(n, -1), parent_edge(n, -1), next(n), edge_stack, mark(n, -1);
+        std::vector<int> parent(n, -1), parent_edge(n, -1), edge_stack, mark(n, -1);
+        std::vector<std::size_t> next(n);
         auto emit = [&](int stop) {
             int id = static_cast<int>(components.size());
             components.emplace_back();
@@ -57,7 +59,7 @@ struct BiconnectedComponents {
                 bool isolated = true;
                 while (!stack.empty()) {
                     int v = stack.back();
-                    if (next[v] == static_cast<int>(lowlink.G[v].size())) {
+                    if (next[v] == lowlink.G[v].size()) {
                         stack.pop_back();
                         int p = parent[v];
                         if (p >= 0 && lowlink.low[v] >= lowlink.ord[p])

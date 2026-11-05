@@ -88,6 +88,9 @@ class Round4Test(unittest.TestCase):
                 source += '{\n'+before+'\n'+expand(snippets[prefix]['body'])+'\n'+after+'\n}\n'
             source += '}\n'
             self.compile_run(source,root)
+            # ライブラリのassertを無効化した定義でも、使用側はassertを保って実際に全APIをインスタンス化する。
+            release_source=source.replace('int main(){', '#undef NDEBUG\n#include <cassert>\nint main(){',1)
+            self.compile_run(release_source,root,standard='gnu++23',flags=['-DNDEBUG'])
             path=root/'snippet.cpp';path.write_text(source)
             bundled=self.command([sys.executable,str(ROOT/'bundle.py'),str(path),'--stdout']).stdout
             self.compile_run(bundled,root,standard='gnu++23',include=False)

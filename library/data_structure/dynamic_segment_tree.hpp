@@ -73,10 +73,12 @@ public:
         assert(lower_ <= l && l <= r && r <= upper_);
         return l == r ? e() : query(root_, lower_, upper_, l, r);
     }
+    /// @brief 1点の値。未設定ならe()。@pre lower<=index<upper。O(log(U+1))。
     S get(C index) const {
         assert(lower_ <= index && index < upper_);
         return prod(index, index + 1);
     }
+    /// @brief 全座標域の集約。空域・未設定ならe()。O(1)。
     S all_prod() const { return value(root_); }
     /// @brief 確保済みノード数。O(1)。queryでは増えない。
     std::size_t node_count() const { return pool_.size(); }

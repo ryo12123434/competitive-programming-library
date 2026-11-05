@@ -2,6 +2,7 @@
 #include "linear_sieve.hpp"
 #include "pollard_rho.hpp"
 #include <cassert>
+#include <cstddef>
 #include <vector>
 
 /**
@@ -23,8 +24,8 @@ struct MultiplicativeFunctions {
         mu.resize(phi.size());
         if (n >= 1)
             phi[1] = mu[1] = 1;
-        for (int x = 2; x <= n; ++x) {
-            int p = sieve.lpf[x], y = x / p;
+        for (std::size_t x = 2; x < phi.size(); ++x) {
+            int p = sieve.lpf[x], y = static_cast<int>(x / p);
             if (y % p == 0) {
                 phi[x] = phi[y] * p;
                 mu[x] = 0;

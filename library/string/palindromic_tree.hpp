@@ -46,6 +46,7 @@ class PalindromicTree {
     }
 
 public:
+    /// @brief 空列または初期文字列から構築する。全追加と同じ計算量。
     explicit PalindromicTree(std::string_view text = {}) {
         for (char c : text)
             add_char(c);
@@ -75,8 +76,11 @@ public:
         ++terminal_[last_];
         return last_;
     }
+    /// @brief 最長回文接尾辞のID。空列では偶根1。O(1)。
     int longest_suffix() const { return last_; }
+    /// @brief 特殊根2個を含むノード数。O(1)。
     int node_count() const { return static_cast<int>(nodes_.size()); }
+    /// @brief 異なる非空回文部分文字列の個数。O(1)。
     int distinct_count() const { return node_count() - 2; }
     /// @brief ノード情報をO(1)でコピーして返す。@pre 有効なノードID。
     PalindromeNode node_info(int id) const {

@@ -2,7 +2,9 @@
 #include <algorithm>
 #include <cassert>
 #include <map>
+#include <limits>
 #include <queue>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
@@ -11,6 +13,7 @@
  * @note IDは同じインスタンス内で比較する。他インスタンスや挿入順が異なる辞書のIDとは比較しない。
  * 空木のIDは0。根付き/根なし・中心1個/2個は異なるタグで管理する。ラベル・重みは扱わない。
  * @pre 入力は両方向に辺を格納した単純な連結無向木（空も可）。頂点数と生成ID数はintに収まる。
+ * @throws std::length_error 新しい型IDがintに収まらない場合。既存IDの照会は継続できる。
  * @par Complexity N頂点、辞書の型数Mに対しO(N log(N+1)+N log(M+N+1))時間。
  * 1回の作業空間O(N)、辞書保持はこれまで登録した木の頂点数合計に比例する空間。
  * @code
@@ -23,8 +26,14 @@ class TreeIsomorphism {
     std::map<std::pair<int, std::vector<int>>, int> ids_;
     int intern(int tag, std::vector<int> children) {
         std::sort(children.begin(), children.end());
+        auto key = std::make_pair(tag, std::move(children));
+        auto found = ids_.find(key);
+        if (found != ids_.end())
+            return found->second;
+        if (ids_.size() >= static_cast<std::size_t>(std::numeric_limits<int>::max()))
+            throw std::length_error("TreeIsomorphism: too many canonical types");
         int fresh = static_cast<int>(ids_.size()) + 1;
-        return ids_.emplace(std::make_pair(tag, std::move(children)), fresh).first->second;
+        return ids_.emplace(std::move(key), fresh).first->second;
     }
     int encode(const std::vector<std::vector<int>> &tree, int root, int blocked) {
         int n = static_cast<int>(tree.size());
