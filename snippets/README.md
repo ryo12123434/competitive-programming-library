@@ -42,6 +42,11 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 | 同上 | `lambda` | 関数内：通常のラムダ式 |
 | 同上 | `lambda-rec` | 関数内：`auto&& self` を使う再帰ラムダ式 |
 | 同上 | `grid-check` | ループ内：グリッドの範囲外なら `continue` |
+| `integer.code-snippets` | `int128-io` / `uint128-io` | 関数内：128bitの10進入出力 |
+| 同上 | `bigint` | グローバル：Boost `cpp_int` の include と型エイリアス |
+| 同上 | `bigint-convert` | 関数内：128bitと `cpp_int` の範囲検査付き変換 |
+| 同上 | `integer-div` / `isqrt` | 関数内：床・天井除算／非負整数の平方根の床 |
+| 同上 | `wide-mul` / `checked-int` | 関数内：64bitの積を128bitへ拡張／範囲検査付き加算・乗算 |
 | `lazy-segtree.code-snippets` | `lazy-assign-min` / `lazy-assign-max` / `lazy-assign-sum` | グローバル：ACL の区間代入設定 |
 | 同上 | `lazy-add-min` / `lazy-add-max` / `lazy-add-sum` | グローバル：ACL の区間加算設定 |
 | 同上 | `lazy-init` | 関数内：葉の長さを 1 として初期化 |
@@ -81,6 +86,10 @@ Beats の和は `__int128_t`、空区間の min/max は `std::optional` です�
 ホバーによる引数の説明は、ヘッダの Doxygen コメントと C/C++ 拡張の IntelliSense を使います。
 
 ## よく使う手順・注意点
+
+整数スニペットの先頭コメントにある include はグローバルへ追加します。
+`main` の `i128` / `u128` は型エイリアスで、入出力には `read_int128` / `print_int128` などを使います。
+Boost は `bigint` を使う場合だけ必要です。[整数処理の仕様・変換例](../library/math/integer.md)も参照してください。
 
 - **遅延セグ木**：設定をグローバルへ挿入し、関数内で `n` を用意して `lazy-init` を展開します。
   初期化側の名前空間・型名を設定とそろえます。例えば `lazy-add-sum` なら

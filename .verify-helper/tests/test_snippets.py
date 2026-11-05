@@ -77,6 +77,7 @@ class SnippetTest(unittest.TestCase):
 
     def test_catalog(self):
         self.assertEqual({path.name for path in SNIPPET_DIRECTORY.glob("*.code-snippets")}, {
+            "integer.code-snippets",
             "gaps.code-snippets", "advanced.code-snippets", "template.code-snippets", "lazy-segtree.code-snippets", "implicit-treap.code-snippets",
             "mo.code-snippets", "sparse-table.code-snippets", "geometry.code-snippets", "geometry.code-snippets",
             "hld.code-snippets", "li-chao-tree.code-snippets",
@@ -85,6 +86,7 @@ class SnippetTest(unittest.TestCase):
         })
         # 全スニペットを下のコンパイル・動作確認へ対応付ける。追加時は検証も追加する。
         self.assertEqual(set(self.snippets), {
+            "int128-io", "uint128-io", "bigint", "bigint-convert", "integer-div", "isqrt", "wide-mul", "checked-int",  # test_integer.py
             "main", "atcmain", "treap-add", "treap-affine", "treap-init", "treap-help",
             "mo-sum", "mo-directional", "mo-help", "sparse-min", "sparse-init", "sparse-help",
             "lazy-assign-min", "lazy-assign-max", "lazy-assign-sum",
