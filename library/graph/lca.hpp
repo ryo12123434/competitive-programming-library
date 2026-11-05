@@ -55,7 +55,7 @@ public:
                 stack.push_back(to);
             }
         }
-        for (int d : depth_) assert(d != -1);
+        for ([[maybe_unused]] int d : depth_) assert(d != -1);
         for (int k = 1; k < levels; ++k) {
             for (int v = 0; v < n; ++v) {
                 int mid = parent_[k - 1][v];

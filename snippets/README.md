@@ -14,7 +14,7 @@ C++ ファイルで prefix を入力し、補完候補を選んで展開しま�
   macOS は `~/Library/Application Support/Code/User/snippets`。
 - **特定のワークスペースだけで使う**：そのフォルダの `.vscode/` にコピーする。
 
-Windows の PowerShell で、このリポジトリのルートから全6ファイルを導入する例です。
+Windows の PowerShell で、このリポジトリのルートからスニペットを導入する例です。
 
 ```powershell
 $snippetDir = Join-Path $env:APPDATA 'Code\User\snippets'
@@ -57,6 +57,15 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 | `geometry.code-snippets` | `geometry` | グローバル：必要なヘッダと `Point` の型を定義 |
 | 同上 | `polar-sort` / `hull` | 関数内：偏角ソート／凸包 |
 | 同上 | `segment-cross` / `ccw` / `polygon-area` | 関数内：閉線分交差／3点の向き／符号付き面積の2倍 |
+| `advanced.code-snippets` | `beats` / `persistent-seg` | 関数内：Beats／経路コピー型の永続セグ木 |
+| 同上 | `kmp` / `aho` / `sam` / `booth` | 関数内：文字列検索／最小巡回表現 |
+| 同上 | `dynamic-connect` / `virtual-tree` | 関数内：辺の追加削除を一括処理／仮想木 |
+| 同上 | `dsu-tree` / `two-edge` | 関数内：部分木の異なる色数／2辺連結成分 |
+| 同上 | `swag` / `disjoint-table` | 関数内：順序付き Queue 集約／静的な非冪等区間集約 |
+
+`advanced` の各スニペットは先頭コメントのヘッダをグローバルで include します。
+`persistent-seg`・`swag` は `S op(S,S)` と単位元 `S e()`、`disjoint-table` は `S op(S,S)` を定義してください。
+Beats の和は `__int128_t`、空区間の min/max は `std::optional` です。Disjoint Sparse Table の区間は非空に限ります。
 
 `*-help` は実行処理を追加しないコメントの早見表です。関数内・グローバルのどちらにも挿入できます。
 生成される変数名はプレースホルダーで変更できますが、早見表内の `tree` / `seg` などは代表名です。

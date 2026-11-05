@@ -60,6 +60,15 @@ snippets/
 各ヘッダの Doxygen に API・前提条件・使用例があります。対応するスニペットは `snippets/` にあります。
 静的な区間順位には `wavelet_matrix.hpp`、履歴の巻き戻しには `rollback_union_find.hpp` を利用できます。
 
+## 区間・文字列・グラフの拡張
+
+発展的な区間・文字列・木クエリには次のヘッダも利用できます。API・制約・使用例は各ヘッダの Doxygen、
+初期化用スニペットは `snippets/advanced.code-snippets` を参照してください。
+
+- 区間：`segment_tree_beats.hpp`、`persistent_segment_tree.hpp`、`swag.hpp`、`disjoint_sparse_table.hpp`
+- 文字列：`kmp.hpp`、`aho_corasick.hpp`、`suffix_automaton.hpp`、`booth.hpp`
+- グラフ：`offline_dynamic_connectivity.hpp`、`virtual_tree.hpp`、`dsu_on_tree.hpp`、`two_edge_connected_components.hpp`
+
 ## 提出用 bundler
 
 `bundle.py` は `library/` 以下の自作ヘッダを展開し、提出用の 1 ファイルにまとめます。
