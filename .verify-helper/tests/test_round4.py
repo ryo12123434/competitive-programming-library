@@ -11,6 +11,33 @@ ROOT = Path(__file__).resolve().parents[2]
 PHASES = json.loads((ROOT / '.verify-helper/tests/round4_manifest.json').read_text())
 
 class Round4Test(unittest.TestCase):
+    def test_c_official_adapters_locally(self):
+        if 'C' not in PHASES: self.skipTest('Phase C is not implemented yet')
+        import random
+        rng = random.Random(934)
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            for path,kind in [('verify/math/round4_linear_recurrence_atcoder.test.cpp','recurrence'),
+                              ('verify/algorithm/round4_knuth_atcoder.test.cpp','knuth')]:
+                exe=root/'adapter'
+                self.command(['g++','-std=c++20','-O2','-Wall','-Wextra','-Werror',str(ROOT/path),'-o',str(exe)])
+                for _ in range(60):
+                    if kind=='recurrence':
+                        a,n,m=rng.randrange(50),rng.randrange(100),rng.randrange(1,100)
+                        expected=sum(pow(a,k,m) for k in range(n))%m
+                        data=f'{a} {n} {m}\n'
+                    else:
+                        n=rng.randrange(1,15);values=[rng.randrange(11) for _ in range(n)]
+                        prefix=[0]
+                        for x in values:prefix.append(prefix[-1]+x)
+                        dp=[[0]*(n+1) for _ in range(n+1)]
+                        for length in range(2,n+1):
+                            for l in range(n-length+1):
+                                r=l+length
+                                dp[l][r]=min(dp[l][k]+dp[k][r] for k in range(l+1,r))+prefix[r]-prefix[l]
+                        expected=dp[0][n];data=str(n)+'\n'+' '.join(map(str,values))+'\n'
+                    self.assertEqual(self.command([str(exe)],input=data,timeout=10).stdout.strip(),str(expected))
+
     def command(self, args, **kwargs):
         result = subprocess.run(args, text=True, capture_output=True, **kwargs)
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -53,7 +80,7 @@ class Round4Test(unittest.TestCase):
                     with self.subTest(example=h):
                         self.compile_run(re.sub(r'^\s*\* ?', '', block, flags=re.M), root)
             snippets = load_snippets()
-            source = includes+'\n#include <atcoder/modint>\n#include <cassert>\nusing M=atcoder::modint998244353;\n'
+            source = includes+''.join(f'#include "library/{h}.hpp"\n' for h in info.get("extra_includes", []))+'\n#include <atcoder/modint>\n#include <cassert>\nusing M=atcoder::modint998244353;\n'
             # 複雑な設定のスニペットはグローバルに挿入する。
             for prefix in info.get('global_snippets',[]):source += expand(snippets[prefix]['body'])+'\n'
             source += 'int main(){\n'

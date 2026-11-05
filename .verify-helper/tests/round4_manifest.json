@@ -70,5 +70,49 @@
         "assert(same);"
       ]
     }
+  },
+  "C": {
+    "headers": [
+      "math/linear_recurrence",
+      "math/berlekamp_massey",
+      "math/bostan_mori",
+      "algorithm/knuth_optimization",
+      "algorithm/smawk",
+      "data_structure/monotone_cht",
+      "math/subset_convolution"
+    ],
+    "snippets": {
+      "recurrence": [
+        "std::vector<M>initial{0,1},coefficient{1,1};std::uint64_t n=10;",
+        "assert(term==55);"
+      ],
+      "berlekamp": [
+        "std::vector<M>sequence{0,1,1,2,3,5};",
+        "assert((coefficient==std::vector<M>{1,1}));"
+      ],
+      "bostan-mori": [
+        "FormalPowerSeries<M>numerator{0,1},denominator{1,-1,-1};std::uint64_t n=10;",
+        "assert(term==55);"
+      ],
+      "knuth": [
+        "int n=3;auto cost=[](int l,int r){return 1LL*(r-l);};",
+        "assert(dp.dp[0][3]==5);"
+      ],
+      "smawk": [
+        "std::vector<int>rows{0,1},columns{0,1};auto value=[](int i,int j){return (i-j)*(i-j);};",
+        "assert((argmin==std::vector<int>{0,1}));"
+      ],
+      "monotone-cht": [
+        "long long a=2,b=3,x=4;",
+        "assert(answer==11);"
+      ],
+      "subset-conv": [
+        "std::vector<M>a{1,2},b{3,4};",
+        "assert(c[1]==10);"
+      ]
+    },
+    "extra_includes": [
+      "math/formal_power_series"
+    ]
   }
 }

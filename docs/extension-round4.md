@@ -54,3 +54,24 @@ seedで再現・変更が可能。0の分解と非素数法の平方根はinvali
 ループだけの頂点にも1個のブロックを作る。この規約でBlock-Cut森の不要な葉を増やさない。
 関節点は複数ブロックに現れるが、辺IDはそれぞれちょうど1ブロックに属する。
 木同型のIDは同じencoder内でのみ比較する。整数IDそのものは他encoderへの持ち出し用正規形ではない。
+
+## Phase C：漸化式・DP高速化
+
+| ヘッダ | 主なAPI | 計算量・規約 |
+| --- | --- | --- |
+| `linear_recurrence.hpp` | `linear_recurrence(initial,c,n)` | a[t]=Σ c[j]a[t-1-j]。O(K² log(n+1))時間、O(K)空間 |
+| `berlekamp_massey.hpp` | `berlekamp_massey(sequence)` | 同じ遅れ順の最短係数列。O(N²)体演算、O(N)空間 |
+| `bostan_mori.hpp` | `bostan_mori(P,Q,n)` | O(M(K) log(n+1))時間、O(K)空間。既存FPSの積を利用すればACL NTT |
+| `knuth_optimization.hpp` | `knuth_optimization<T>(n,cost)`, `dp`, `split` | O(N²)時間・空間。半開区間、等値は最大の分割位置 |
+| `smawk.hpp` | `smawk(rows,columns,value)` | O(H+W)評価回数・空間。全単調性が必要、等値は入力順の左 |
+| `monotone_cht.hpp` | `MonotoneCHT<Max>`, `add_line`, `query`, `query_monotone` | 追加・単調x取得は償却O(1)、任意xはO(log L)、空間O(L) |
+| `subset_convolution.hpp` | `subset_convolution(a,b)` | 既存集合変換を再利用。O(B² 2^B)時間、O(B 2^B)空間 |
+
+Bostan–Moriは多項式型を受け取り、既存`FormalPowerSeries`を利用側でincludeする。
+本ヘッダ単独にはACLの非inline定義を持ち込まない。係数型にmod()があるBM/Bostan–Moriは素数法を検査する。
+CHTの係数・切片は絶対値2^62-1以下。比較差の積をsigned 128bitに収めるための十分条件で、xはsigned 64bit全域。
+Subset Convolutionはmodint・B=20でも作業領域が約176MiB（入力配列を除く主領域）になるため、メモリ制限と係数型のサイズを確認する。
+
+検証はKitamasa・Bostan–Mori・愚直漸化式の相互比較、GF(2)短列の最小次数全探索、
+KnuthとO(N³)DP、SMAWKの左端同値と評価回数、CHTと全直線走査を含む。
+AtCoder ABC293 EとDP Nのadapterはそれぞれ60ケースをローカル比較する。

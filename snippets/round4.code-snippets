@@ -124,5 +124,78 @@
       "bool ${2:same} = $1.unrooted_id(${3:first}) == $1.unrooted_id(${4:second});",
       "$0"
     ]
+  },
+  "recurrence": {
+    "scope": "cpp",
+    "prefix": "recurrence",
+    "description": "関数内：遅れ順係数の線形漸化式をKitamasa法で評価",
+    "body": [
+      "// #include \"library/math/linear_recurrence.hpp\"",
+      "auto ${1:term} = linear_recurrence(${2:initial}, ${3:coefficient}, ${4:n});",
+      "$0"
+    ]
+  },
+  "berlekamp": {
+    "scope": "cpp",
+    "prefix": "berlekamp",
+    "description": "関数内：素数法の観測列から最短漸化式の遅れ順係数を推定",
+    "body": [
+      "// #include \"library/math/berlekamp_massey.hpp\"",
+      "auto ${1:coefficient} = berlekamp_massey(${2:sequence});",
+      "$0"
+    ]
+  },
+  "bostan-mori": {
+    "scope": "cpp",
+    "prefix": "bostan-mori",
+    "description": "関数内：FPSの有理式の第n係数を計算",
+    "body": [
+      "// #include \"library/math/bostan_mori.hpp\"",
+      "// #include \"library/math/formal_power_series.hpp\"",
+      "auto ${1:term} = bostan_mori(${2:numerator}, ${3:denominator}, ${4:n});",
+      "$0"
+    ]
+  },
+  "knuth": {
+    "scope": "cpp",
+    "prefix": "knuth",
+    "description": "関数内：単調最適位置を保証できる区間DP専用",
+    "body": [
+      "// #include \"library/algorithm/knuth_optimization.hpp\"",
+      "auto ${1:dp} = knuth_optimization<${2:long long}>(${3:n}, ${4:cost});",
+      "$0"
+    ]
+  },
+  "smawk": {
+    "scope": "cpp",
+    "prefix": "smawk",
+    "description": "関数内：全単調行列の行最小列を線形評価回数で取得",
+    "body": [
+      "// #include \"library/algorithm/smawk.hpp\"",
+      "auto ${1:argmin} = smawk(${2:rows}, ${3:columns}, ${4:value});",
+      "$0"
+    ]
+  },
+  "monotone-cht": {
+    "scope": "cpp",
+    "prefix": "monotone-cht",
+    "description": "関数内：単調な傾きの直線集合。falseは最小値・傾き非増加",
+    "body": [
+      "// #include \"library/data_structure/monotone_cht.hpp\"",
+      "MonotoneCHT<${1:false}> ${2:hull};",
+      "$2.add_line(${3:a}, ${4:b});",
+      "auto ${5:answer} = $2.query(${6:x});",
+      "$0"
+    ]
+  },
+  "subset-conv": {
+    "scope": "cpp",
+    "prefix": "subset-conv",
+    "description": "関数内：重複しない部分集合の畳み込み",
+    "body": [
+      "// #include \"library/math/subset_convolution.hpp\"",
+      "auto ${1:c} = subset_convolution(${2:a}, ${3:b});",
+      "$0"
+    ]
   }
 }
