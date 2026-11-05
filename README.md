@@ -120,3 +120,7 @@ ACL は `CPATH`、`CPLUS_INCLUDE_PATH`、リポジトリ内の `ac-library/` と
 `--acl-dir` では ACL の checkout、include ディレクトリ、または `atcoder/` 自体を指定できます。
 展開に必要な ACL ヘッダが見つからない場合はエラーにし、出力ファイルを書き換えません。
 
+
+## 第4弾の拡張
+
+[比較対象・API・計算量・制約・検証記録](docs/extension-round4.md)を参照してください。

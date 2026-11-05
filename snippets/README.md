@@ -180,3 +180,8 @@ python -m unittest discover -s .verify-helper/tests -p test_snippets.py -v
 再帰ラムダは現在の入力用の枠に引数・本体を補い、引数なし・再帰呼び出しも検証します。
 メインテンプレートは bundle 前後とも `LOCAL` 有効・無効を検証し、提出版はリポジトリの include パスなしでもコンパイルします。
 実行には `g++` と ACL が必要です。
+
+## 第4弾
+
+`round4.code-snippets` の `prime64`・`factor64`・`phi-mu`・`set-transform`・`xor-conv`・`mod-sqrt` は関数内用です。
+先頭コメントにあるincludeをグローバルに追加します。型・前提条件は[拡張記録](../docs/extension-round4.md)と各ヘッダを参照してください。

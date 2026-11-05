@@ -77,7 +77,7 @@ class SnippetTest(unittest.TestCase):
 
     def test_catalog(self):
         self.assertEqual({path.name for path in SNIPPET_DIRECTORY.glob("*.code-snippets")}, {
-            "integer.code-snippets",
+            "round4.code-snippets", "integer.code-snippets",
             "gaps.code-snippets", "advanced.code-snippets", "template.code-snippets", "lazy-segtree.code-snippets", "implicit-treap.code-snippets",
             "mo.code-snippets", "sparse-table.code-snippets", "geometry.code-snippets", "geometry.code-snippets",
             "hld.code-snippets", "li-chao-tree.code-snippets",
@@ -102,7 +102,8 @@ class SnippetTest(unittest.TestCase):
             "kmp", "aho", "sam", "booth", "beats", "persistent-seg",  # API 展開検証は test_expansion_integration.py
             "wavelet", "rollback-uf",  # API 展開検証は test_phase_d.py
             "geometry", "polar-sort", "hull", "segment-cross", "ccw", "polygon-area",
-        })
+        } | {prefix for phase in json.loads((REPOSITORY / ".verify-helper/tests/round4_manifest.json").read_text()).values()
+             for prefix in [*phase["snippets"], *phase.get("global_snippets", [])]})
         for prefix, snippet in self.snippets.items():
             with self.subTest(prefix=prefix):
                 self.assertRegex(prefix, r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$")

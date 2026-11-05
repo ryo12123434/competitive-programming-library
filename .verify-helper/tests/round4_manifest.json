@@ -1,0 +1,38 @@
+{
+  "A": {
+    "headers": [
+      "math/miller_rabin",
+      "math/pollard_rho",
+      "math/multiplicative_functions",
+      "math/subset_transform",
+      "math/xor_convolution",
+      "math/mod_sqrt"
+    ],
+    "snippets": {
+      "prime64": [
+        "std::uint64_t n=7;",
+        "assert(prime);"
+      ],
+      "factor64": [
+        "std::uint64_t n=12;",
+        "assert(factors.size()==2);"
+      ],
+      "phi-mu": [
+        "int n=10;",
+        "assert(table.phi[10]==4);"
+      ],
+      "set-transform": [
+        "std::vector<M>a{1,2,3,4};",
+        "assert(a[0]==1&&a[3]==4);"
+      ],
+      "xor-conv": [
+        "std::vector<M>a{1,2},b{3,4};",
+        "assert(c[0]==11);"
+      ],
+      "mod-sqrt": [
+        "std::uint64_t a=10,p=13;",
+        "assert(root==6);"
+      ]
+    }
+  }
+}

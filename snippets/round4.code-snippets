@@ -1,0 +1,63 @@
+{
+  "prime64": {
+    "scope": "cpp",
+    "prefix": "prime64",
+    "description": "関数内：unsigned 64bit全域の決定的素数判定",
+    "body": [
+      "// #include \"library/math/miller_rabin.hpp\"",
+      "bool ${1:prime} = is_prime_u64(${2:n});",
+      "$0"
+    ]
+  },
+  "factor64": {
+    "scope": "cpp",
+    "prefix": "factor64",
+    "description": "関数内：64bitの素因数と指数。0は不可、再試行失敗は例外",
+    "body": [
+      "// #include \"library/math/pollard_rho.hpp\"",
+      "auto ${1:factors} = factorize_u64_counts(${2:n});",
+      "$0"
+    ]
+  },
+  "phi-mu": {
+    "scope": "cpp",
+    "prefix": "phi-mu",
+    "description": "関数内：0..nのEuler phiとMobius muを線形篩で計算",
+    "body": [
+      "// #include \"library/math/multiplicative_functions.hpp\"",
+      "MultiplicativeFunctions ${1:table}(${2:n});",
+      "$0"
+    ]
+  },
+  "set-transform": {
+    "scope": "cpp",
+    "prefix": "set-transform",
+    "description": "関数内：2冪長配列の部分集合Zetaと逆変換",
+    "body": [
+      "// #include \"library/math/subset_transform.hpp\"",
+      "subset_zeta(${1:a});",
+      "subset_mobius($1); // 元に戻す。上位集合はsuperset_*",
+      "$0"
+    ]
+  },
+  "xor-conv": {
+    "scope": "cpp",
+    "prefix": "xor-conv",
+    "description": "関数内：奇数法modint等でXOR畳み込み",
+    "body": [
+      "// #include \"library/math/xor_convolution.hpp\"",
+      "auto ${1:c} = xor_convolution(${2:a}, ${3:b});",
+      "$0"
+    ]
+  },
+  "mod-sqrt": {
+    "scope": "cpp",
+    "prefix": "mod-sqrt",
+    "description": "関数内：素数法の平方根。解なしはnullopt",
+    "body": [
+      "// #include \"library/math/mod_sqrt.hpp\"",
+      "auto ${1:root} = mod_sqrt_u64(${2:a}, ${3:p});",
+      "$0"
+    ]
+  }
+}
