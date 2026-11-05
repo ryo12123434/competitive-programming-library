@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../math/int128_io.hpp"
+
 #include <algorithm>
 #include <cstddef>
 #include <iomanip>
@@ -82,7 +84,11 @@ inline std::string quote(std::string_view value, char delimiter) {
 template <class T>
 void write(std::ostream& out, const T& value, std::size_t depth, const PrintOptions& options) {
     using U = std::remove_cvref_t<T>;
-    if constexpr (std::is_same_v<U, bool>) {
+    if constexpr (std::is_same_v<U, __int128_t>) {
+        out << ::to_string_int128(value);
+    } else if constexpr (std::is_same_v<U, __uint128_t>) {
+        out << ::to_string_uint128(value);
+    } else if constexpr (std::is_same_v<U, bool>) {
         out << (value ? "true" : "false");
     } else if constexpr (std::is_same_v<U, char>) {
         const char ch = value;
@@ -157,7 +163,7 @@ void write(std::ostream& out, const T& value, std::size_t depth, const PrintOpti
 
 /**
  * @brief 値を再帰的に文字列化する。LOCAL に関係なく実行する補助関数。
- * @tparam T 文字列、range、pair / tuple、queue / stack / priority_queue、または ostream に出力可能な型。
+ * @tparam T 128bit整数、文字列、range、pair / tuple、queue / stack / priority_queue、または ostream に出力可能な型。
  * @param value 表示する値。STL の operator<< は追加・変更しない。
  * @param options 各コンテナの件数・深さの上限。
  * @return 文字列・文字は引用符付き。未対応型は <unprintable>。
@@ -166,7 +172,8 @@ void write(std::ostream& out, const T& value, std::size_t depth, const PrintOpti
  * これらと pair / tuple / コンテナアダプタは任意に入れ子にでき、各階層に options を適用する。
  * queue は front から、stack は top から、priority_queue は比較関数に従った pop 順に表示する。
  * 例: queue[1, 2]、stack[2, 1]、priority_queue[3, 1]。元のコンテナは変更しない。
- * @note unordered コンテナの順序は不定。文字列自体の長さは制限しない。
+ * @note GNU signed/unsigned 128bitは10進で表示する。cpp_intは利用側でBoostをincludeすれば標準のストリーム出力で表示可能。
+ * unordered コンテナの順序は不定。文字列自体の長さは制限しない。
  * @par Complexity
  * 表示する要素数と文字数に比例する時間・出力空間。
  * ただし、要素数 N のアダプタは表示件数 K を制限してもコピー・破棄に O(N) 時間・コピーに O(N) 追加空間を使う。

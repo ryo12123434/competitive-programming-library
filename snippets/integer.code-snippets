@@ -1,0 +1,91 @@
+{
+  "Signed 128bit IO": {
+    "scope": "cpp",
+    "prefix": "int128-io",
+    "description": "符号付き128bitの10進入出力。関数内に挿入し、includeはグローバルへ移動する",
+    "body": [
+      "// #include \"library/math/int128_io.hpp\"",
+      "__int128_t ${1:value} = 0;",
+      "if (!read_int128(${2:std::cin}, $1)) return 0;",
+      "print_int128(${3:std::cout}, $1) << '\\n';",
+      "$0"
+    ]
+  },
+  "Unsigned 128bit IO": {
+    "scope": "cpp",
+    "prefix": "uint128-io",
+    "description": "符号なし128bitの10進入出力。負号・範囲外はfailbit、includeはグローバルへ移動する",
+    "body": [
+      "// #include \"library/math/int128_io.hpp\"",
+      "__uint128_t ${1:value} = 0;",
+      "if (!read_uint128(${2:std::cin}, $1)) return 0;",
+      "print_uint128(${3:std::cout}, $1) << '\\n';",
+      "$0"
+    ]
+  },
+  "Boost cpp_int": {
+    "scope": "cpp",
+    "prefix": "bigint",
+    "description": "グローバルに挿入：Boost多倍長整数。通常のcin/coutと四則演算を使う",
+    "body": [
+      "#include <boost/multiprecision/cpp_int.hpp>",
+      "using ${1:BigInt} = boost::multiprecision::cpp_int;",
+      "$0"
+    ]
+  },
+  "Boost and 128bit conversion": {
+    "scope": "cpp",
+    "prefix": "bigint-convert",
+    "description": "関数内：128bitとcpp_intを10進文字列で変換。戻すときはoptionalで範囲を検査する",
+    "body": [
+      "// #include <boost/multiprecision/cpp_int.hpp>",
+      "// #include \"library/math/int128_io.hpp\"",
+      "__int128_t ${1:small} = ${2:123};",
+      "boost::multiprecision::cpp_int ${3:big}(to_string_int128($1));",
+      "auto ${4:narrowed} = parse_int128($3.str()); // 範囲外ならnullopt",
+      "$0"
+    ]
+  },
+  "Integer division": {
+    "scope": "cpp",
+    "prefix": "integer-div",
+    "description": "関数内：符号付きの床・天井除算。0除算と最小値/-1はnullopt",
+    "body": [
+      "// #include \"library/math/integer_division.hpp\"",
+      "auto ${1:lower} = floor_div<${2:long long}>(${3:a}, ${4:b});",
+      "auto ${5:upper} = ceil_div<$2>($3, $4);",
+      "$0"
+    ]
+  },
+  "Integer square root": {
+    "scope": "cpp",
+    "prefix": "isqrt",
+    "description": "関数内：非負整数の平方根の床。unsigned 64/128bit全域、負値は事前条件違反",
+    "body": [
+      "// #include \"library/math/integer_sqrt.hpp\"",
+      "auto ${1:root} = isqrt(${2:x});",
+      "$0"
+    ]
+  },
+  "Wide multiplication": {
+    "scope": "cpp",
+    "prefix": "wide-mul",
+    "description": "関数内：64bit以下の同一型2値の積を128bitで厳密に計算する",
+    "body": [
+      "// #include \"library/math/safe_arithmetic.hpp\"",
+      "auto ${1:product} = wide_mul(${2:a}, ${3:b});",
+      "$0"
+    ]
+  },
+  "Checked integer arithmetic": {
+    "scope": "cpp",
+    "prefix": "checked-int",
+    "description": "関数内：同一型整数の加算・乗算。128bitも対応、範囲外はnullopt",
+    "body": [
+      "// #include \"library/math/safe_arithmetic.hpp\"",
+      "auto ${1:sum} = checked_add(${2:a}, ${3:b});",
+      "auto ${4:product} = checked_mul($2, $3);",
+      "$0"
+    ]
+  }
+}

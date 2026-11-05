@@ -69,6 +69,14 @@ snippets/
 - 文字列：`kmp.hpp`、`aho_corasick.hpp`、`suffix_automaton.hpp`、`booth.hpp`
 - グラフ：`offline_dynamic_connectivity.hpp`、`virtual_tree.hpp`、`dsu_on_tree.hpp`、`two_edge_connected_components.hpp`
 
+## ABC・ARC向けの補助アルゴリズム
+
+ABC・ARC向けの追加分は、各ヘッダの Doxygen と `snippets/gaps.code-snippets` から参照できます。
+
+- グラフ：Kruskal、閉路検出、オイラー路、Warshall–Floyd、なもり分解
+- 数列・DP：Cartesian Tree、Sliding Window、Slope Trick、Monotone Minima、分割統治DP、Knapsack
+- 数学・クエリ：GF(2)連立方程式、2D Fenwick、静的2D Range Tree、並列二分探索、更新付きMo、区間加算Fenwick
+
 ## 提出用 bundler
 
 `bundle.py` は `library/` 以下の自作ヘッダを展開し、提出用の 1 ファイルにまとめます。

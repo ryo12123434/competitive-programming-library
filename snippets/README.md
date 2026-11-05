@@ -42,6 +42,11 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 | 同上 | `lambda` | 関数内：通常のラムダ式 |
 | 同上 | `lambda-rec` | 関数内：`auto&& self` を使う再帰ラムダ式 |
 | 同上 | `grid-check` | ループ内：グリッドの範囲外なら `continue` |
+| `integer.code-snippets` | `int128-io` / `uint128-io` | 関数内：128bitの10進入出力 |
+| 同上 | `bigint` | グローバル：Boost `cpp_int` の include と型エイリアス |
+| 同上 | `bigint-convert` | 関数内：128bitと `cpp_int` の範囲検査付き変換 |
+| 同上 | `integer-div` / `isqrt` | 関数内：床・天井除算／非負整数の平方根の床 |
+| 同上 | `wide-mul` / `checked-int` | 関数内：64bitの積を128bitへ拡張／範囲検査付き加算・乗算 |
 | `lazy-segtree.code-snippets` | `lazy-assign-min` / `lazy-assign-max` / `lazy-assign-sum` | グローバル：ACL の区間代入設定 |
 | 同上 | `lazy-add-min` / `lazy-add-max` / `lazy-add-sum` | グローバル：ACL の区間加算設定 |
 | 同上 | `lazy-init` | 関数内：葉の長さを 1 として初期化 |
@@ -62,6 +67,15 @@ ACL のヘッダもコンパイラから見える状態にします。`main` の
 | 同上 | `dynamic-connect` / `virtual-tree` | 関数内：辺の追加削除を一括処理／仮想木 |
 | 同上 | `dsu-tree` / `two-edge` | 関数内：部分木の異なる色数／2辺連結成分 |
 | 同上 | `swag` / `disjoint-table` | 関数内：順序付き Queue 集約／静的な非冪等区間集約 |
+| `gaps.code-snippets` | `mst` / `cycle` / `euler-trail` / `floyd` / `namori` | 関数内：無向辺IDは入力配列の添字。有向・無向を指定 |
+| 同上 | `cartesian` / `slide-min` | 関数内：Min Cartesian Tree／固定窓最小値。最大値版もヘッダに用意 |
+| 同上 | `slope` / `monotone-min` / `dc-dp` | 関数内：凸関数／単調な最適位置を持つ行列・DP専用 |
+| 同上 | `gf2-solve` / `knapsack` | 関数内：係数1の変数添字から方程式を登録／0/1 Knapsack |
+| 同上 | `bit2d` / `range2d` / `range-add-bit` | 関数内：点加算矩形和／静的矩形内点数／区間加算和 |
+| 同上 | `parallel-bs` / `mo-updates` | 関数内：更新回数に単調なクエリ／点更新付きオフライン区間和 |
+
+`gaps` も先頭コメントのヘッダをグローバルで include します。`mo-updates` は1更新・1クエリの例なので、
+実際の入力では登録処理と回答配列のサイズを変更してください。`dc-dp` の到達不能値は `std::nullopt` です。
 
 `advanced` の各スニペットは先頭コメントのヘッダをグローバルで include します。
 `persistent-seg`・`swag` は `S op(S,S)` と単位元 `S e()`、`disjoint-table` は `S op(S,S)` を定義してください。
@@ -72,6 +86,10 @@ Beats の和は `__int128_t`、空区間の min/max は `std::optional` です�
 ホバーによる引数の説明は、ヘッダの Doxygen コメントと C/C++ 拡張の IntelliSense を使います。
 
 ## よく使う手順・注意点
+
+整数スニペットの先頭コメントにある include はグローバルへ追加します。
+`main` の `i128` / `u128` は型エイリアスで、入出力には `read_int128` / `print_int128` などを使います。
+Boost は `bigint` を使う場合だけ必要です。[整数処理の仕様・変換例](../library/math/integer.md)も参照してください。
 
 - **遅延セグ木**：設定をグローバルへ挿入し、関数内で `n` を用意して `lazy-init` を展開します。
   初期化側の名前空間・型名を設定とそろえます。例えば `lazy-add-sum` なら
