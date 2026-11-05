@@ -34,5 +34,41 @@
         "assert(root==6);"
       ]
     }
+  },
+  "B": {
+    "headers": [
+      "graph/bipartite_graph",
+      "graph/bipartite_matching",
+      "graph/centroid_decomposition",
+      "graph/biconnected_components",
+      "graph/block_cut_tree",
+      "graph/tree_isomorphism"
+    ],
+    "snippets": {
+      "bipartite": [
+        "int n=2;std::vector<std::pair<int,int>>edges{{0,1}};",
+        "assert(result.bipartite);"
+      ],
+      "matching": [
+        "int left_size=2,right_size=2;std::vector<std::pair<int,int>>edges{{0,1}};",
+        "assert(matched==1);"
+      ],
+      "centroid": [
+        "std::vector<std::vector<int>>tree{{1},{0}};",
+        "assert(decomposition.ancestors.size()==2);"
+      ],
+      "biconnected": [
+        "int n=2;std::vector<std::pair<int,int>>edges{{0,1}};",
+        "assert(blocks.components.size()==1);"
+      ],
+      "block-cut": [
+        "BiconnectedComponents blocks(1);blocks.build();",
+        "assert(cut.vertex_node[0]==0);"
+      ],
+      "tree-iso": [
+        "std::vector<std::vector<int>>first{{1},{0}},second=first;",
+        "assert(same);"
+      ]
+    }
   }
 }

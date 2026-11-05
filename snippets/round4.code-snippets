@@ -59,5 +59,70 @@
       "auto ${1:root} = mod_sqrt_u64(${2:a}, ${3:p});",
       "$0"
     ]
+  },
+  "bipartite": {
+    "scope": "cpp",
+    "prefix": "bipartite",
+    "description": "関数内：二部判定と奇閉路の復元",
+    "body": [
+      "// #include \"library/graph/bipartite_graph.hpp\"",
+      "auto ${1:result} = bipartite_coloring(${2:n}, ${3:edges});",
+      "$0"
+    ]
+  },
+  "matching": {
+    "scope": "cpp",
+    "prefix": "matching",
+    "description": "関数内：二部最大マッチングと最小頂点被覆",
+    "body": [
+      "// #include \"library/graph/bipartite_matching.hpp\"",
+      "BipartiteMatching ${1:matcher}(${2:left_size}, ${3:right_size});",
+      "for (auto [u, v] : ${4:edges}) $1.add_edge(u, v);",
+      "int ${5:matched} = $1.solve();",
+      "$0"
+    ]
+  },
+  "centroid": {
+    "scope": "cpp",
+    "prefix": "centroid",
+    "description": "関数内：重心祖先と元の木での距離を前計算",
+    "body": [
+      "// #include \"library/graph/centroid_decomposition.hpp\"",
+      "CentroidDecomposition ${1:decomposition}(${2:tree});",
+      "$0"
+    ]
+  },
+  "biconnected": {
+    "scope": "cpp",
+    "prefix": "biconnected",
+    "description": "関数内：多重辺・孤立点にも対応する二重頂点連結成分",
+    "body": [
+      "// #include \"library/graph/biconnected_components.hpp\"",
+      "BiconnectedComponents ${1:blocks}(${2:n});",
+      "for (auto [u, v] : ${3:edges}) $1.add_edge(u, v);",
+      "$1.build();",
+      "$0"
+    ]
+  },
+  "block-cut": {
+    "scope": "cpp",
+    "prefix": "block-cut",
+    "description": "関数内：build済み二重頂点連結成分からBlock-Cut森を構築",
+    "body": [
+      "// #include \"library/graph/block_cut_tree.hpp\"",
+      "BlockCutTree ${1:cut}(${2:blocks});",
+      "$0"
+    ]
+  },
+  "tree-iso": {
+    "scope": "cpp",
+    "prefix": "tree-iso",
+    "description": "関数内：共有辞書による衝突のない根なし木同型判定",
+    "body": [
+      "// #include \"library/graph/tree_isomorphism.hpp\"",
+      "TreeIsomorphism ${1:encoder};",
+      "bool ${2:same} = $1.unrooted_id(${3:first}) == $1.unrooted_id(${4:second});",
+      "$0"
+    ]
   }
 }

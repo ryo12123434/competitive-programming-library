@@ -37,3 +37,20 @@ seedで再現・変更が可能。0の分解と非素数法の平方根はinvali
 ローカル検証は `.verify-helper/tests/test_round4.py` とphase別fixtureを使う。
 各phaseでC++20+ASan/UBSan、GNU++23、単独ヘッダ、複数翻訳単位、Doxygen例、スニペット、bundleを実行する。
 公式問題は対応する `verify/*/round4_*.test.cpp`。公式データの取得・実行と外部サイトへの提出は区別する。
+
+## Phase B：グラフ・木
+
+| ヘッダ | 主なAPI | 計算量・規約 |
+| --- | --- | --- |
+| `bipartite_graph.hpp` | `bipartite_coloring(n,edges)` | O(V+E)。成功時2色、失敗時は始点再掲なしの奇閉路と辺ID |
+| `bipartite_matching.hpp` | `BipartiteMatching`, `add_edge`, `solve`, `matching`, `minimum_vertex_cover` | 初期化O(V)+探索O(E√V)、保持O(V+E)。被覆復元O(V+E) |
+| `centroid_decomposition.hpp` | `CentroidDecomposition(tree)`, `parent`, `level`, `ancestors` | O(N log N)時間・保持空間。祖先ごとに元の木での距離 |
+| `biconnected_components.hpp` | `BiconnectedComponents`, `add_edge`, `build`, `components`, `component_edges` | 既存Lowlinkのord/low/関節点を利用。O(V+E) |
+| `block_cut_tree.hpp` | `BlockCutTree(bcc)`, `tree`, `vertex_node`, `articulation_vertex` | O(V+E)。ブロックノードの後に関節点ノード |
+| `tree_isomorphism.hpp` | `TreeIsomorphism.rooted_id/unrooted_id` | ソート+共有辞書による厳密判定。N頂点・M既存型にO(N log(N+M+1)) |
+
+全探索・愚直比較に加え、HKの10万段増加路、重心分解の20万頂点の鎖を反復処理で検証する。
+二重頂点連結成分の自己ループは、所属頂点の最初の通常ブロックへ割り当てる。
+ループだけの頂点にも1個のブロックを作る。この規約でBlock-Cut森の不要な葉を増やさない。
+関節点は複数ブロックに現れるが、辺IDはそれぞれちょうど1ブロックに属する。
+木同型のIDは同じencoder内でのみ比較する。整数IDそのものは他encoderへの持ち出し用正規形ではない。
