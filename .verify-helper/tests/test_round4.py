@@ -83,7 +83,7 @@ class Round4Test(unittest.TestCase):
             source = includes+''.join(f'#include "library/{h}.hpp"\n' for h in info.get("extra_includes", []))+'\n#include <atcoder/modint>\n#include <cassert>\nusing M=atcoder::modint998244353;\n'
             # 複雑な設定のスニペットはグローバルに挿入する。
             for prefix in info.get('global_snippets',[]):source += expand(snippets[prefix]['body'])+'\n'
-            source += 'int main(){\n'
+            source += info.get('global_code', '') + '\nint main(){\n'
             for prefix,(before,after) in info['snippets'].items():
                 source += '{\n'+before+'\n'+expand(snippets[prefix]['body'])+'\n'+after+'\n}\n'
             source += '}\n'

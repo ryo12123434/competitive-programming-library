@@ -197,5 +197,67 @@
       "auto ${1:c} = subset_convolution(${2:a}, ${3:b});",
       "$0"
     ]
+  },
+  "fast-set": {
+    "scope": "cpp",
+    "prefix": "fast-set",
+    "description": "関数内：固定宇宙[0,n)の整数集合と前後要素",
+    "body": [
+      "// #include \"library/data_structure/fast_set.hpp\"",
+      "FastSet ${1:present}(${2:n});",
+      "$1.insert(${3:x});",
+      "$0"
+    ]
+  },
+  "dynamic-seg": {
+    "scope": "cpp",
+    "prefix": "dynamic-seg",
+    "description": "関数内：巨大半開座標域の非永続セグ木。op/eはグローバルに定義",
+    "body": [
+      "// #include \"library/data_structure/dynamic_segment_tree.hpp\"",
+      "DynamicSegmentTree<${1:long long}, ${2:op}, ${3:e}> ${4:seg}(${5:lower}, ${6:upper});",
+      "$0"
+    ]
+  },
+  "uf-monoid": {
+    "scope": "cpp",
+    "prefix": "uf-monoid",
+    "description": "関数内：初期頂点値を持つ成分モノイドDSU",
+    "body": [
+      "// #include \"library/data_structure/union_find_monoid.hpp\"",
+      "UnionFindMonoid<${1:long long}, ${2:op}, ${3:e}> ${4:uf}(${5:values});",
+      "$0"
+    ]
+  },
+  "eertree": {
+    "scope": "cpp",
+    "prefix": "eertree",
+    "description": "関数内：異なる回文と各出現回数。ID0/1は特殊根",
+    "body": [
+      "// #include \"library/string/palindromic_tree.hpp\"",
+      "PalindromicTree ${1:palindromes}(${2:s});",
+      "auto ${3:counts} = $1.occurrences();",
+      "$0"
+    ]
+  },
+  "enclosing-circle": {
+    "scope": "cpp",
+    "prefix": "enclosing-circle",
+    "description": "関数内：最小包含円の数値近似と境界の元点ID。空ならnullopt",
+    "body": [
+      "// #include \"library/geometry/minimum_enclosing_circle.hpp\"",
+      "auto ${1:result} = cpl::geometry::minimum_enclosing_circle(${2:points});",
+      "$0"
+    ]
+  },
+  "minkowski": {
+    "scope": "cpp",
+    "prefix": "minkowski",
+    "description": "関数内：凸多角形のMinkowski和。空・点・線分も対応",
+    "body": [
+      "// #include \"library/geometry/minkowski_sum.hpp\"",
+      "auto ${1:boundary} = cpl::geometry::minkowski_sum(${2:first}, ${3:second});",
+      "$0"
+    ]
   }
 }

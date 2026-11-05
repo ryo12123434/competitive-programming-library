@@ -75,3 +75,36 @@ Subset Convolutionはmodint・B=20でも作業領域が約176MiB（入力配列�
 検証はKitamasa・Bostan–Mori・愚直漸化式の相互比較、GF(2)短列の最小次数全探索、
 KnuthとO(N³)DP、SMAWKの左端同値と評価回数、CHTと全直線走査を含む。
 AtCoder ABC293 EとDP Nのadapterはそれぞれ60ケースをローカル比較する。
+
+## Phase D：集合・文字列・幾何
+
+| ヘッダ | 主なAPI | 計算量・規約 |
+| --- | --- | --- |
+| `fast_set.hpp` | `FastSet`, `insert/erase/contains`, `next/prev`, `min/max`, `any` | O(log₆₄(n+1)+1)操作、contains/sizeはO(1)。保持O(n/64+log n)語 |
+| `dynamic_segment_tree.hpp` | `DynamicSegmentTree<S,op,e>`, `set/prod/get/all_prod` | 初期化O(1)、更新・範囲取得O(log(U+1))、Q回更新でO(Q log(U+1))空間 |
+| `union_find_monoid.hpp` | `UnionFindMonoid<S,op,e>`, `merge/get/set/leader/same/size` | ACL dsu再利用。O(alpha(N))償却+モノイド演算。保持O(N) |
+| `palindromic_tree.hpp` | `PalindromicTree`, `add_char`, `node_info`, `occurrences` | 全追加O(N log(sigma+1))、空間O(N)。集計O(N)。バイト文字集合 |
+| `minimum_enclosing_circle.hpp` | `minimum_enclosing_circle(points,seed,tolerance)` | 期待O(N)、最悪O(N³)、空間O(N)。既存RealPoint/RealCircleを再利用 |
+| `minkowski_sum.hpp` | `minkowski_sum(a,b)` | 凸境界の正規化・辺マージでO(N+M)。空・点・線分・共線も対応 |
+
+UnionFindMonoidの非可換演算はmerge(a,b)の引数順で定義し、代表元選択に依存させない。
+setは成分値全体の上書き。一般モノイドでの任意の頂点値更新は扱わない。
+動的セグ木はsigned 64bitで表現可能な両端の半開域。LLONG_MAXを右端にすると、その座標自体は含まれない。
+EertreeのID0/1は特殊根、2以降が初出順の回文。特殊根の出現回数は0。
+
+最小包含円は相対的な距離許容幅と外向き半径補正を用いる数値近似で、任意の条件数での絶対精度保証はない。
+数値的に矛盾する境界制約は例外。支持点1～3個の元IDも返す。
+公式verifyの整数座標では、支持点の整数円方程式で全点の包含を確認し、円周上かを厳密に判定する。
+Minkowski和は凸境界順が前提。整数PointとWideを再利用し、出力座標の型あふれは例外。
+
+## 実施した検証
+
+- Phase別C++20+ASan/UBSan、GNU++23で境界・全探索・独立な愚直比較を実行。
+- 25ヘッダの単独コンパイル、複数翻訳単位、全使用例、25スニペット、bundleを実行。
+- Library Checkerの新規14 adapterで公式データ290ケースを実行して成功。外部サーバーへの提出ではない。
+- φ/μ、二部判定、重心分解、Block-Cut、木同型、SMAWK、CHT、成分モノイド、Minkowski和など、直接の公式adapterがない機能は独立なローカルテストで検証。
+- Miller–Rabin/Pollard Rhoの公式問題は上限10^18。2^64近傍はローカルで既知の素数・合成数・素数冪・積の復元を追加検証。
+- AtCoder ABC293 E・DP Nは公式データ取得を成功扱いにせず、adapterを各60ケースでローカル比較。
+
+詳細な使用例は各ヘッダのDoxygen、テスト対応は `.verify-helper/tests/round4_manifest.json`。
+Phase Eの追加候補は今回実装せず、必須25機能の検証を優先する。

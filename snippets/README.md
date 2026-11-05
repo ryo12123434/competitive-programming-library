@@ -185,3 +185,9 @@ python -m unittest discover -s .verify-helper/tests -p test_snippets.py -v
 
 `round4.code-snippets` の `prime64`・`factor64`・`phi-mu`・`set-transform`・`xor-conv`・`mod-sqrt` は関数内用です。
 先頭コメントにあるincludeをグローバルに追加します。型・前提条件は[拡張記録](../docs/extension-round4.md)と各ヘッダを参照してください。
+
+追加分は `bipartite`・`matching`・`centroid`・`biconnected`・`block-cut`・`tree-iso`、
+`recurrence`・`berlekamp`・`bostan-mori`・`knuth`・`smawk`・`monotone-cht`・`subset-conv`、
+`fast-set`・`dynamic-seg`・`uf-monoid`・`eertree`・`enclosing-circle`・`minkowski` です。
+`dynamic-seg` と `uf-monoid` の `op` / `e` はグローバルに定義します。
+Bostan–Moriで既存FPSを使う場合は `formal_power_series.hpp` もincludeしてください。
