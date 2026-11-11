@@ -92,7 +92,7 @@ inline std::optional<__uint128_t> parse_uint128(std::string_view text) {
 }
 
 /**
- * @brief 空白区切りの1トークンを読み、符号付き128bitへ変換する。演算子は追加しない。
+ * @brief 空白区切りの1トークンを読み、符号付き128bitへ変換する。ストリーム演算子も利用可能。
  * @param input 入力ストリーム。トークン抽出は標準stringの規則（skipws等）に従う。
  * @param value 成功時だけ代入する出力先。失敗時は変更せずfailbitを設定する。
  * @return input。例外マスクが設定されていれば標準ストリームの例外規則に従う。
@@ -141,4 +141,29 @@ inline std::ostream &print_int128(std::ostream &output, __int128_t value) {
 /// @brief 符号なし版。仕様・計算量はprint_int128と同じ。
 inline std::ostream &print_uint128(std::ostream &output, __uint128_t value) {
     return output << to_string_uint128(value);
+}
+
+/**
+ * @brief 符号付き/符号なし128bit整数のストリーム演算子。
+ * @note std::cin/std::cout/std::cerrやstringstreamで、通常の整数と同じ形式で入出力できる。
+ *       既存のread_int128/print_int128関数も利用可能。
+ *       不正入力・範囲外ではfailbitを立て、値は変更しない。
+ * @code
+ * __int128_t x = 0;
+ * std::cin >> x;
+ * std::cout << x << '\n';
+ * std::cerr << x << '\n';
+ * @endcode
+ */
+inline std::istream &operator>>(std::istream &input, __int128_t &value) {
+    return read_int128(input, value);
+}
+inline std::istream &operator>>(std::istream &input, __uint128_t &value) {
+    return read_uint128(input, value);
+}
+inline std::ostream &operator<<(std::ostream &output, __int128_t value) {
+    return print_int128(output, value);
+}
+inline std::ostream &operator<<(std::ostream &output, __uint128_t value) {
+    return print_uint128(output, value);
 }
