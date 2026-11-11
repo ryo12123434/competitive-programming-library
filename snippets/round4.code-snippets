@@ -1,0 +1,263 @@
+{
+  "prime64": {
+    "scope": "cpp",
+    "prefix": "prime64",
+    "description": "関数内：unsigned 64bit全域の決定的素数判定",
+    "body": [
+      "// #include \"library/math/miller_rabin.hpp\"",
+      "bool ${1:prime} = is_prime_u64(${2:n});",
+      "$0"
+    ]
+  },
+  "factor64": {
+    "scope": "cpp",
+    "prefix": "factor64",
+    "description": "関数内：64bitの素因数と指数。0は不可、再試行失敗は例外",
+    "body": [
+      "// #include \"library/math/pollard_rho.hpp\"",
+      "auto ${1:factors} = factorize_u64_counts(${2:n});",
+      "$0"
+    ]
+  },
+  "phi-mu": {
+    "scope": "cpp",
+    "prefix": "phi-mu",
+    "description": "関数内：0..nのEuler phiとMobius muを線形篩で計算",
+    "body": [
+      "// #include \"library/math/multiplicative_functions.hpp\"",
+      "MultiplicativeFunctions ${1:table}(${2:n});",
+      "$0"
+    ]
+  },
+  "set-transform": {
+    "scope": "cpp",
+    "prefix": "set-transform",
+    "description": "関数内：2冪長配列の部分集合Zetaと逆変換",
+    "body": [
+      "// #include \"library/math/subset_transform.hpp\"",
+      "subset_zeta(${1:a});",
+      "subset_mobius($1); // 元に戻す。上位集合はsuperset_*",
+      "$0"
+    ]
+  },
+  "xor-conv": {
+    "scope": "cpp",
+    "prefix": "xor-conv",
+    "description": "関数内：奇数法modint等でXOR畳み込み",
+    "body": [
+      "// #include \"library/math/xor_convolution.hpp\"",
+      "auto ${1:c} = xor_convolution(${2:a}, ${3:b});",
+      "$0"
+    ]
+  },
+  "mod-sqrt": {
+    "scope": "cpp",
+    "prefix": "mod-sqrt",
+    "description": "関数内：素数法の平方根。解なしはnullopt",
+    "body": [
+      "// #include \"library/math/mod_sqrt.hpp\"",
+      "auto ${1:root} = mod_sqrt_u64(${2:a}, ${3:p});",
+      "$0"
+    ]
+  },
+  "bipartite": {
+    "scope": "cpp",
+    "prefix": "bipartite",
+    "description": "関数内：二部判定と奇閉路の復元",
+    "body": [
+      "// #include \"library/graph/bipartite_graph.hpp\"",
+      "auto ${1:result} = bipartite_coloring(${2:n}, ${3:edges});",
+      "$0"
+    ]
+  },
+  "matching": {
+    "scope": "cpp",
+    "prefix": "matching",
+    "description": "関数内：二部最大マッチングと最小頂点被覆",
+    "body": [
+      "// #include \"library/graph/bipartite_matching.hpp\"",
+      "BipartiteMatching ${1:matcher}(${2:left_size}, ${3:right_size});",
+      "for (auto [u, v] : ${4:edges}) $1.add_edge(u, v);",
+      "int ${5:matched} = $1.solve();",
+      "$0"
+    ]
+  },
+  "centroid": {
+    "scope": "cpp",
+    "prefix": "centroid",
+    "description": "関数内：重心祖先と元の木での距離を前計算",
+    "body": [
+      "// #include \"library/graph/centroid_decomposition.hpp\"",
+      "CentroidDecomposition ${1:decomposition}(${2:tree});",
+      "$0"
+    ]
+  },
+  "biconnected": {
+    "scope": "cpp",
+    "prefix": "biconnected",
+    "description": "関数内：多重辺・孤立点にも対応する二重頂点連結成分",
+    "body": [
+      "// #include \"library/graph/biconnected_components.hpp\"",
+      "BiconnectedComponents ${1:blocks}(${2:n});",
+      "for (auto [u, v] : ${3:edges}) $1.add_edge(u, v);",
+      "$1.build();",
+      "$0"
+    ]
+  },
+  "block-cut": {
+    "scope": "cpp",
+    "prefix": "block-cut",
+    "description": "関数内：build済み二重頂点連結成分からBlock-Cut森を構築",
+    "body": [
+      "// #include \"library/graph/block_cut_tree.hpp\"",
+      "BlockCutTree ${1:cut}(${2:blocks});",
+      "$0"
+    ]
+  },
+  "tree-iso": {
+    "scope": "cpp",
+    "prefix": "tree-iso",
+    "description": "関数内：共有辞書による衝突のない根なし木同型判定",
+    "body": [
+      "// #include \"library/graph/tree_isomorphism.hpp\"",
+      "TreeIsomorphism ${1:encoder};",
+      "bool ${2:same} = $1.unrooted_id(${3:first}) == $1.unrooted_id(${4:second});",
+      "$0"
+    ]
+  },
+  "recurrence": {
+    "scope": "cpp",
+    "prefix": "recurrence",
+    "description": "関数内：遅れ順係数の線形漸化式をKitamasa法で評価",
+    "body": [
+      "// #include \"library/math/linear_recurrence.hpp\"",
+      "auto ${1:term} = linear_recurrence(${2:initial}, ${3:coefficient}, ${4:n});",
+      "$0"
+    ]
+  },
+  "berlekamp": {
+    "scope": "cpp",
+    "prefix": "berlekamp",
+    "description": "関数内：素数法の観測列から最短漸化式の遅れ順係数を推定",
+    "body": [
+      "// #include \"library/math/berlekamp_massey.hpp\"",
+      "auto ${1:coefficient} = berlekamp_massey(${2:sequence});",
+      "$0"
+    ]
+  },
+  "bostan-mori": {
+    "scope": "cpp",
+    "prefix": "bostan-mori",
+    "description": "関数内：FPSの有理式の第n係数を計算",
+    "body": [
+      "// #include \"library/math/bostan_mori.hpp\"",
+      "// #include \"library/math/formal_power_series.hpp\"",
+      "auto ${1:term} = bostan_mori(${2:numerator}, ${3:denominator}, ${4:n});",
+      "$0"
+    ]
+  },
+  "knuth": {
+    "scope": "cpp",
+    "prefix": "knuth",
+    "description": "関数内：単調最適位置を保証できる区間DP専用",
+    "body": [
+      "// #include \"library/algorithm/knuth_optimization.hpp\"",
+      "auto ${1:dp} = knuth_optimization<${2:long long}>(${3:n}, ${4:cost});",
+      "$0"
+    ]
+  },
+  "smawk": {
+    "scope": "cpp",
+    "prefix": "smawk",
+    "description": "関数内：全単調行列の行最小列を線形評価回数で取得",
+    "body": [
+      "// #include \"library/algorithm/smawk.hpp\"",
+      "auto ${1:argmin} = smawk(${2:rows}, ${3:columns}, ${4:value});",
+      "$0"
+    ]
+  },
+  "monotone-cht": {
+    "scope": "cpp",
+    "prefix": "monotone-cht",
+    "description": "関数内：単調な傾きの直線集合。falseは最小値・傾き非増加",
+    "body": [
+      "// #include \"library/data_structure/monotone_cht.hpp\"",
+      "MonotoneCHT<${1:false}> ${2:hull};",
+      "$2.add_line(${3:a}, ${4:b});",
+      "auto ${5:answer} = $2.query(${6:x});",
+      "$0"
+    ]
+  },
+  "subset-conv": {
+    "scope": "cpp",
+    "prefix": "subset-conv",
+    "description": "関数内：重複しない部分集合の畳み込み",
+    "body": [
+      "// #include \"library/math/subset_convolution.hpp\"",
+      "auto ${1:c} = subset_convolution(${2:a}, ${3:b});",
+      "$0"
+    ]
+  },
+  "fast-set": {
+    "scope": "cpp",
+    "prefix": "fast-set",
+    "description": "関数内：固定宇宙[0,n)の整数集合と前後要素",
+    "body": [
+      "// #include \"library/data_structure/fast_set.hpp\"",
+      "FastSet ${1:present}(${2:n});",
+      "$1.insert(${3:x});",
+      "$0"
+    ]
+  },
+  "dynamic-seg": {
+    "scope": "cpp",
+    "prefix": "dynamic-seg",
+    "description": "関数内：巨大半開座標域の非永続セグ木。op/eはグローバルに定義",
+    "body": [
+      "// #include \"library/data_structure/dynamic_segment_tree.hpp\"",
+      "DynamicSegmentTree<${1:long long}, ${2:op}, ${3:e}> ${4:seg}(${5:lower}, ${6:upper});",
+      "$0"
+    ]
+  },
+  "uf-monoid": {
+    "scope": "cpp",
+    "prefix": "uf-monoid",
+    "description": "関数内：初期頂点値を持つ成分モノイドDSU",
+    "body": [
+      "// #include \"library/data_structure/union_find_monoid.hpp\"",
+      "UnionFindMonoid<${1:long long}, ${2:op}, ${3:e}> ${4:uf}(${5:values});",
+      "$0"
+    ]
+  },
+  "eertree": {
+    "scope": "cpp",
+    "prefix": "eertree",
+    "description": "関数内：異なる回文と各出現回数。ID0/1は特殊根",
+    "body": [
+      "// #include \"library/string/palindromic_tree.hpp\"",
+      "PalindromicTree ${1:palindromes}(${2:s});",
+      "auto ${3:counts} = $1.occurrences();",
+      "$0"
+    ]
+  },
+  "enclosing-circle": {
+    "scope": "cpp",
+    "prefix": "enclosing-circle",
+    "description": "関数内：最小包含円の数値近似と境界の元点ID。空ならnullopt",
+    "body": [
+      "// #include \"library/geometry/minimum_enclosing_circle.hpp\"",
+      "auto ${1:result} = cpl::geometry::minimum_enclosing_circle(${2:points});",
+      "$0"
+    ]
+  },
+  "minkowski": {
+    "scope": "cpp",
+    "prefix": "minkowski",
+    "description": "関数内：凸多角形のMinkowski和。空・点・線分も対応",
+    "body": [
+      "// #include \"library/geometry/minkowski_sum.hpp\"",
+      "auto ${1:boundary} = cpl::geometry::minkowski_sum(${2:first}, ${3:second});",
+      "$0"
+    ]
+  }
+}

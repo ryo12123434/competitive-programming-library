@@ -12,10 +12,10 @@
  * @brief 座標圧縮 Li Chao Tree。直線 ax+b の追加と、登録済み整数座標での最小値取得を行う。
  * @note a,b,x は long long の全範囲に対応。乗算前に符号付き __int128 に拡張し、評価値も同型で返す。
  * |a*x+b| <= 2^126+2^63 なので符号付き128bitに収まる。INF は使わず、空状態は std::nullopt。
- * @note クエリ座標は構築前に列挙する。未知の座標・最大値・区間限定の直線追加には対応しない。
+ * @note クエリ座標は構築前に列挙する。未知の座標・最大値クエリには対応しない。区間限定追加はadd_segmentを使う。
  * @par Complexity
  * 入力座標数 K、重複除去後 M に対し構築 O(K log(K+1)) 時間・O(K+M) ピーク空間、保持空間 O(M)。
- * add_line / query は O(log(M+1)) 時間・追加空間 O(1)。空座標の add_line は O(1)。
+ * add_line / query は O(log(M+1)) 時間・追加空間 O(1)。区間追加は O(log^2(M+1))。空座標の add_line は O(1)。
  * @code
  * #include "library/data_structure/li_chao_tree.hpp"
  * #include <cassert>
@@ -62,20 +62,39 @@ public:
      * O(log(M+1)) 時間・追加空間 O(1)。M==0 は O(1)。
      */
     void add_line(long long a, long long b) {
-        if (xs_.empty()) return;
-        Line line{a, b};
-        int l = 0, r = size();
-        std::size_t node = 1;
-        while (true) {
-            if (!tree_[node]) { tree_[node] = line; return; }
-            const int mid = l + (r - l) / 2; // 座標値の加減算をせず添字の中点を使う
-            const bool better_left = line.eval(xs_[l]) < tree_[node]->eval(xs_[l]);
-            const bool better_mid = line.eval(xs_[mid]) < tree_[node]->eval(xs_[mid]);
-            if (better_mid) std::swap(line, *tree_[node]);
-            if (r - l == 1 || line.a == tree_[node]->a) return;
-            if (better_left != better_mid) { r = mid; node *= 2; }
-            else { l = mid; node = node * 2 + 1; }
-        }
+        if (!xs_.empty())
+            insert_line(Line{a, b}, 0, size(), 1);
+    }
+
+    /**
+     * @brief xが半開区間[left,right)内の登録座標だけで有効な直線ax+bを追加する。
+     * @pre left<=right。範囲端は登録不要。空区間は何もしない。
+     * @par Complexity O(log^2(M+1))時間・O(log(M+1))呼出しスタック。
+     */
+    void add_segment(long long left, long long right, long long a, long long b) {
+        assert(left <= right);
+        int l = static_cast<int>(std::lower_bound(xs_.begin(), xs_.end(), left) - xs_.begin());
+        int r = static_cast<int>(std::lower_bound(xs_.begin(), xs_.end(), right) - xs_.begin());
+        add_segment_indices(l, r, a, b);
+    }
+    /// @brief ソート・重複除去後の座標添字[l,r)で有効な直線。LLONG_MAXの座標も含められる。
+    /// @pre 0<=l<=r<=size()。計算量はadd_segmentと同じ。
+    void add_segment_indices(int l, int r, long long a, long long b) {
+        assert(0 <= l && l <= r && r <= size());
+        if (l == r)
+            return;
+        auto update = [&](auto &&self, std::size_t node, int low, int high) -> void {
+            if (r <= low || high <= l)
+                return;
+            if (l <= low && high <= r) {
+                insert_line(Line{a, b}, low, high, node);
+                return;
+            }
+            int mid = low + (high - low) / 2;
+            self(self, node * 2, low, mid);
+            self(self, node * 2 + 1, mid, high);
+        };
+        update(update, 1, 0, size());
     }
 
     /**
@@ -95,9 +114,10 @@ public:
         std::size_t node = 1;
         std::optional<Value> answer;
         while (l < r) {
-            if (!tree_[node]) break;
-            const Value value = tree_[node]->eval(x);
-            if (!answer || value < *answer) answer = value;
+            if (tree_[node]) {
+                const Value value = tree_[node]->eval(x);
+                if (!answer || value < *answer) answer = value;
+            }
             if (r - l == 1) break;
             const int mid = l + (r - l) / 2;
             if (index < mid) { r = mid; node *= 2; }
@@ -111,6 +131,29 @@ private:
         long long a, b;
         Value eval(long long x) const { return static_cast<Value>(a) * x + b; }
     };
+    void insert_line(Line line, int l, int r, std::size_t node) {
+        while (true) {
+            if (!tree_[node]) {
+                tree_[node] = line;
+                return;
+            }
+            const int mid = l + (r - l) / 2; // 座標値の加減算をせず添字の中点を使う
+            const bool better_left = line.eval(xs_[l]) < tree_[node]->eval(xs_[l]);
+            const bool better_mid = line.eval(xs_[mid]) < tree_[node]->eval(xs_[mid]);
+            if (better_mid)
+                std::swap(line, *tree_[node]);
+            if (r - l == 1 || line.a == tree_[node]->a)
+                return;
+            if (better_left != better_mid) {
+                r = mid;
+                node *= 2;
+            } else {
+                l = mid;
+                node = node * 2 + 1;
+            }
+        }
+    }
+
     std::vector<long long> xs_;
     std::vector<std::optional<Line>> tree_;
 };

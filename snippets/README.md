@@ -180,3 +180,28 @@ python -m unittest discover -s .verify-helper/tests -p test_snippets.py -v
 再帰ラムダは現在の入力用の枠に引数・本体を補い、引数なし・再帰呼び出しも検証します。
 メインテンプレートは bundle 前後とも `LOCAL` 有効・無効を検証し、提出版はリポジトリの include パスなしでもコンパイルします。
 実行には `g++` と ACL が必要です。
+
+## 第4弾
+
+`round4.code-snippets` の `prime64`・`factor64`・`phi-mu`・`set-transform`・`xor-conv`・`mod-sqrt` は関数内用です。
+先頭コメントにあるincludeをグローバルに追加します。型・前提条件は[拡張記録](../docs/extension-round4.md)と各ヘッダを参照してください。
+
+追加分は `bipartite`・`matching`・`centroid`・`biconnected`・`block-cut`・`tree-iso`、
+`recurrence`・`berlekamp`・`bostan-mori`・`knuth`・`smawk`・`monotone-cht`・`subset-conv`、
+`fast-set`・`dynamic-seg`・`uf-monoid`・`eertree`・`enclosing-circle`・`minkowski` です。
+`dynamic-seg` と `uf-monoid` の `op` / `e` はグローバルに定義します。
+Bostan–Moriで既存FPSを使う場合は `formal_power_series.hpp` もincludeしてください。
+
+## 第5弾
+
+`round5.code-snippets`も関数内で展開します。先頭コメントのincludeはグローバルに追加してください。
+
+- グラフ：`directed-mst` / `steiner` / `complement` / `range-graph`
+- データ構造：`partial-uf` / `sparse-bit2d` / `dynamic-bits` / `dual-seg` / `segment-li`
+- 文字列：`suffix-query` / `dynamic-hash` / `runs`
+- 数学：`discrete-log` / `segmented-sieve` / `fps-sqrt` / `multipoint` / `interpolate` / `gauss-mod`
+
+`dual-seg`の作用関数・型はグローバルで用意します。`FPS`は`FormalPowerSeries<Mint>`、
+`Mint`は対応する素数法modintなどへ変更します。`suffix-query`は全バイト対応のencodeと空文字列処理を含みます。
+`runs`には元文字列と逆順文字列のSuffixArrayQueryを渡します。
+数値制約・optionalの意味・検証記録は[第5弾の記録](../docs/extension-round5.md)と各ヘッダを参照してください。

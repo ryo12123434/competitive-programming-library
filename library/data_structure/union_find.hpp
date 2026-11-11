@@ -1,7 +1,7 @@
 #pragma once
 
-#include <bits/stdc++.h>
-using namespace std;
+#include <utility>
+#include <vector>
 
 /**
  * @brief 素集合を管理する Union-Find。
@@ -26,7 +26,7 @@ using namespace std;
  * @endcode
  */
 struct UnionFind {
-    vector<int> parent, rank, size, edge_count;
+    std::vector<int> parent, rank, size, edge_count;
 
     /**
      * @brief n 頂点をそれぞれ独立した集合として初期化する。
@@ -77,7 +77,7 @@ struct UnionFind {
             ++edge_count[rx];
             return false;
         }
-        if(rank[rx]<rank[ry]) swap(rx, ry);
+        if(rank[rx]<rank[ry]) std::swap(rx, ry);
         parent[ry] = rx;
         if(rank[rx] == rank[ry]) rank[rx]++;
         size[rx] += size[ry];

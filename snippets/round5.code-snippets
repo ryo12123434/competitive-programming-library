@@ -1,0 +1,195 @@
+{
+  "directed-mst": {
+    "scope": "cpp",
+    "prefix": "directed-mst",
+    "description": "関数内：有向最小全域木と元辺ID・親を復元",
+    "body": [
+      "// #include \"library/graph/directed_mst.hpp\"",
+      "auto ${1:result} = directed_mst(${2:n}, ${3:root}, ${4:edges});",
+      "$0"
+    ]
+  },
+  "steiner": {
+    "scope": "cpp",
+    "prefix": "steiner",
+    "description": "関数内：小さい端点集合を非負無向辺で接続",
+    "body": [
+      "// #include \"library/graph/steiner_tree.hpp\"",
+      "auto ${1:cost} = steiner_tree(${2:n}, ${3:edges}, ${4:terminals});",
+      "$0"
+    ]
+  },
+  "complement": {
+    "scope": "cpp",
+    "prefix": "complement",
+    "description": "関数内：補グラフを明示生成せず連結成分分解",
+    "body": [
+      "// #include \"library/graph/complement_graph.hpp\"",
+      "ComplementGraph ${1:graph}(${2:n}, ${3:edges});",
+      "auto ${4:groups} = $1.components();",
+      "$0"
+    ]
+  },
+  "range-graph": {
+    "scope": "cpp",
+    "prefix": "range-graph",
+    "description": "関数内：非負有向の区間間辺をO(log N)辺に展開",
+    "body": [
+      "// #include \"library/graph/range_edge_graph.hpp\"",
+      "RangeEdgeGraph ${1:graph}(${2:n});",
+      "$1.add_range_to_range(${3:l1}, ${4:r1}, ${5:l2}, ${6:r2}, ${7:weight});",
+      "$0"
+    ]
+  },
+  "partial-uf": {
+    "scope": "cpp",
+    "prefix": "partial-uf",
+    "description": "関数内：過去時刻の連結性・成分サイズを参照",
+    "body": [
+      "// #include \"library/data_structure/partially_persistent_union_find.hpp\"",
+      "PartiallyPersistentUnionFind ${1:uf}(${2:n});",
+      "$1.merge(${3:a}, ${4:b});",
+      "$0"
+    ]
+  },
+  "sparse-bit2d": {
+    "scope": "cpp",
+    "prefix": "sparse-bit2d",
+    "description": "関数内：全更新座標(y,x)をオフライン登録",
+    "body": [
+      "// #include \"library/data_structure/sparse_fenwick_tree_2d.hpp\"",
+      "SparseFenwickTree2D<${1:long long}> ${2:bit}(${3:points});",
+      "$0"
+    ]
+  },
+  "dynamic-bits": {
+    "scope": "cpp",
+    "prefix": "dynamic-bits",
+    "description": "関数内：任意長ビット列、先頭・次bitはoptional",
+    "body": [
+      "// #include \"library/data_structure/dynamic_bitset.hpp\"",
+      "DynamicBitset ${1:bits}(${2:n});",
+      "$0"
+    ]
+  },
+  "dual-seg": {
+    "scope": "cpp",
+    "prefix": "dual-seg",
+    "description": "関数内：非可換の区間作用・一点取得。作用関数はグローバル定義",
+    "body": [
+      "// #include \"library/data_structure/dual_segment_tree.hpp\"",
+      "DualSegmentTree<${1:long long}, ${2:Action}, ${3:map_action}, ${4:compose_action}, ${5:identity_action}> ${6:seg}(${7:values});",
+      "$0"
+    ]
+  },
+  "segment-li": {
+    "scope": "cpp",
+    "prefix": "segment-li",
+    "description": "関数内：登録クエリ座標に対する区間限定直線の追加",
+    "body": [
+      "// #include \"library/data_structure/segment_li_chao_tree.hpp\"",
+      "SegmentLiChaoTree ${1:hull}(${2:xs});",
+      "$1.add_segment(${3:left}, ${4:right}, ${5:a}, ${6:b});",
+      "$0"
+    ]
+  },
+  "suffix-query": {
+    "scope": "cpp",
+    "prefix": "suffix-query",
+    "description": "関数内：ACLのSA/LCPとRMQ。encodeで全バイトを0..255化",
+    "body": [
+      "// #include \"library/string/suffix_array_query.hpp\"",
+      "// #include <atcoder/string>",
+      "auto ${1:encoded} = SuffixArrayQuery::encode(${2:s});",
+      "auto ${3:sa} = atcoder::suffix_array($1, 255);",
+      "SuffixArrayQuery ${4:query}($2, $3, $1.empty() ? std::vector<int>{} : atcoder::lcp_array($1, $3));",
+      "$0"
+    ]
+  },
+  "dynamic-hash": {
+    "scope": "cpp",
+    "prefix": "dynamic-hash",
+    "description": "関数内：1文字更新可能な区間hash。固定基数は再現用、衝突に注意",
+    "body": [
+      "// #include \"library/string/dynamic_rolling_hash.hpp\"",
+      "DynamicRollingHash ${1:hash}(${2:s}, ${3:911382323});",
+      "$0"
+    ]
+  },
+  "runs": {
+    "scope": "cpp",
+    "prefix": "runs",
+    "description": "関数内：正順と逆順のSuffixArrayQueryから最小周期の極大区間を列挙",
+    "body": [
+      "// #include \"library/string/runs.hpp\"",
+      "auto ${1:repetitions} = enumerate_runs(${2:forward}, ${3:reversed});",
+      "$0"
+    ]
+  },
+  "Round5 discrete-log": {
+    "scope": "cpp",
+    "prefix": "discrete-log",
+    "body": [
+      "// #include \"library/math/discrete_log.hpp\"",
+      "auto ${1:exponent} = discrete_log_u64(${2:a}, ${3:b}, ${4:mod});",
+      "$0"
+    ],
+    "description": "関数内：一般の法の離散対数（最小非負解、予算超過は例外）"
+  },
+  "Round5 segmented-sieve": {
+    "scope": "cpp",
+    "prefix": "segmented-sieve",
+    "body": [
+      "// #include \"library/math/segmented_sieve.hpp\"",
+      "auto ${1:primes} = segmented_sieve(${2:left}, ${3:right});",
+      "$0"
+    ],
+    "description": "関数内：閉区間の素数列挙（sqrt(R)と区間長にメモリ制約）"
+  },
+  "Round5 fps-sqrt": {
+    "scope": "cpp",
+    "prefix": "fps-sqrt",
+    "body": [
+      "// #include \"library/math/formal_power_series.hpp\"",
+      "// #include \"library/math/fps_sqrt.hpp\"",
+      "auto ${1:root} = fps_sqrt(${2:f}, ${3:n});",
+      "$0"
+    ],
+    "description": "関数内：形式的冪級数の平方根（解なしはnullopt）"
+  },
+  "Round5 multipoint": {
+    "scope": "cpp",
+    "prefix": "multipoint",
+    "body": [
+      "// #include \"library/math/formal_power_series.hpp\"",
+      "// #include \"library/math/multipoint_evaluation.hpp\"",
+      "PolynomialProductTree<${1:FPS}> ${2:tree}(${3:xs});",
+      "auto ${4:ys} = ${2:tree}.evaluate(${5:f});",
+      "$0"
+    ],
+    "description": "関数内：Product Treeによる多点評価（評価点の重複も可）"
+  },
+  "Round5 interpolate": {
+    "scope": "cpp",
+    "prefix": "interpolate",
+    "body": [
+      "// #include \"library/math/formal_power_series.hpp\"",
+      "// #include \"library/math/polynomial_interpolation.hpp\"",
+      "auto ${1:polynomial} = polynomial_interpolation<${2:FPS}>(${3:xs}, ${4:ys});",
+      "$0"
+    ],
+    "description": "関数内：多項式補間（評価点の重複はnullopt）"
+  },
+  "Round5 gauss-mod": {
+    "scope": "cpp",
+    "prefix": "gauss-mod",
+    "body": [
+      "// #include \"library/math/gauss_elimination_mod.hpp\"",
+      "ModLinearSystem<${1:Mint}> ${2:system}(${3:variables});",
+      "${2:system}.add_equation(${4:coefficients}, ${5:rhs});",
+      "auto ${6:result} = ${2:system}.solve(${7:true});",
+      "$0"
+    ],
+    "description": "関数内：素数法の連立一次方程式（解空間基底も取得）"
+  }
+}

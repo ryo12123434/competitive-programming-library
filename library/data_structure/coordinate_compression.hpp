@@ -1,7 +1,8 @@
 #pragma once
 
-#include <bits/stdc++.h>
-using namespace std;
+#include <algorithm>
+#include <cstddef>
+#include <vector>
 
 /**
  * @brief 整数列を座標圧縮する。
@@ -24,20 +25,20 @@ using namespace std;
  * }
  * @endcode
  */
-inline vector<int> compress(vector<int> a){
+inline std::vector<int> compress(std::vector<int> a){
     // コピー
-    vector<int> b = a;
+    std::vector<int> b = a;
     
     // B を小さい順にソート
-    sort(b.begin(), b.end());
+    std::sort(b.begin(), b.end());
     
     // B から重複を除去する
-    b.erase(unique(b.begin(), b.end()), b.end());
+    b.erase(std::unique(b.begin(), b.end()), b.end());
 
     // 座標圧縮した結果を求める
-    vector<int> res(a.size());
+    std::vector<int> res(a.size());
     for (std::size_t i = 0; i < a.size(); ++i) {
-        res[i] = static_cast<int>(lower_bound(b.begin(), b.end(), a[i]) - b.begin());
+        res[i] = static_cast<int>(std::lower_bound(b.begin(), b.end(), a[i]) - b.begin());
     }
     return res;
 };

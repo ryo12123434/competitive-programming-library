@@ -1,0 +1,134 @@
+{
+  "A": {
+    "headers": [
+      "graph/directed_mst",
+      "graph/steiner_tree",
+      "graph/complement_graph",
+      "graph/range_edge_graph"
+    ],
+    "snippets": {
+      "directed-mst": [
+        "int n=2,root=0;std::vector<DirectedMSTEdge>edges{{0,1,-3}};",
+        "assert(result&&result->cost==-3);"
+      ],
+      "steiner": [
+        "int n=2;std::vector<SteinerTreeEdge>edges{{0,1,4}};std::vector<int>terminals{0,1};",
+        "assert(cost==4);"
+      ],
+      "complement": [
+        "int n=3;std::vector<std::pair<int,int>>edges{{0,1}};",
+        "assert(groups.size()==1);"
+      ],
+      "range-graph": [
+        "int n=4,l1=0,r1=2,l2=2,r2=4;long long weight=7;",
+        "assert(graph.distances(0)[3]==7);"
+      ]
+    }
+  },
+  "B": {
+    "headers": [
+      "data_structure/partially_persistent_union_find",
+      "data_structure/sparse_fenwick_tree_2d",
+      "data_structure/dynamic_bitset",
+      "data_structure/dual_segment_tree",
+      "data_structure/segment_li_chao_tree"
+    ],
+    "snippets": {
+      "partial-uf": [
+        "int n=3,a=0,b=1;",
+        "assert(uf.size(1,0)==2&&uf.size(0,0)==1);"
+      ],
+      "sparse-bit2d": [
+        "std::vector<std::pair<long long,long long>>points{{2,3}};",
+        "bit.add(2,3,7);assert(bit.sum(0,5,0,5)==7);"
+      ],
+      "dynamic-bits": [
+        "int n=65;",
+        "bits.set(64);assert(bits.find_first()==64);"
+      ],
+      "dual-seg": [
+        "std::vector<long long>values{1,2};",
+        "seg.apply(0,2,{2,1});assert(seg.get(1)==5);"
+      ],
+      "segment-li": [
+        "std::vector<long long>xs{0,1,2};long long left=0,right=2,a=3,b=4;",
+        "assert(hull.query(1)==7&&!hull.query(2));"
+      ]
+    },
+    "global_code": "struct Action{long long a,b;};long long map_action(Action f,long long x){return f.a*x+f.b;}Action compose_action(Action f,Action g){return {f.a*g.a,f.a*g.b+f.b};}Action identity_action(){return {1,0};}"
+  },
+  "C": {
+    "headers": [
+      "string/suffix_array_query",
+      "string/dynamic_rolling_hash",
+      "string/runs"
+    ],
+    "snippets": {
+      "suffix-query": [
+        "std::string s=\"banana\";",
+        "assert(query.lcp(1,3)==3);"
+      ],
+      "dynamic-hash": [
+        "std::string s=\"ababa\";",
+        "assert(hash.get(0,3)==hash.get(2,5));"
+      ],
+      "runs": [
+        "auto forward=make_query(\"ababab\"),reversed=make_query(\"bababa\");",
+        "assert(repetitions.size()==1&&repetitions[0].period==2);"
+      ]
+    },
+    "extra_system_includes": [
+      "atcoder/string"
+    ],
+    "global_code": "SuffixArrayQuery make_query(const std::string&s){auto a=SuffixArrayQuery::encode(s);auto sa=atcoder::suffix_array(a,255);return SuffixArrayQuery(s,sa,a.empty()?std::vector<int>{}:atcoder::lcp_array(a,sa));}"
+  },
+  "D": {
+    "headers": [
+      "math/discrete_log",
+      "math/segmented_sieve",
+      "math/fps_sqrt",
+      "math/multipoint_evaluation",
+      "math/polynomial_interpolation",
+      "math/gauss_elimination_mod"
+    ],
+    "extra_includes": [
+      "math/formal_power_series"
+    ],
+    "global_code": "using FPS=FormalPowerSeries<M>;using Mint=M;",
+    "snippets": {
+      "discrete-log": [
+        "std::uint64_t a=4,b=8,mod=14;",
+        "assert(exponent==3);"
+      ],
+      "segmented-sieve": [
+        "int left=0,right=7;",
+        "assert(primes.size()==4);"
+      ],
+      "fps-sqrt": [
+        "FPS f{1,2,1};int n=3;",
+        "assert(root&&((*root)*(*root)).pre(n)==f);"
+      ],
+      "multipoint": [
+        "FPS f{2,3};std::vector<M>xs{0,1};",
+        "assert((ys==std::vector<M>{2,5}));"
+      ],
+      "interpolate": [
+        "std::vector<M>xs{0,1},ys{2,5};",
+        "assert(polynomial==FPS({2,3}));"
+      ],
+      "gauss-mod": [
+        "int variables=1;std::vector<M>coefficients{2};M rhs=6;",
+        "assert(result.solvable&&result.solution[0]==M(3));"
+      ]
+    }
+  },
+  "E": {
+    "headers": [
+      "data_structure/coordinate_compression",
+      "data_structure/union_find",
+      "algorithm/doubling",
+      "graph/bellman_ford"
+    ],
+    "snippets": {}
+  }
+}

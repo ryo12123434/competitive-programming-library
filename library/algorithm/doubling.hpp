@@ -35,7 +35,7 @@ public:
         assert(next.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()));
         assert(1 <= levels && levels <= 64);
         int n = static_cast<int>(next.size());
-        for (int v : next) assert(-1 <= v && v < n);
+        for ([[maybe_unused]] int v : next) assert(-1 <= v && v < n);
         table_.assign(levels, std::vector<int>(n, -1));
         table_[0] = next;
         for (int k = 1; k < levels; ++k) {
