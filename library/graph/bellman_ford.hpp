@@ -52,7 +52,7 @@ inline constexpr long long BELLMAN_FORD_INF = std::numeric_limits<long long>::ma
 inline bool bellman_ford(const Edges& Es, int V, int s, std::vector<long long>& dis) {
     assert(V > 0 && 0 <= s && s < V);
     assert(Es.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()));
-    for (const auto& e : Es) assert(0 <= e.from && e.from < V && 0 <= e.to && e.to < V);
+    for ([[maybe_unused]] const auto& e : Es) assert(0 <= e.from && e.from < V && 0 <= e.to && e.to < V);
     dis.assign(V, BELLMAN_FORD_INF);
     dis[s] = 0;
     const __int128 wide_inf = static_cast<__int128>(1) << 126;

@@ -191,3 +191,17 @@ python -m unittest discover -s .verify-helper/tests -p test_snippets.py -v
 `fast-set`・`dynamic-seg`・`uf-monoid`・`eertree`・`enclosing-circle`・`minkowski` です。
 `dynamic-seg` と `uf-monoid` の `op` / `e` はグローバルに定義します。
 Bostan–Moriで既存FPSを使う場合は `formal_power_series.hpp` もincludeしてください。
+
+## 第5弾
+
+`round5.code-snippets`も関数内で展開します。先頭コメントのincludeはグローバルに追加してください。
+
+- グラフ：`directed-mst` / `steiner` / `complement` / `range-graph`
+- データ構造：`partial-uf` / `sparse-bit2d` / `dynamic-bits` / `dual-seg` / `segment-li`
+- 文字列：`suffix-query` / `dynamic-hash` / `runs`
+- 数学：`discrete-log` / `segmented-sieve` / `fps-sqrt` / `multipoint` / `interpolate` / `gauss-mod`
+
+`dual-seg`の作用関数・型はグローバルで用意します。`FPS`は`FormalPowerSeries<Mint>`、
+`Mint`は対応する素数法modintなどへ変更します。`suffix-query`は全バイト対応のencodeと空文字列処理を含みます。
+`runs`には元文字列と逆順文字列のSuffixArrayQueryを渡します。
+数値制約・optionalの意味・検証記録は[第5弾の記録](../docs/extension-round5.md)と各ヘッダを参照してください。

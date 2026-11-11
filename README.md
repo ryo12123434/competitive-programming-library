@@ -124,3 +124,9 @@ ACL は `CPATH`、`CPLUS_INCLUDE_PATH`、リポジトリ内の `ac-library/` と
 ## 第4弾の拡張
 
 [比較対象・API・計算量・制約・検証記録](docs/extension-round4.md)を参照してください。
+
+## 第5弾の拡張
+
+有向MST・Steiner木・区間辺グラフ、部分永続UF・疎2D BIT・Dual Segtree、
+接尾辞クエリ・動的ハッシュ・Runs、離散対数・FPS平方根・多点評価／補間・素数法掃き出しを追加しました。
+[API・制約・検証と監査の記録](docs/extension-round5.md)を参照してください。
